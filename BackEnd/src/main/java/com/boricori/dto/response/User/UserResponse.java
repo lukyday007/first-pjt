@@ -1,4 +1,4 @@
-package com.boricori.dto.response;
+package com.boricori.dto.response.User;
 
 import com.boricori.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
