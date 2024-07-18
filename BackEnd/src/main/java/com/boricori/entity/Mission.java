@@ -15,11 +15,11 @@ public class Mission {
 
   @Id
   @GeneratedValue
-  @Column(name = "mssion_id")
+  @Column(name = "misson_id")
   private Long id;
 
   private int category;
-  private String field;
+  private String target;
   private String targetEn;
 
 }
