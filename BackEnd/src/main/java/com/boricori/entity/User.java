@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class User {
 
-  public User() {
+  protected User() {
   }
 
   @Builder
@@ -25,12 +25,12 @@ public class User {
 
   @Id
   @GeneratedValue
-  int userId;
-  String username;
-  String email;
-  int playtime = 0;
-  String password;
-  String profilePic = null;
+  private Long userId;
+  private String username;
+  private String email;
+  private int playtime = 0;
+  private String password;
+  private String profilePic = null;
 
 
   public void updateUser(String username, String password, String profilePic){

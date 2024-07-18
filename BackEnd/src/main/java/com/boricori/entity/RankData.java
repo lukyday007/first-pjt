@@ -6,7 +6,7 @@ import lombok.Getter;
 @Entity
 @Getter
 public class RankData {
-  int rank;
-  String username;
-  int score;
+  private int rank;
+  private String username;
+  private int score;
 }
