@@ -15,7 +15,7 @@ public class Mission {
 
   @Id
   @GeneratedValue
-  @Column(name = "misson_id")
+  @Column(name = "mission_id")
   private Long id;
 
   private int category;
