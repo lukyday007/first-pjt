@@ -1,10 +1,12 @@
 package com.boricori.entity;
 
-import lombok.Data;
+import jakarta.persistence.Entity;
+import lombok.Getter;
 
-@Data
+@Entity
+@Getter
 public class RankData {
-  int rank;
-  String username;
-  int score;
+  private int rank;
+  private String username;
+  private int score;
 }

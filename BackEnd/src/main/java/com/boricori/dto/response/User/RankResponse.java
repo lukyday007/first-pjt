@@ -1,4 +1,4 @@
-package com.boricori.dto.response;
+package com.boricori.dto.response.User;
 
 
 import com.boricori.entity.RankData;
