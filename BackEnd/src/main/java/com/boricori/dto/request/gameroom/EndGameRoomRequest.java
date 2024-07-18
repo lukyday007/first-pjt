@@ -16,5 +16,5 @@ public class EndGameRoomRequest {
     private LocalDateTime endTime;
 
     @Schema(description = "살아남은 유저와 죽은 유저")
-    private List<EndPlayerInfo> playerinfos;
+    private List<EndPlayerInfoRequest> playerinfos;
 }

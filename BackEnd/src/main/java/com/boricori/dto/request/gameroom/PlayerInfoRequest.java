@@ -3,7 +3,7 @@ package com.boricori.dto.request.gameroom;
 import lombok.Data;
 
 @Data
-public class PlayerInfo {
+public class PlayerInfoRequest {
 
     private String username;
     private String email;

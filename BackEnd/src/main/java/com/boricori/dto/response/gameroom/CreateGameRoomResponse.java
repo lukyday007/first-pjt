@@ -10,7 +10,7 @@ public class CreateGameRoomResponse {
     private GameRoomSettingResponse gameRoomSetting;
 
     @Schema(description = "게임 참여자 정보")
-    private EnterUserInfo playerInfo;
+    private EnterUserInfoResponse playerInfo;
 
 
 }

@@ -1,6 +1,6 @@
 package com.boricori.dto.request.gameroom;
 
-import com.boricori.dto.request.gameroom.setting.GameSettings;
+import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public class StartGameRoomRequest {
 
     @Schema(description = "게임방 세팅")
-    private GameSettings setting;
+    private GameSettingRequest setting;
 
     @Schema(description = "게임시작 시간", example = "2024-07-17T15:00:00")
     private LocalDateTime startTime;
@@ -23,5 +23,5 @@ public class StartGameRoomRequest {
     private String codeNum; // 입장 코드
 
     @Schema(description = "게임방 사용자 목록")
-    private List<PlayerInfo> playerInfos; // 사용자 목록
+    private List<PlayerInfoRequest> playerInfoRequests; // 사용자 목록
 }

@@ -12,7 +12,7 @@ public class GameRoomSettingResponse {
     @Schema(description = "인원 수", example = "5")
     private int limit;
 
-    @Schema(description = "게임 이용 시간", example = "600")
+    @Schema(description = "게임 이용 시간", example = "10")
     private String time;
 
     @Schema(description = "맵 크기", example = "100")

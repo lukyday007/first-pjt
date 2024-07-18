@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-public class EndPlayerInfo {
+public class EndPlayerInfoRequest {
 
     @Schema(description = "유저 이름", example = "member1")
     private String username;

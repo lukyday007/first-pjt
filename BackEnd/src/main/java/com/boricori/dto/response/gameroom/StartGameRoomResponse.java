@@ -11,7 +11,7 @@ public class StartGameRoomResponse {
     private GameRoomSettingResponse gameRoomSetting;
 
     @Schema(description = "게임 참여자 정보")
-    private List<EnterUserInfo> playerInfo;
+    private List<EnterUserInfoResponse> playerInfo;
 
     @Schema(description = "미션 정보")
     private List<MissionResponse> missions;
