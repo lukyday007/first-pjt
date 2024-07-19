@@ -77,7 +77,6 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "표시할 내용 없음"),
   })
   public ResponseEntity<?> getRanks(@PathVariable String userEmail){
-    System.out.println(userEmail);
     try{
       int score = userService.findUserScore(userEmail);
       List<RankDtoResponse> allRank = userService.findAllRank();
