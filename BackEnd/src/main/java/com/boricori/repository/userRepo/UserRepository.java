@@ -5,12 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u.ranking FROM (" +
-            "SELECT u.email AS email, " +
-            "RANK() OVER (ORDER BY u.scores DESC) AS ranking " +
-            "FROM User u) ranked_users " +
-            "WHERE ranked_users.email = :email")
+    @Query(value = "SELECT COUNT(*) + 1 " +
+            "FROM User " +
+            "WHERE scores > (SELECT scores FROM User WHERE email = :email)")
     int findUserRankingByEmail(@Param("email") String email);
 }
