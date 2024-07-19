@@ -2,6 +2,7 @@ package com.boricori.service;
 
 import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
+import com.boricori.dto.response.User.RankDtoResponse;
 import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
@@ -10,6 +11,9 @@ import com.boricori.util.ResponseEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,6 +40,21 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public int findUserScore(String email){
+    return userRepo.findUserRankingByEmail(email);
+  }
+
+  @Override
+  public List<RankDtoResponse> findAllRank(){
+    List<User> RankAll = userRepo.findAllByOrderByScoresAsc();
+    List<RankDtoResponse> rankList = new ArrayList<>();
+    for (int i=0; i<RankAll.size(); i++) {
+      rankList.add(new RankDtoResponse(i+1, RankAll.get(i)));
+    }
+
+    return rankList;
+  }
+
   public UserLoginResponse login(UserLoginRequest request) {
     User user = userRepo.findByEmail(request.getEmail());
     if (null != user) {
