@@ -8,6 +8,7 @@ import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.dto.response.User.UserResponse;
 import com.boricori.entity.User;
 import com.boricori.service.UserService;
+import com.boricori.util.ResponseEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,11 +43,11 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "로그인 실패"),
   })
   public ResponseEntity<UserLoginResponse> login(@RequestBody @Parameter(name = "유저 로그인 폼") UserLoginRequest loginRequest){
-    String token = userService.login(loginRequest);
-    if (null == token){
-      return ResponseEntity.status(400).body(UserLoginResponse.of(400, "로그인 실패", null));
+    UserLoginResponse res = userService.login(loginRequest);
+    if (res.getResult() == ResponseEnum.SUCCESS){
+      return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(res);
     }
-    return ResponseEntity.status(200).body(UserLoginResponse.of(200, "로그인 성공", token));
+    return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(res);
   }
 
   @PostMapping("/signup")
@@ -58,9 +59,9 @@ public class UserController {
   public ResponseEntity<UserResponse> signup(@RequestBody @Parameter(name = "유저 회원가입 폼") UserSignupRequest signUpRequest){
     User user = userService.signup(signUpRequest);
     if (user != null){
-      return ResponseEntity.status(200).body(UserResponse.of(user));
+      return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(UserResponse.of(user));
     }
-    return ResponseEntity.status(400).body(null);
+    return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
   }
 
   // 로그아웃은 프론트에서 처리, 백에서 할 일 없음

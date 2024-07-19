@@ -11,6 +11,6 @@ public interface UserService {
 
   User signup(UserSignupRequest request);
 
-  String login(UserLoginRequest request);
+  UserLoginResponse login(UserLoginRequest request);
 
 }
