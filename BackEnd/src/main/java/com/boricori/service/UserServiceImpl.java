@@ -1,5 +1,6 @@
 package com.boricori.service;
 
+import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
@@ -22,5 +23,10 @@ public class UserServiceImpl implements UserService{
 
     User signedUp = userRepo.save(newUser);
     return signedUp;
+  }
+
+  @Override
+  public int findUserScore(String email){
+    return userRepo.findUserRankingByEmail(email);
   }
 }

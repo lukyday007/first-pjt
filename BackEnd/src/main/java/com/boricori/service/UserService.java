@@ -9,4 +9,5 @@ public interface UserService {
 
   User signup(UserSignupRequest request);
 
+  int findUserScore(String email);
 }

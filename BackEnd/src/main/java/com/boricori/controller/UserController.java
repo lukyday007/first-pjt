@@ -71,12 +71,20 @@ public class UserController {
   }
 
   @GetMapping("/ranks")
-  @Operation(summary = "순위검색", description = "전체 유저 중 상위 n명의 순위 출력")
+  @Operation(summary = "순위검색", description = "전체 유저 중 순위 출력")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "회원별 순위 리턴"),
       @ApiResponse(responseCode = "400", description = "표시할 내용 없음"),
   })
-  public ResponseEntity<List<RankResponse>> getRanks(){
+  public ResponseEntity<?> getRanks(@Parameter(hidden = true) HttpServletRequest req){
+    try{
+      String userEmail = req.getParameter("userEmail");
+      int score = userService.findUserScore(userEmail);
+      return ResponseEntity.status(200).body(score);
+    }catch (Exception e){
+      return ResponseEntity.status(400).body("Error fetching ranks");
+    }
+
 //    List<RankData> res = userService.getRanks();
 //    List<RankResponse> resp = new ArrayList<>();
 //    for (RankData rank : res){
@@ -86,7 +94,6 @@ public class UserController {
 //      return ResponseEntity.status(400).body(null);
 //    }
 //    return ResponseEntity.status(200).body(resp);
-    return null;
   }
 
   @GetMapping("/myProfile")
