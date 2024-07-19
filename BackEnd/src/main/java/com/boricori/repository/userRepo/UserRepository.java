@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User " +
             "WHERE scores > (SELECT scores FROM User WHERE email = :email)")
     int findUserRankingByEmail(@Param("email") String email);
+
+    List<User> findAllByOrderByScoresAsc();
 }

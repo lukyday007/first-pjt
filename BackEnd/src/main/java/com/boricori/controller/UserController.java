@@ -3,6 +3,7 @@ package com.boricori.controller;
 import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
 import com.boricori.dto.request.User.UserUpdateRequest;
+import com.boricori.dto.response.User.RankDtoResponse;
 import com.boricori.dto.response.User.RankResponse;
 import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.dto.response.User.UserResponse;
@@ -70,30 +71,22 @@ public class UserController {
   public void logout(){
   }
 
-  @GetMapping("/ranks")
+  @GetMapping("/ranks/{userEmail}")
   @Operation(summary = "순위검색", description = "전체 유저 중 순위 출력")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "회원별 순위 리턴"),
       @ApiResponse(responseCode = "400", description = "표시할 내용 없음"),
   })
-  public ResponseEntity<?> getRanks(@Parameter(hidden = true) HttpServletRequest req){
+  public ResponseEntity<?> getRanks(@PathVariable String userEmail){
+    System.out.println(userEmail);
     try{
-      String userEmail = req.getParameter("userEmail");
       int score = userService.findUserScore(userEmail);
-      return ResponseEntity.status(200).body(score);
+      List<RankDtoResponse> allRank = userService.findAllRank();
+      RankResponse rankInfo = new RankResponse(score, allRank);
+      return ResponseEntity.status(200).body(rankInfo);
     }catch (Exception e){
       return ResponseEntity.status(400).body("Error fetching ranks");
     }
-
-//    List<RankData> res = userService.getRanks();
-//    List<RankResponse> resp = new ArrayList<>();
-//    for (RankData rank : res){
-//      resp.add(RankResponse.of(rank));
-//    }
-//    if (res.isEmpty()){
-//      return ResponseEntity.status(400).body(null);
-//    }
-//    return ResponseEntity.status(200).body(resp);
   }
 
   @GetMapping("/myProfile")
