@@ -2,11 +2,8 @@ package com.boricori.service;
 
 import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
-<<<<<<< HEAD
 import com.boricori.dto.response.User.RankDtoResponse;
-=======
 import com.boricori.dto.response.User.UserLoginResponse;
->>>>>>> 95e5f312786646cd1408a8623fd6b6b074dd9dd7
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
 import com.boricori.util.JwtUtil;
@@ -43,7 +40,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-<<<<<<< HEAD
   public int findUserScore(String email){
     return userRepo.findUserRankingByEmail(email);
   }
@@ -58,8 +54,7 @@ public class UserServiceImpl implements UserService {
 
     return rankList;
   }
-}
-=======
+
   public UserLoginResponse login(UserLoginRequest request) {
     User user = userRepo.findByEmail(request.getEmail());
     if (null != user) {
@@ -73,4 +68,3 @@ public class UserServiceImpl implements UserService {
     return UserLoginResponse.of(null, null, ResponseEnum.FAIL);
   }
 }
->>>>>>> 95e5f312786646cd1408a8623fd6b6b074dd9dd7
