@@ -1,7 +1,6 @@
 package com.boricori.dto.response.User;
 
 
-import com.boricori.dto.RankData;
 import com.boricori.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.Setter;
 @Schema(name = "유저 랭크")
 @Getter
 @Setter
-public class RankResponse {
+public class RankDtoResponse {
 
     @Schema(description = "순위")
     int rank;
@@ -19,7 +18,7 @@ public class RankResponse {
     @Schema(description = "누적 점수")
     int score;
 
-    public RankResponse(int rank, User user) {
+    public RankDtoResponse(int rank, User user) {
         this.rank = rank;
         this.username = user.getUsername();
         this.score = user.getScores();
