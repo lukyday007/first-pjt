@@ -1,6 +1,8 @@
 package com.boricori.util;
 
 
+import com.boricori.exception.NoSuchTokenException;
+import com.boricori.exception.TokenExpiredException;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -11,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.HandlerInterceptor;
+
 
 public class JwtAuthenticationFilter implements Filter {
 
@@ -30,36 +32,50 @@ public class JwtAuthenticationFilter implements Filter {
     HttpServletResponse httpResponse = (HttpServletResponse) response;
 
     String authHeader = httpRequest.getHeader("Authorization");
+    String refreshToken = httpRequest.getHeader("RefreshToken").substring(7);
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      String jwtToken = authHeader.substring(7);
+      String accessToken = authHeader.substring(7);
       try {
         // JWT 유효성 검사 로직 구현
-        if (isValid(jwtToken)) {
+        if (isValid(accessToken, refreshToken)) {
           // 토큰이 유효한 경우 요청을 계속 처리
           chain.doFilter(request, response);
         } else {
-          // 유효하지 않은 토큰인 경우 오류 응답 반환
-          httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+          // access token 재발급
+          String newToken = jwtUtil.createAccessToken(jwtUtil.getEmail(accessToken));
+          httpResponse.addHeader("NewToken", newToken);
         }
+      } catch (NoSuchTokenException e) {
+        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+      } catch (TokenExpiredException e) {
+        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Refresh Token Expired");
       } catch (Exception e) {
-        // 토큰 검사 중 오류 발생 시 오류 응답 반환
-        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error validating JWT Token");
+        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+            "Error occurred while processing token...");
       }
     } else {
       // Authorization 헤더가 없거나 형식이 올바르지 않은 경우 오류 응답 반환
-      httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header missing or not Bearer");
+      httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+          "Authorization header missing or not Bearer");
     }
   }
 
 
   // JWT 토큰의 유효성을 검사하는 메서드
-  private boolean isValid(String jwtToken) {
-
-    return true; // 토큰이 유효한 경우 true 반환
-  }
-
-  @Override
-  public void destroy() {
-    Filter.super.destroy();
+  private boolean isValid(String accessToken, String refreshToken) throws NoSuchTokenException {
+    if (!jwtUtil.isExpired(accessToken)) {
+      // access token이 유효한 상태
+      return true;
+    } else {
+      if (!jwtUtil.isValidRefreshToken(refreshToken)) {
+        throw new NoSuchTokenException();
+      } else if (jwtUtil.isExpired(refreshToken)) {
+        throw new TokenExpiredException();
+      } else if (!jwtUtil.getEmail(accessToken).equals(jwtUtil.getEmail(refreshToken))) {
+        throw new NoSuchTokenException();
+      }
+      // valid refresh token이며 access token 재발급 가능한 상태
+      return false;
+    }
   }
 }

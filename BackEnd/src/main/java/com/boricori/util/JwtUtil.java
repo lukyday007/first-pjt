@@ -72,47 +72,14 @@ public class JwtUtil {
     }
   }
 
-
-  public boolean verifyAccessToken(String accessToken) {
-        try {
-          if (isExpired(accessToken)){
-            return false;
-          }
-            Claims claim = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
-            return claim.getSubject();
-        }
-
-        catch (Exception e) {
-            return false;
-        }
-    }
-
-    public String getEmail(String token){
-    return null;
+    public String getEmail(String accessToken){
+      Claims claim = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
+      return claim.getSubject();
     }
 
 
-
-    public boolean isActiveToken(String accessToken, String refreshToken) throws NoSuchTokenException {
-        if (isExpired(accessToken)){
-          if (refreshTokens.getOrDefault(refreshToken, null) == null){
-            throw new NoSuchTokenException();
-          }
-          else if (isExpired(refreshToken)){
-            throw new TokenExpiredException();
-          }
-          else{
-            String email = refreshTokens.get(refreshToken);
-            if (!getEmail(accessToken).equals(email)){
-              throw new NoSuchTokenException();
-            }
-            // access token 재발급
-            return false;
-          }
-        }else {
-            return true;
-        }
+    public boolean isValidRefreshToken(String refreshToken){
+      return refreshTokens.getOrDefault(refreshToken, null) != null;
     }
-
 
 }
