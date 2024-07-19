@@ -1,7 +1,7 @@
 package com.boricori.dto.response.User;
 
 
-import com.boricori.entity.RankData;
+import com.boricori.dto.RankData;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

@@ -10,7 +10,7 @@ public class GameSettingRequest {
     private String name;
 
     @Schema(description = "게임방 인원 제한", example = "10")
-    private int limit;
+    private int maxPlayer;
 
     @Schema(description = "게임 시간", example = "10")
     private int time; // 게임 시간

@@ -12,5 +12,8 @@ public class UserSignupRequest {
   String email;
   @Schema(description = "비밀번호", example = "myPassword")
   String password;
+  @Schema(description = "닉네임", example = "유저입니당")
+  String username;
+
 
 }
