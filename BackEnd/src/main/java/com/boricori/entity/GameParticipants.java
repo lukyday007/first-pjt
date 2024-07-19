@@ -39,6 +39,11 @@ public class GameParticipants {
   @ColumnDefault("0")
   private int bullets;
 
+  public GameParticipants(GameRoom gameRoom, User user) {
+    this.gameRoom = gameRoom;
+    this.user = user;
+  }
+
   public void deadUser() {
     this.alive = false;
   }
