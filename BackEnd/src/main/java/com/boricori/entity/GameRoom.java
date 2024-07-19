@@ -17,7 +17,7 @@ import java.util.List;
 public class GameRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="game_id")
     private Long id;
 
@@ -27,7 +27,7 @@ public class GameRoom {
     @Column(nullable = false)
     private int maxPlayer;
 
-    private boolean isActivated;
+    private boolean isActivated = true;
 
     @Column(nullable = false)
     private int mapSize;
