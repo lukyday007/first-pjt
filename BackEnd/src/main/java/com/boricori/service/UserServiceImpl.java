@@ -4,6 +4,7 @@ import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
+import com.boricori.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   PasswordEncoder passwordEncoder;
+
+  @Autowired
+  JwtUtil jwtUtil;
 
   @Override
   public User signup(UserSignupRequest request) {
@@ -35,9 +39,9 @@ public class UserServiceImpl implements UserService {
     if (null != user) {
       String passwordEncoded = user.getPassword();
       if (passwordEncoder.matches(request.getPassword(), passwordEncoded)) {
-        return "success";
+        return jwtUtil.createToken(user.getEmail());
       }
     }
-    return "fail";
+    return null;
   }
 }

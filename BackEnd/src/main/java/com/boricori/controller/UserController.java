@@ -43,12 +43,10 @@ public class UserController {
   })
   public ResponseEntity<UserLoginResponse> login(@RequestBody @Parameter(name = "유저 로그인 폼") UserLoginRequest loginRequest){
     String token = userService.login(loginRequest);
-//    if (res == 1){
-//      String token = jwtUtil.tokenize(loginRequest.getEmail);
-//      return ResponseEntity.status(200).body(UserLoginResponse.of(200, "로그인 성공", token));
-//    }
-//    return ResponseEntity.status(400).body(UserLoginResponse.of(400, "로그인 실패", null));
-    return ResponseEntity.status(200).body(UserLoginResponse.of(200, "결과", token));
+    if (null == token){
+      return ResponseEntity.status(400).body(UserLoginResponse.of(400, "로그인 실패", null));
+    }
+    return ResponseEntity.status(200).body(UserLoginResponse.of(200, "로그인 성공", token));
   }
 
   @PostMapping("/signup")
