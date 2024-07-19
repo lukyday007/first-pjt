@@ -1,10 +1,15 @@
 package com.boricori.util;
 
+import com.boricori.exception.NoSuchTokenException;
+import com.boricori.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +22,9 @@ public class JwtUtil {
     private String secret;
 
     private SecretKey secretKey;
+
+
+    private Map<String, String> refreshTokens = new HashMap<>();
 
   @PostConstruct
     protected void init(){
@@ -36,29 +44,42 @@ public class JwtUtil {
     }
 
 
+//  public UUID createRefreshToken(String email) {
+//    UUID token = UUID.randomUUID();
+//    refreshTokens.put(token, email);
+//    return token;
+//  }
+
   public String createRefreshToken(String email) {
     Claims claims = Jwts.claims().subject(email).build();
-    long validFor = 1000 * 60 * 60 * 24 * 14; // 2 week
-    return Jwts.builder()
+    long validFor = 1000 * 60 * 60 * 24 * 14; // 2 weeks
+    String token = Jwts.builder()
         .claims(claims)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + validFor))
         .signWith(secretKey)
         .compact();
-  }
-
-  public Boolean isExpired(String token) {
-
-    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    refreshTokens.put(token, email);
+    return token;
   }
 
 
-  public String getEmail(String token) {
-        try {
-            Claims claim = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
-            return claim.getSubject();
-        } catch (Exception e) {
-            return null;
-        }
+  public Boolean isExpired(String token) throws NoSuchTokenException {
+    try{
+      return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    }catch (Exception e) {
+      throw new NoSuchTokenException();
     }
+  }
+
+    public String getEmail(String accessToken){
+      Claims claim = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
+      return claim.getSubject();
+    }
+
+
+    public boolean isValidRefreshToken(String refreshToken){
+      return refreshTokens.getOrDefault(refreshToken, null) != null;
+    }
+
 }
