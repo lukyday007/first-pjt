@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class GameRoom {
 
@@ -22,12 +22,12 @@ public class GameRoom {
     private Long id;
 
     @Column(length = 64, nullable = false)
-    private String roomName;
+    private String roomName = "";
 
     @Column(nullable = false)
-    private int limit;
+    private int maxPlayer;
 
-    private boolean isActivated;
+    private boolean isActivated = true;
 
     @Column(nullable = false)
     private int mapSize;
@@ -40,9 +40,9 @@ public class GameRoom {
     private String codeNumber;
 
     @Builder
-    public GameRoom(String roomName, int limit, int mapSize, boolean magneticField, String codeNumber) {
+    public GameRoom(String roomName, int maxPlayer, int mapSize, boolean magneticField, String codeNumber) {
         this.roomName = roomName;
-        this.limit = limit;
+        this.maxPlayer = maxPlayer;
         this.isActivated = true;
         this.mapSize = mapSize;
         this.magneticField = magneticField;
@@ -51,7 +51,7 @@ public class GameRoom {
 
     public void updateGameRoom(GameSettingRequest request) {
         this.roomName = request.getName();
-        this.limit = request.getLimit();
+        this.maxPlayer = request.getMaxPlayer();
         this.mapSize = request.getMapSize();
         this.magneticField = request.isMagenticField();
     }

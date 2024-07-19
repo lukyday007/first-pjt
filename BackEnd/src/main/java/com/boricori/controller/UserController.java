@@ -6,6 +6,7 @@ import com.boricori.dto.request.User.UserUpdateRequest;
 import com.boricori.dto.response.User.RankResponse;
 import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.dto.response.User.UserResponse;
+import com.boricori.entity.User;
 import com.boricori.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -57,12 +58,11 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "회원가입 실패"),
   })
   public ResponseEntity<UserResponse> signup(@RequestBody @Parameter(name = "유저 회원가입 폼") UserSignupRequest signUpRequest){
-//    User user = userService.signup(signUpRequest);
-//    if (user != null){
-//      return ResponseEntity.status(200).body(UserResponse.of(user));
-//    }
-//    return ResponseEntity.status(400).body(null);
-    return null;
+    User user = userService.signup(signUpRequest);
+    if (user != null){
+      return ResponseEntity.status(200).body(UserResponse.of(user));
+    }
+    return ResponseEntity.status(400).body(null);
   }
 
   // 로그아웃은 프론트에서 처리, 백에서 할 일 없음

@@ -2,16 +2,20 @@ package com.boricori.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Entity
 @Getter
+@Table(name = "user")
 public class User {
 
-  protected User() {
+  public User() {
   }
 
   @Builder
@@ -24,13 +28,17 @@ public class User {
   }
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long userId;
   private String username;
   private String email;
+//  @ColumnDefault("0")
   private int playtime = 0;
   private String password;
-  private String profilePic = null;
+//  @ColumnDefault("")
+  private String profilePic = "";
+//  @ColumnDefault("0")
+  private int scores = 0;
 
 
   public void updateUser(String username, String password, String profilePic){
