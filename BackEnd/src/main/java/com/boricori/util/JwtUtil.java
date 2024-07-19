@@ -1,5 +1,6 @@
 package com.boricori.util;
 
+import com.boricori.exception.NoSuchTokenException;
 import com.boricori.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,7 +24,7 @@ public class JwtUtil {
     private SecretKey secretKey;
 
 
-    private Map<UUID, String> refreshTokens = new HashMap<>();
+    private Map<String, String> refreshTokens = new HashMap<>();
 
   @PostConstruct
     protected void init(){
@@ -43,14 +44,32 @@ public class JwtUtil {
     }
 
 
-  public UUID createRefreshToken(String email) {
-    UUID token = UUID.randomUUID();
+//  public UUID createRefreshToken(String email) {
+//    UUID token = UUID.randomUUID();
+//    refreshTokens.put(token, email);
+//    return token;
+//  }
+
+  public String createRefreshToken(String email) {
+    Claims claims = Jwts.claims().subject(email).build();
+    long validFor = 1000 * 60 * 60 * 24 * 14; // 2 weeks
+    String token = Jwts.builder()
+        .claims(claims)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + validFor))
+        .signWith(secretKey)
+        .compact();
     refreshTokens.put(token, email);
     return token;
   }
 
-  public Boolean isExpired(String token) {
-    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+
+  public Boolean isExpired(String token) throws NoSuchTokenException {
+    try{
+      return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    }catch (Exception e) {
+      throw new NoSuchTokenException();
+    }
   }
 
 
@@ -68,15 +87,30 @@ public class JwtUtil {
         }
     }
 
+    public String getEmail(String token){
+    return null;
+    }
 
-    public void verify(String accessToken, String refreshToken){
+
+
+    public boolean isActiveToken(String accessToken, String refreshToken) throws NoSuchTokenException {
         if (isExpired(accessToken)){
-          if (isExpired(refreshToken)){
+          if (refreshTokens.getOrDefault(refreshToken, null) == null){
+            throw new NoSuchTokenException();
+          }
+          else if (isExpired(refreshToken)){
             throw new TokenExpiredException();
           }
           else{
-
+            String email = refreshTokens.get(refreshToken);
+            if (!getEmail(accessToken).equals(email)){
+              throw new NoSuchTokenException();
+            }
+            // access token 재발급
+            return false;
           }
+        }else {
+            return true;
         }
     }
 
