@@ -42,13 +42,13 @@ public class UserController {
       @ApiResponse(responseCode = "400", description = "로그인 실패"),
   })
   public ResponseEntity<UserLoginResponse> login(@RequestBody @Parameter(name = "유저 로그인 폼") UserLoginRequest loginRequest){
-//    int res = userService.login(loginRequest);
+    String token = userService.login(loginRequest);
 //    if (res == 1){
 //      String token = jwtUtil.tokenize(loginRequest.getEmail);
 //      return ResponseEntity.status(200).body(UserLoginResponse.of(200, "로그인 성공", token));
 //    }
 //    return ResponseEntity.status(400).body(UserLoginResponse.of(400, "로그인 실패", null));
-    return null;
+    return ResponseEntity.status(200).body(UserLoginResponse.of(200, "결과", token));
   }
 
   @PostMapping("/signup")

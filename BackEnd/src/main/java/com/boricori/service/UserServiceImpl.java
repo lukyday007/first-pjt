@@ -1,5 +1,6 @@
 package com.boricori.service;
 
+import com.boricori.dto.request.User.UserLoginRequest;
 import com.boricori.dto.request.User.UserSignupRequest;
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
@@ -8,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
   @Autowired
   UserRepository userRepo;
@@ -26,5 +27,17 @@ public class UserServiceImpl implements UserService{
 
     User signedUp = userRepo.save(newUser);
     return signedUp;
+  }
+
+  @Override
+  public String login(UserLoginRequest request) {
+    User user = userRepo.findByEmail(request.getEmail());
+    if (null != user) {
+      String passwordEncoded = user.getPassword();
+      if (passwordEncoder.matches(request.getPassword(), passwordEncoded)) {
+        return "success";
+      }
+    }
+    return "fail";
   }
 }
