@@ -1,13 +1,15 @@
-import { useState } from 'react';
 import { Button } from '@components/ui/Button';
+import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
-  const [count, setCount] = useState(0);
-
+const Home = () => {
+  const navigate = useNavigate();
   return (
-    <div>
-      <h1>HOME</h1>
-      <Button onClick={() => setCount(count + 1)}>TEST : {count}</Button>
-    </div>
+    <>
+      <div className="flex h-screen items-center justify-center bg-white">
+        <Button onClick={() => navigate('/room')}>방 만들기</Button>
+      </div>
+    </>
   );
-}
+};
+
+export default Home;
