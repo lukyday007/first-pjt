@@ -5,6 +5,7 @@ const Home = () => {
   const navigate = useNavigate();
   return (
     <>
+      <div>Home Page</div>
       <div className="flex h-screen items-center justify-center bg-white">
         <Button onClick={() => navigate('/room')}>방 만들기</Button>
       </div>

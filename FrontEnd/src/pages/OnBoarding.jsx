@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@components/ui/Button';
-import onBoardingImage from '@assets/onboarding-image.png';
+import onboardingImage from '@assets/onboarding-image.png';
 
-const OnBoarding = () => {
+const Onboarding = () => {
   const navigate = useNavigate();
+
   return (
     <div className="m-4 flex h-screen flex-col items-center justify-center">
       <img
-        src={onBoardingImage}
-        alt="onBoardingImage"
+        src={onboardingImage}
+        alt="onboardingImage"
         className="mb-8 aspect-square w-3/4"
       />
       <h1 className="mb-2 p-4 text-2xl font-bold">
@@ -25,4 +26,4 @@ const OnBoarding = () => {
   );
 };
 
-export default OnBoarding;
+export default Onboarding;
