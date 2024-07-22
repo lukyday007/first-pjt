@@ -1,7 +1,7 @@
 package com.boricori.util;
 
 public enum ResponseEnum {
-    SUCCESS(200), FAIL(400), NOT_FOUND(404), NO_RESULT(406);
+    SUCCESS(200), FAIL(400), NOT_FOUND(404), NO_RESULT(406), TOKEN_RENEWED(7000);
 
 
     // 문자열을 저장할 필드

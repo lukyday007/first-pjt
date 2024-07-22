@@ -44,6 +44,7 @@ public class JwtAuthenticationFilter implements Filter {
           // access token 재발급
           String newToken = jwtUtil.createAccessToken(jwtUtil.getEmail(accessToken));
           httpResponse.addHeader("NewToken", newToken);
+          httpResponse.sendError(ResponseEnum.TOKEN_RENEWED.getCode(), "토큰 재발급 완료");
         }
       } catch (NoSuchTokenException e) {
         httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
