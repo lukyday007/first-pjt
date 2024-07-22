@@ -9,6 +9,7 @@ import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
 import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
 import com.boricori.dto.response.gameroom.StartGameRoomResponse;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
+import com.boricori.entity.GameRoom;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.ParticipantsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,10 +86,10 @@ public class GameRoomController {
   public ResponseEntity<StartGameRoomResponse> startGameRoom(
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
-    long id = gameRoomService.makeRoom(request);
+    GameRoom gameRoom = gameRoomService.makeRoom(request);
     // 게임 참여자 튜플 생성 JPA
-    participantsService.makeGameParticipant(id, request.getPlayerInfoRequests());
-    // 생성된 게임 참여자 테이블의 id를 받음
+    participantsService.makeGameParticipant(gameRoom, request.getPlayerInfoRequests());
+    // 생성된 게임 방 id를 받음
     // ..
     // 게임 참여 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
     // ..

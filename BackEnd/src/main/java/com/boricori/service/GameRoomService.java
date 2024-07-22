@@ -1,8 +1,9 @@
 package com.boricori.service;
 
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
+import com.boricori.entity.GameRoom;
 
 public interface GameRoomService {
 
-  public long makeRoom(StartGameRoomRequest request);
+  public GameRoom makeRoom(StartGameRoomRequest request);
 }
