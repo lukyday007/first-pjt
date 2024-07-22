@@ -1,10 +1,10 @@
-import { Routes, Route } from 'react-router-dom';
-import Onboarding from './pages/Onboarding';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Room from './pages/Room';
-import GamePlay from './pages/GamePlay';
-import CamChatting from './pages/CamChatting';
+import { Routes, Route } from "react-router-dom";
+import Onboarding from "./pages/Onboarding";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
+import Room from "./pages/Room";
+import GamePlay from "./pages/GamePlay";
+import CamChatting from "./pages/CamChatting";
 
 const App = () => {
   return (

@@ -1,13 +1,13 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@components/ui/Button';
-import { Input } from '@components/ui/Input';
+import { useNavigate } from "react-router-dom";
+import { Button } from "@components/ui/Button";
+import { Input } from "@components/ui/Input";
 
 const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
     // 로그인 인증 로직 추가해야 함
-    navigate('/home');
+    navigate("/home");
   };
 
   return (

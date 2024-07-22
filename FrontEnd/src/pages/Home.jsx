@@ -1,5 +1,5 @@
-import { Button } from '@components/ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { Button } from "@components/ui/Button";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -7,7 +7,7 @@ const Home = () => {
     <>
       <div>Home Page</div>
       <div className="flex h-screen items-center justify-center bg-white">
-        <Button onClick={() => navigate('/room')}>방 만들기</Button>
+        <Button onClick={() => navigate("/room")}>방 만들기</Button>
       </div>
     </>
   );
