@@ -13,8 +13,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   private GameRoomRepository gameRoomRepository;
 
   @Override
-  public void makeRoom(StartGameRoomRequest gameRoomInfo) {
-    GameRoom gameRoom = new GameRoom(gameRoomInfo);
-    gameRoomRepository.save(gameRoom);
+  public GameRoom makeRoom(StartGameRoomRequest gameRoomInfo) {
+    return gameRoomRepository.save(new GameRoom(gameRoomInfo));
   }
 }

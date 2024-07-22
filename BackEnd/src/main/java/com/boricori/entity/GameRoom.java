@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class GameRoom {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "game_id")
   private Long id;
 

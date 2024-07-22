@@ -9,6 +9,7 @@ import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
 import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
 import com.boricori.dto.response.gameroom.StartGameRoomResponse;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
+import com.boricori.entity.GameRoom;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.ParticipantsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/gameroom")
 @RestController
-@RequiredArgsConstructor
 public class GameRoomController {
 
   @Autowired
-  private final GameRoomService gameRoomService;
+  private GameRoomService gameRoomService;
 
   @Autowired
-  private final ParticipantsService participantsService;
+  private ParticipantsService participantsService;
 
   @GetMapping("/create")
   @Operation(summary = "게임방 생성", description = "게임방 생성")
@@ -87,10 +86,10 @@ public class GameRoomController {
   public ResponseEntity<StartGameRoomResponse> startGameRoom(
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
-    gameRoomService.makeRoom(request);
+    GameRoom gameRoom = gameRoomService.makeRoom(request);
     // 게임 참여자 튜플 생성 JPA
-    // ..
-    // 생성된 게임 참여자 테이블의 id를 받음
+    participantsService.makeGameParticipant(gameRoom, request.getPlayerInfoRequests());
+    // 생성된 게임 방 id를 받음
     // ..
     // 게임 참여 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
     // ..

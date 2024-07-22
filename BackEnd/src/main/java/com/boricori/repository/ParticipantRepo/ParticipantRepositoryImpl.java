@@ -8,12 +8,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ParticipantRepositoryImpl {
 
-  @Autowired
   private EntityManager em;
 
-  private JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+  private JPAQueryFactory queryFactory;
+
+  public ParticipantRepositoryImpl(
+      @Autowired EntityManager em) {
+    this.queryFactory = new JPAQueryFactory(em);
+  }
 
   public void makeGameParticipants() {
-    
+
   }
 }
