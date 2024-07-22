@@ -1,35 +1,20 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 const { kakao } = window;
 
-const useKakaoMap = (location, isLoading) => {
+const useKakaoMap = (location, isLoading, areaCenter) => {
   // 1. state
-  // const [areaCenter, setAreaCenter] = useState();
-  // const [distance, setDistance] = useState(0);
 
   // 2. constant
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
 
+  const centerMarkerRef = useRef(null);
+
   // 3. handler
 
   // 4. useEffect
-
-  // // useEffect - 방장이라면 중심 위치 결정 (수정 필요)
-  // useEffect(() => {
-  //   if (!isLoading && !!areaCenter) {
-  //     const { latitude, longitude } = location;
-  //     const roundedLat = parseFloat(latitude.toFixed(5));
-  //     const roundedLng = parseFloat(longitude.toFixed(5));
-
-  //     setAreaCenter({
-  //       lat: roundedLat,
-  //       lng: roundedLng,
-  //     });
-  //   }
-  // });
-
   // useEffect - Kakao Map 초기화
   useEffect(() => {
     if (!isLoading && mapRef.current && !mapInstanceRef.current) {
@@ -44,7 +29,13 @@ const useKakaoMap = (location, isLoading) => {
         position: new kakao.maps.LatLng(location.lat, location.lng),
         map: mapInstance,
       });
+
+      const centerMarker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(areaCenter.lat, areaCenter.lng),
+        map: mapInstance,
+      });
       markerRef.current = marker;
+      centerMarkerRef.current = centerMarker;
     }
   }, [isLoading]);
 
