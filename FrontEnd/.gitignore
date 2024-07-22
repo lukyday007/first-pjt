@@ -26,3 +26,6 @@ dist-ssr
 
 # Contentlayer
 .contentlayer
+
+# PWA service worker
+dev-dist/
