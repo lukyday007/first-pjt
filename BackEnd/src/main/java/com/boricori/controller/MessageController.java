@@ -1,29 +1,36 @@
 package com.boricori.controller;
 
 import com.boricori.dto.GpsSignal;
-import com.boricori.util.GameroomManager;
+import com.boricori.service.NotificationService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
 
 @Controller
 public class MessageController {
 
   private final SimpMessagingTemplate messagingTemplate;
 
-  private final GameroomManager gameroomManager;
+  private final NotificationService notificationService;
+
 
   @Autowired
-  public MessageController(SimpMessagingTemplate messagingTemplate, GameroomManager manager) {
+  public MessageController(SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
     this.messagingTemplate = messagingTemplate;
-    this.gameroomManager = manager;
+    this.notificationService = notificationService;
+  }
+
+  // Convert LocalDateTime to epoch seconds
+  public static long localDateTimeToEpochSeconds(LocalDateTime localDateTime) {
+    return localDateTime.toEpochSecond(ZoneOffset.UTC);
   }
 
 //  @MessageMapping("/hello")
@@ -44,27 +51,20 @@ public class MessageController {
 
   @MessageMapping("/start")
   public void startGame(Long gameRoomId){
-    messagingTemplate.convertAndSend(String.format("/topic/room/%d/general", gameRoomId));
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d/general", gameRoomId), "start");
   }
 
 
   @Scheduled(fixedRate = 1000) // 1초마다 실행
   public void checkTimeAndSendMessages() {
-    LocalTime now = LocalTime.now();
-    for (Map.Entry<Long, LocalDateTime[]> entry : gameroomManager.getGameRooms().entrySet()) {
-      Long id = entry.getKey();
-      LocalDateTime[] times = entry.getValue();
-      for (LocalDateTime t : times){
-        if (now.getHour() == t.getHour() && now.getMinute() == t.getMinute() && now.getSecond() == t.getSecond()) {
-          messagingTemplate.convertAndSend(String.format("/topic/room/%d/general", id) , "Alert for room " + id + " at " + entry.getValue());
-        }
-      }
-      LocalDateTime end = gameroomManager.getEndTime(id);
-      if (now.getHour() == end.getHour() && now.getMinute() == end.getMinute() && now.getSecond() == end.getSecond()){
-        messagingTemplate.convertAndSend(String.format("/topic/room/%d/general", id) , "게임이 종료되었습니다");
-      }
-
+    LocalDateTime now = LocalDateTime.now();
+    long timestamp = localDateTimeToEpochSeconds(now);
+    Set<String> notifications = notificationService.getNotificationsBefore(timestamp);
+    for (String s : notifications){
+      String[] idAndDegree = s.split(":");
+      messagingTemplate.convertAndSend(String.format("/topic/room/%s/general", idAndDegree[0]), idAndDegree[1]);
     }
+
   }
 
 }
