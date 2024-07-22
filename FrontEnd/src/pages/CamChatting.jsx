@@ -54,7 +54,6 @@ const CamChatting = () => {
   const [roomName, setRoomName] = useState("Test Room");
 
   async function joinRoom() {
-    // Initialize a new Room object
     const room = new Room();
     setRoom(room);
 
@@ -70,7 +69,6 @@ const CamChatting = () => {
       }
     );
 
-    // On every Track destroyed...
     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
       setRemoteTracks(prev => prev.filter(track => track.trackPublication.trackSid !== publication.trackSid));
     });
@@ -124,10 +122,6 @@ const CamChatting = () => {
     const data = await response.json();
     return data.token;
   }
-
-
-
-
 
 
   return (
