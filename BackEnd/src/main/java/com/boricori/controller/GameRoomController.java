@@ -96,6 +96,7 @@ public class GameRoomController {
     // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
     makeCatchableList(gameRoom.getId(), users);
 
+    // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(new StartGameRoomResponse());
   }
 
