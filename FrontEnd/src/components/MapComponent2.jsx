@@ -1,8 +1,12 @@
-import useGeolocation2 from '@/hooks/useGeolocation2';
+import useAreaCenter from '@/hooks/useAreaCenter';
+import useCurrentLocation from '@/hooks/useCurrentLocation';
+import useDistanceCalculator from '@/hooks/useDistanceCalculator';
 import useKakaoMap2 from '@/hooks/useKakaoMap2';
 
 const MapComponent = () => {
-  const { isLoading, location, areaCenter, distance } = useGeolocation2();
+  const areaCenter = useAreaCenter();
+  const { location, isLoading } = useCurrentLocation();
+  const { distance } = useDistanceCalculator(location, areaCenter);
   const mapRef = useKakaoMap2(location, isLoading, areaCenter);
 
   return isLoading ? (
@@ -24,10 +28,6 @@ const MapComponent = () => {
         ref={mapRef}
         style={{ width: '100%', height: '500px', border: '1px solid black' }}
       />
-
-      <div id="distance-calc-time"></div>
-      <div id="map-init-time"></div>
-      <div id="map-update-time"></div>
     </div>
   );
 };

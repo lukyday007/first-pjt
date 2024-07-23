@@ -66,7 +66,6 @@ const useKakaoMap = (location, isLoading, areaCenter) => {
 
   useEffect(() => {
     if (!isLoading && mapRef.current && !mapInstanceRef.current) {
-      const start = performance.now();
       const options = {
         center: new kakao.maps.LatLng(location.lat, location.lng),
         level: 1,
@@ -85,29 +84,13 @@ const useKakaoMap = (location, isLoading, areaCenter) => {
       });
       markerRef.current = marker;
       centerMarkerRef.current = centerMarker;
-
-      const end = performance.now();
-      const initTime = (end - start).toFixed(5);
-
-      const resultElem = document.getElementById('map-init-time');
-      if (resultElem) {
-        resultElem.innerText = `맵 초기화 시간: ${initTime} 밀리초`;
-      }
     }
   }, [isLoading]);
 
   useEffect(() => {
     if (mapInstanceRef.current && markerRef.current) {
-      const start = performance.now();
       const newPosition = new kakao.maps.LatLng(location.lat, location.lng);
       markerRef.current.setPosition(newPosition);
-      const end = performance.now();
-      const updateTime = (end - start).toFixed(5);
-
-      const resultElem = document.getElementById('map-update-time');
-      if (resultElem) {
-        resultElem.innerText = `위치 업데이트 시간: ${updateTime} 밀리초`;
-      }
     }
   }, [location]);
 
