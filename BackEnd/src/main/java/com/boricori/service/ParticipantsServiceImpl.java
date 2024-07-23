@@ -20,17 +20,14 @@ public class ParticipantsServiceImpl implements ParticipantsService {
   private UserRepositoryImpl userRepositoryImpl;
 
   @Override
-  public void makeGameParticipant(GameRoom gameRoom, List<PlayerInfoRequest> playerInfoList) {
+  public List<User> makeGameParticipant(GameRoom gameRoom, List<PlayerInfoRequest> playerInfoList) {
 
     List<User> gameUsers = userRepositoryImpl.getUserList(playerInfoList);
     gameUsers.forEach(user -> {
       participantRepository.save(new GameParticipants(gameRoom, user));
     });
 
-//      participantRepository.save(new GameParticipants())
-//    GameParticipants gameParticipants = new GameParticipants(gameRoom, playerInfoList);
-//
-//    GameParticipants save = participantRepository.save(gameParticipants);
+    return gameUsers;
 
   }
 
