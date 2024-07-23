@@ -41,7 +41,7 @@ public class MessageController {
 //  }
 
 
-  @MessageMapping("/locate")
+  @MessageMapping("/location")
   public void location(GpsSignal gps) throws Exception {
     String host = gps.getHost();
     // 여기서 꼬리 잡는 상대 가져오기

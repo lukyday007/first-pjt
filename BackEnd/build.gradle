@@ -44,12 +44,17 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.3.1'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
+// https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
 
     //Querydsl 추가
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
