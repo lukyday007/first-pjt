@@ -20,7 +20,7 @@ const Onboarding = () => {
         onClick={() => navigate("/login")}
         className="bg-theme-color-1 font-bold"
       >
-        Get Started
+        Get Started &gt;
       </Button>
     </div>
   );
