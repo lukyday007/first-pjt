@@ -6,6 +6,16 @@ import {
   Room,
   RoomEvent,
 } from "livekit-client";
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/Carousel.jsx";
+
+import { Card } from "@/components/ui/Card";
 import "../hooks/WebRTC/CamChatting.css";
 import { useState } from "react";
 import VideoComponent from "../hooks/WebRTC/VideoComponent.jsx";
@@ -13,15 +23,16 @@ import AudioComponent from "../hooks/WebRTC/AudioComponent.jsx";
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-// For local development, leave these variables emptytaskkill /f /pid
-// For production, configure them with correct URLs depending on your deployment
+
+// 로컬 환경에서는 아래 변수들을 빈 값으로 남겨두기 
+// =====> 배포할 때, 아래의 변수들을 조건에 맞게 정확한 url을 다시 setting할 것 
 let APPLICATION_SERVER_URL = "";
 let LIVEKIT_URL = "";
 
 configureUrls();
 
 function configureUrls() {
-  // If APPLICATION_SERVER_URL is not configured, use default value from local development
+  // APPLICATION_SERVER_URL 이 설정되지 않으면, 로컬 값을 디폴트로 사용 
   const hostname = window.location.hostname;
 
   if (!APPLICATION_SERVER_URL) {
@@ -32,7 +43,7 @@ function configureUrls() {
     }
   }
 
-  // If LIVEKIT_URL is not configured, use default value from local development
+  // LIVEKIT_URL 이 설정되지 않으면, 로컬 값을 디폴트로 사용 
   if (!LIVEKIT_URL) {
     if (window.location.hostname === "localhost") {
       LIVEKIT_URL = "ws://localhost:7880/";
@@ -56,8 +67,7 @@ const CamChatting = () => {
     const room = new Room();
     setRoom(room);
 
-    // Specify the actions when events take place in the room
-    // On every new Track received...
+    // 방에서 이벤트가 발생했을 때 수행할 작업 지정하기 
     room.on(RoomEvent.TrackSubscribed, (_track, publication, participant) => {
       setRemoteTracks(prev => [
         ...prev,
@@ -68,6 +78,7 @@ const CamChatting = () => {
       ]);
     });
 
+    // 유저 입장 처리 로직 
     room.on(RoomEvent.TrackUnsubscribed, (_track, publication) => {
       setRemoteTracks(prev =>
         prev.filter(
@@ -77,16 +88,16 @@ const CamChatting = () => {
     });
 
     try {
-      // Get a token from your application server with the room name and participant name
+      // 어플리케이션 서버로부터 방 이름과 유저 이름이 있는 토큰 받기 
       console.log(roomName, participantName);
       const token = await getToken(roomName, participantName);
       console.log("Token retrieved:", token);
 
-      // Connect to the room with the LiveKit URL and the token
+      // LiveKit URL 와 token 으로 방에 연결하기 
       await room.connect(LIVEKIT_URL, token);
       console.log("Connected to room");
 
-      // Publish your camera and microphone
+      // 카메라 및 마이크 게시하기 
       await room.localParticipant.enableCameraAndMicrophone();
       setLocalTrack(
         room.localParticipant.videoTrackPublications.values().next().value
@@ -99,10 +110,10 @@ const CamChatting = () => {
   }
 
   async function leaveRoom() {
-    // Leave the room by calling 'disconnect' method over the Room object
+    // 'disconnect' 버튼을 눌러 호출하며 방 떠나기 
     await room?.disconnect();
 
-    // Reset the state
+    // 상태 값 초기화 
     setRoom(undefined);
     setLocalTrack(undefined);
     setRemoteTracks([]);
@@ -186,33 +197,50 @@ const CamChatting = () => {
               Leave Room
             </button>
           </div>
-          <div id="layout-container">
-            {localTrack && (
-              <VideoComponent
-                track={localTrack}
-                participantIdentity={participantName}
-                local={true}
-              />
-            )}
-            {remoteTracks.map(remoteTrack => {
-              const { trackPublication, participantIdentity } = remoteTrack;
-              const { kind, videoTrack, audioTrack, trackSid } =
-                trackPublication;
+          
+          <Carousel opts={{ align: "start", }} >
+            <CarouselContent> 
+              {/* 나 자신  */}
+              {/* {localTrack && (
+                <VideoComponent                  
+                  track={localTrack}
+                  participantIdentity={participantName}
+                  local={true}
+                />
+              )} */}
 
-              if (kind === "video" && videoTrack) {
-                return (
-                  <VideoComponent
-                    key={trackSid}
-                    track={videoTrack}
-                    participantIdentity={participantIdentity}
-                  />
-                );
-              } else if (audioTrack) {
-                return <AudioComponent key={trackSid} track={audioTrack} />;
-              }
-            })}
-            ;
-          </div>
+              {/* 다른 참여자들 */}
+              {remoteTracks.map((remoteTrack) => {
+                console.log(remoteTracks);
+                const { trackPublication, participantIdentity } = remoteTrack;
+                const { kind, videoTrack, audioTrack, trackSid } =
+                  trackPublication;
+                console.log(`trackSid: ${trackSid}`);
+
+                if (kind === "video" && videoTrack) {
+                  return (
+                    <CarouselItem key={trackSid}>                    
+                      <div>
+                        <Card>
+                          <VideoComponent                 
+                            key={trackSid}
+                            track={videoTrack}
+                            participantIdentity={participantIdentity}
+                          />
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  );
+                } else if (audioTrack) {
+                  return (
+                    <AudioComponent key={trackSid} track={audioTrack} />
+                  )
+                }
+              })}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </div>
       )}
     </>
