@@ -4,6 +4,8 @@ import com.boricori.dto.GpsSignal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -13,10 +15,12 @@ public class MessageController {
 
   private final SimpMessagingTemplate messagingTemplate;
 
+  private final KafkaTemplate<String, String> kafkaTemplate;
 
   @Autowired
-  public MessageController(SimpMessagingTemplate messagingTemplate) {
+  public MessageController(SimpMessagingTemplate messagingTemplate, KafkaTemplate<String, String> kafkaTemplate) {
     this.messagingTemplate = messagingTemplate;
+    this.kafkaTemplate = kafkaTemplate;
   }
 
   // Convert LocalDateTime to epoch seconds
@@ -35,11 +39,10 @@ public class MessageController {
   @MessageMapping("/location")
   public void location(GpsSignal gps) throws Exception {
     String host = gps.getHost();
-    // 여기서 꼬리 잡는 상대 가져오기
-    Long targetId = 0l;
-    messagingTemplate.convertAndSend(String.format("/topic/user/%d", targetId));
+    messagingTemplate.convertAndSend(String.format("/topic/user/%s", host));
   }
 
+  // pub/start 하면 여기로 옴
   @MessageMapping("/start")
   public void startGame(Long gameRoomId){
     messagingTemplate.convertAndSend(String.format("/topic/room/%d/alert", gameRoomId), "Game Started");
