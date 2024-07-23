@@ -19,8 +19,9 @@ function VideoComponent({ track, participantIdentity, local = false }) {
     <div id={"camera-" + participantIdentity} className="video-container">
       <div className="participant-data">
         <p>{participantIdentity + (local ? " (You)" : "")}</p>
-      </div>
-      <video ref={videoElement} id={track.sid}></video>
+      </div>      
+      {/* 비디오 레이어가 계속 생성되는 지점  */}
+      <video className="video-box" ref={videoElement} id={track.sid}></video>
     </div>
   );
 }
