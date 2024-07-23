@@ -1,17 +1,11 @@
 package com.boricori.controller;
 
 import com.boricori.dto.GpsSignal;
-import com.boricori.service.NotificationService;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -19,13 +13,10 @@ public class MessageController {
 
   private final SimpMessagingTemplate messagingTemplate;
 
-  private final NotificationService notificationService;
-
 
   @Autowired
-  public MessageController(SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
+  public MessageController(SimpMessagingTemplate messagingTemplate) {
     this.messagingTemplate = messagingTemplate;
-    this.notificationService = notificationService;
   }
 
   // Convert LocalDateTime to epoch seconds

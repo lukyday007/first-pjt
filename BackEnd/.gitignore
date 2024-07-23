@@ -8,7 +8,7 @@ build/
 application-jwt.properties
 application-db.properties
 application-api.properties
-application-rabbitMQ.properties
+application-kafka.properties
 
 ### STS ###
 .apt_generated
