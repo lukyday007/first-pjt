@@ -29,7 +29,7 @@ public class GameRoom {
   @Column(nullable = false)
   private int maxPlayer;
 
-  private boolean isActivated = true;
+  private boolean isActivated;
 
   @Column(nullable = false)
   private int mapSize;
@@ -37,6 +37,7 @@ public class GameRoom {
   @Column(nullable = false)
   private boolean magneticField;
 
+  private int gameTime;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private String codeNumber;
@@ -62,6 +63,8 @@ public class GameRoom {
     this.roomName = setting.getName();
     this.maxPlayer = setting.getMaxPlayer();
     this.mapSize = setting.getMapSize();
+    this.gameTime = setting.getTime();
+    this.magneticField = setting.isMagenticField();
   }
 
   public void updateGameRoom(GameSettingRequest request) {
