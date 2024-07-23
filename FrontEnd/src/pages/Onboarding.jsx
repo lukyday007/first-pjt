@@ -10,15 +10,15 @@ const Onboarding = () => {
       <img
         src={onboardingImage}
         alt="onboardingImage"
-        className="mb-8 aspect-square w-3/4"
+        className="w-400 h-400 mb-8"
       />
       <h1 className="mb-2 p-4 text-2xl font-bold">
-        BORICORI에 오신 것을 환영합니다
+        <i>RunTail</i> 에<br /> 오신 것을 환영합니다
       </h1>
-      <p className="mb-8">보리꼬리! 꼬리 한 번 잡아볼까요?</p>
+      <p className="mb-8"> 꼬리 한 번 잡아볼까요?</p>
       <Button
         onClick={() => navigate("/login")}
-        className="bg-emerald-500 font-bold"
+        className="bg-theme-color-1 font-bold"
       >
         Get Started
       </Button>

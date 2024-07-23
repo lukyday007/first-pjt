@@ -19,7 +19,7 @@ const Login = () => {
       </div>
       <Button
         type="submit"
-        className="bg-emerald-500 font-bold"
+        className="bg-theme-color-1 font-bold"
         onClick={handleLogin}
       >
         로그인
