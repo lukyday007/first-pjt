@@ -1,17 +1,13 @@
 package com.boricori.entity;
 
-import com.boricori.dto.request.gameroom.StartGameRoomRequest;
+import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -29,7 +25,7 @@ public class GameRoom {
   @Column(nullable = false)
   private int maxPlayer;
 
-  private boolean isActivated = true;
+  private boolean isActivated;
 
   @Column(nullable = false)
   private int mapSize;
@@ -37,31 +33,24 @@ public class GameRoom {
   @Column(nullable = false)
   private boolean magneticField;
 
+  private int gameTime;
+
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private String codeNumber;
 
-  @Builder
-  public GameRoom(String roomName, int maxPlayer, int mapSize, boolean magneticField,
-      String codeNumber) {
-    this.roomName = roomName;
-    this.maxPlayer = maxPlayer;
+  public GameRoom(GameRequest request){
+    roomSetting(request.getSetting());
     this.isActivated = true;
-    this.mapSize = mapSize;
-    this.magneticField = magneticField;
-    this.codeNumber = codeNumber;
-  }
-
-  public GameRoom(StartGameRoomRequest gameRoomRequest) {
-    roomSetting(gameRoomRequest.getSetting());
-    this.startTime = LocalDateTime.now();
-    this.codeNumber = gameRoomRequest.getCodeNum();
+    this.codeNumber = request.getCodeNum();
   }
 
   private void roomSetting(GameSettingRequest setting) {
     this.roomName = setting.getName();
     this.maxPlayer = setting.getMaxPlayer();
     this.mapSize = setting.getMapSize();
+    this.gameTime = setting.getTime();
+    this.magneticField = setting.isMagenticField();
   }
 
   public void updateGameRoom(GameSettingRequest request) {
