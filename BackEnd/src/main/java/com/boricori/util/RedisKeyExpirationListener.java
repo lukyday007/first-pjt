@@ -20,23 +20,11 @@ public class RedisKeyExpirationListener implements MessageListener {
     String expiredKey = new String(message.getBody());
     System.out.println("Key expired: " + expiredKey);
 
-    // 키 형식: gameRoomId-Interval-AlertDegree
+    // 키 형식: gameRoomId-AlertDegree
     String[] parts = expiredKey.split("-");
-    if (parts.length == 3) {
+    if (parts.length == 2) {
       String gameRoomId = parts[0];
-      int interval = Integer.parseInt(parts[1]);
-      int alertDegree = Integer.parseInt(parts[2]);
-
-      // alertDegree를 증가시키고 새로운 키 설정
-      alertDegree++;
-      if (alertDegree < GAME_ENDED) {
-        String newKey = gameRoomId + "-" + interval + "-" + alertDegree;
-        redisTemplate.opsForValue().set(newKey, "", interval, TimeUnit.SECONDS);
-        System.out.println("New key set: " + newKey);
-      } else {
-        System.out.println("Alert degree exceeded limit for gameRoomId: " + gameRoomId);
-      }
-
+      int alertDegree = Integer.parseInt(parts[1]);
       // 필요에 따라 추가적인 처리
     } else {
       System.err.println("Invalid key format: " + expiredKey);
