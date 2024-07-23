@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,7 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class GameParticipants {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "play_id")
   private Long id;
 
@@ -38,6 +39,11 @@ public class GameParticipants {
   private int kills;
   @ColumnDefault("0")
   private int bullets;
+
+  public GameParticipants(GameRoom gameRoom, User user) {
+    this.gameRoom = gameRoom;
+    this.user = user;
+  }
 
   public void deadUser() {
     this.alive = false;
