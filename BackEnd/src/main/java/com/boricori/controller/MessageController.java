@@ -46,25 +46,13 @@ public class MessageController {
     String host = gps.getHost();
     // 여기서 꼬리 잡는 상대 가져오기
     Long targetId = 0l;
-    messagingTemplate.convertAndSend(String.format("/topic/%d", targetId));
+    messagingTemplate.convertAndSend(String.format("/topic/user/%d", targetId));
   }
 
   @MessageMapping("/start")
   public void startGame(Long gameRoomId){
-    messagingTemplate.convertAndSend(String.format("/topic/room/%d/general", gameRoomId), "start");
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d/alert", gameRoomId), "Game Started");
   }
 
-
-  @Scheduled(fixedRate = 1000) // 1초마다 실행
-  public void checkTimeAndSendMessages() {
-    LocalDateTime now = LocalDateTime.now();
-    long timestamp = localDateTimeToEpochSeconds(now);
-    Set<String> notifications = notificationService.getNotificationsBefore(timestamp);
-    for (String s : notifications){
-      String[] idAndDegree = s.split(":");
-      messagingTemplate.convertAndSend(String.format("/topic/room/%s/general", idAndDegree[0]), idAndDegree[1]);
-    }
-
-  }
 
 }
