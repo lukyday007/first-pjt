@@ -1,9 +1,9 @@
 package com.boricori.service;
 
-import com.boricori.dto.request.gameroom.GameRequest;
-import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
+import com.boricori.dto.request.gameroom.StartGameRoomRequest;
+import com.boricori.entity.GameRoom;
 
 public interface GameRoomService {
 
-  public GameRoomSettingResponse makeRoom(GameRequest request);
+  public GameRoom makeRoom(StartGameRoomRequest request);
 }
