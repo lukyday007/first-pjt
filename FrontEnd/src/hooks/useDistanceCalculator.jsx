@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const harversineDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371;
@@ -37,25 +37,24 @@ const approximateDistance = (lat1, lng1, lat2, lng2) => {
   return (distance * 1000).toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
 };
 
+const coordToFixed = number => {
+  return parseFloat(number.toFixed(5)); // 연산에 위/경도의 소수점 5자리까지 사용
+};
+
 const useDistanceCalculator = (location, areaCenter) => {
   const [distance, setDistance] = useState(0);
 
-  const updateDistance = useCallback(() => {
+  useEffect(() => {
     if (location && areaCenter) {
-      const calculatedDistance = approximateDistance(
-        location.lat,
-        location.lng,
-        areaCenter.lat,
-        areaCenter.lng
-      );
+      const lat1 = coordToFixed(location.lat);
+      const lng1 = coordToFixed(location.lng);
+      const lat2 = coordToFixed(areaCenter.lat);
+      const lng2 = coordToFixed(areaCenter.lng);
 
+      const calculatedDistance = approximateDistance(lat1, lng1, lat2, lng2);
       setDistance(calculatedDistance);
     }
-  }, [areaCenter]);
-
-  useEffect(() => {
-    updateDistance();
-  }, [location, updateDistance]);
+  }, [location, areaCenter]);
 
   return distance;
 };

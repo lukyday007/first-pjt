@@ -6,7 +6,7 @@ import useKakaoMap2 from '@/hooks/useKakaoMap2';
 const MapComponent = () => {
   const areaCenter = useAreaCenter();
   const { location, isLoading } = useCurrentLocation();
-  const { distance } = useDistanceCalculator(location, areaCenter);
+  const distance = useDistanceCalculator(location, areaCenter);
   const mapRef = useKakaoMap2(location, isLoading, areaCenter);
 
   return isLoading ? (
