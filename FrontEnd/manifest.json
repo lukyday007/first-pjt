@@ -1,9 +1,9 @@
 {
-  "name": "boricori",
-  "short_name": "boricori",
+  "name": "RunTail",
+  "short_name": "RunTail",
   "description": "catch the tail",
-  "theme_color": "#33AD90",
-  "background_color": "#33AD90",
+  "theme_color": "#25B4BB",
+  "background_color": "#80EDF4",
   "display": "fullscreen",
   "icons": [
     {

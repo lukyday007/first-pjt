@@ -1,4 +1,4 @@
-import MapComponent2 from '@/components/MapComponent2';
+import MapComponent2 from "@/components/MapComponent2";
 
 const GamePlay = () => {
   return (
