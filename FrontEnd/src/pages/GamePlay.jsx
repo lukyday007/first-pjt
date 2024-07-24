@@ -1,10 +1,10 @@
-import MapComponent2 from "@/components/MapComponent2";
+import MapComponent from "@/components/MapComponent";
 
 const GamePlay = () => {
   return (
     <>
       <div>GamePlay Page</div>
-      <MapComponent2 />
+      <MapComponent />
     </>
   );
 };
