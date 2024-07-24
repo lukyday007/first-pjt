@@ -1,7 +1,9 @@
+// import { useEffect } from "react";
 import useAreaInfo from "@/hooks/Map/useAreaInfo";
 import useCurrentLocation from "@/hooks/Map/useCurrentLocation";
 import useDistanceCalculator from "@/hooks/Map/useDistanceCalculator";
 import useKakaoMap from "@/hooks/Map/useKakaoMap";
+// import useWebSocket from "@/hooks/Map/useWebSocket";
 
 const MapComponent = () => {
   // areaCenter: 플레이 지역 중심
@@ -14,6 +16,15 @@ const MapComponent = () => {
   const { location, isLoading } = useCurrentLocation(); // 디바이스의 현재 위치를 잡는 hook
   const distance = useDistanceCalculator(location, areaCenter); // 플레이 지역 중심과 디바이스 현재 위치 간 거리를 계산하는 hook
   const mapRef = useKakaoMap(location, isLoading, areaCenter, areaRadius); // 지도를 그리는 hook
+
+  // const roomId = '12345'  // 임시
+  // const { otherLocations, sendLocation } = useWebSocket(roomId);
+
+  // useEffect(() => {
+  //   if (!isLoading && location) {
+  //     sendLocation(location);
+  //   }
+  // }, [isLoading, location, sendLocation]);
 
   // 개발 중 임시로 지도 상단에 중심 위치, 내 위치, 거리 표시
   return isLoading ? (
