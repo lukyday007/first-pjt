@@ -1,17 +1,13 @@
 package com.boricori.entity;
 
-import com.boricori.dto.request.gameroom.StartGameRoomRequest;
+import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -37,21 +33,18 @@ public class GameRoom {
   private int gameTime;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  private String codeNumber;
 
-  @Builder
-  public GameRoom(String roomName, int maxPlayer, int mapSize, String codeNumber) {
-    this.roomName = roomName;
-    this.maxPlayer = maxPlayer;
-    this.isActivated = true;
-    this.mapSize = mapSize;
-    this.codeNumber = codeNumber;
+  @Column(length = 1024)
+  private String qrCode;
+
+
+  public void createQrCode(String qrCode){
+    this.qrCode = qrCode;
   }
 
-  public GameRoom(StartGameRoomRequest gameRoomRequest) {
+  public GameRoom(GameRequest gameRoomRequest) {
     roomSetting(gameRoomRequest.getSetting());
-    this.startTime = LocalDateTime.now();
-    this.codeNumber = gameRoomRequest.getCodeNum();
+    isActivated = true;
   }
 
   private void roomSetting(GameSettingRequest setting) {
