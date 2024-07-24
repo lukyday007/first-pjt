@@ -15,10 +15,13 @@ import com.boricori.service.GameRoomService;
 import com.boricori.service.ParticipantsService;
 import com.boricori.util.ResponseEnum;
 import com.boricori.util.UserCircularLinkedList;
+import com.google.zxing.WriterException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.boricori.util.ResponseEnum.SUCCESS;
+
 @RequestMapping("/gameroom")
 @RestController
 public class GameRoomController {
@@ -40,17 +45,21 @@ public class GameRoomController {
   @Autowired
   private ParticipantsService participantsService;
 
-  @GetMapping("/create")
+  @PostMapping("/create")
   @Operation(summary = "게임방 생성", description = "게임방 생성")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "성공"),
       @ApiResponse(responseCode = "404", description = "실패"),
       @ApiResponse(responseCode = "500", description = "서버 오류")
   })
-  public ResponseEntity<GameRoomSettingResponse> createGameRoom(
-      @RequestBody @Parameter(description = "회원가입 정보", required = true) GameRequest gameRequest) {
-
-    return null;
+  public ResponseEntity<CreateGameRoomResponse> createGameRoom(
+      @RequestBody @Parameter(description = "게임방 세팅", required = true) GameRequest gameRequest) {
+    try {
+      CreateGameRoomResponse room = gameRoomService.createRoom(gameRequest);
+      return ResponseEntity.status(200).body(room);
+    } catch (WriterException | IOException e) {
+      return ResponseEntity.status(500).build();
+    }
   }
 
   @GetMapping("/{id}")
@@ -97,7 +106,7 @@ public class GameRoomController {
     makeCatchableList(gameRoom.getId(), users);
 
     // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
-    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(new StartGameRoomResponse());
+    return ResponseEntity.status(SUCCESS.getCode()).body(new StartGameRoomResponse());
   }
 
   private void makeCatchableList(Long roomId, List<User> users) {
