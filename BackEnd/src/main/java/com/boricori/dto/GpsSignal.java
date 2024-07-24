@@ -6,7 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GpsSignal {
-
-    String location;
+    Long gameId;
     String host;
+    String lat;
+    String lng;
 }

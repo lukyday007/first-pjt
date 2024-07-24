@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +15,9 @@ public class RedisKeyExpirationListener implements MessageListener {
 
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
+
+  @Autowired
+  KafkaTemplate<String, String> kafkaTemplate;
 
   @Override
   public void onMessage(Message message, byte[] pattern) {
@@ -25,7 +29,9 @@ public class RedisKeyExpirationListener implements MessageListener {
     if (parts.length == 2) {
       String gameRoomId = parts[0];
       int alertDegree = Integer.parseInt(parts[1]);
-      // 필요에 따라 추가적인 처리
+      // kafka의 topic: game-alert에 보내놓기
+      String jsonData = String.format("{'system-message':null, 'alert-degree':%d}", alertDegree);
+      kafkaTemplate.send("game-alert", jsonData);
     } else {
       System.err.println("Invalid key format: " + expiredKey);
     }
