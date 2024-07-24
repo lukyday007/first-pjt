@@ -34,22 +34,17 @@ public class GameRoom {
   @Column(nullable = false)
   private int mapSize;
 
-  @Column(nullable = false)
-  private boolean magneticField;
-
   private int gameTime;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private String codeNumber;
 
   @Builder
-  public GameRoom(String roomName, int maxPlayer, int mapSize, boolean magneticField,
-      String codeNumber) {
+  public GameRoom(String roomName, int maxPlayer, int mapSize, String codeNumber) {
     this.roomName = roomName;
     this.maxPlayer = maxPlayer;
     this.isActivated = true;
     this.mapSize = mapSize;
-    this.magneticField = magneticField;
     this.codeNumber = codeNumber;
   }
 
@@ -64,13 +59,11 @@ public class GameRoom {
     this.maxPlayer = setting.getMaxPlayer();
     this.mapSize = setting.getMapSize();
     this.gameTime = setting.getTime();
-    this.magneticField = setting.isMagenticField();
   }
 
   public void updateGameRoom(GameSettingRequest request) {
     this.roomName = request.getName();
     this.maxPlayer = request.getMaxPlayer();
     this.mapSize = request.getMapSize();
-    this.magneticField = request.isMagenticField();
   }
 }
