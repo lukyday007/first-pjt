@@ -1,4 +1,3 @@
-// useCircleWithOverlay.jsx
 import { useEffect, useRef } from "react";
 
 const { kakao } = window;

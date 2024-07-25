@@ -11,9 +11,6 @@ const useCurrentLocation = () => {
       const fetchLocation = () => {
         navigator.geolocation.getCurrentPosition(
           position => {
-            // console.log(position);
-            // console.log(position.coords);
-            console.log(position.coords.latitude, position.coords.longitude);
             const { latitude, longitude } = position.coords;
             setLocation({ lat: latitude, lng: longitude });
             setIsLoading(false);
@@ -23,7 +20,6 @@ const useCurrentLocation = () => {
             document.getElementById("errorMsg").innerText =
               "getCurrentPosition: useCurrentLocation";
           }
-          // { enableHighAccuracy: true }
         );
       };
 

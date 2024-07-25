@@ -1,4 +1,3 @@
-// useKakaoMap.jsx
 import { useRef, useEffect } from "react";
 import useMarker from "./useMarker";
 // import useArea from "./useArea";

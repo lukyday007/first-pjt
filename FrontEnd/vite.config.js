@@ -18,6 +18,10 @@ export default defineConfig({
       manifest,
     }),
   ],
+  // SockJS 라이브러리가 Node.js 환경에서 사용되는 global 객체 참조 시 에러 수정
+  define: {
+    global: "window",
+  },
   resolve: {
     alias: {
       "@components": path.resolve(__dirname, "./src/components"),
