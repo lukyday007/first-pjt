@@ -32,7 +32,7 @@ public class RedisKeyExpirationListener implements MessageListener {
       String gameRoomId = parts[0];
       int alertDegree = Integer.parseInt(parts[1]);
       // kafka의 topic: game-alert에 보내놓기
-      String jsonData = String.format("{'system-message':null, 'alert-degree':%d}", alertDegree);
+      String jsonData = String.format("{'msgType':alert, 'alert-degree':%d}", alertDegree);
       CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send("game-alert", gameRoomId, jsonData);
       future.thenAccept(result -> {
         System.out.println("Completed successfully with result: " + result);

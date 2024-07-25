@@ -12,6 +12,7 @@ import com.boricori.entity.GameRoom;
 import com.boricori.entity.User;
 import com.boricori.game.GameManager;
 import com.boricori.service.GameRoomService;
+import com.boricori.service.MessageService;
 import com.boricori.service.ParticipantsService;
 import com.boricori.util.ResponseEnum;
 import com.boricori.util.UserCircularLinkedList;
@@ -44,6 +45,9 @@ public class GameRoomController {
 
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
+
+  @Autowired
+  private MessageService messageService;
 
   @GetMapping("/create")
   @Operation(summary = "게임방 생성", description = "게임방 생성")
@@ -106,6 +110,8 @@ public class GameRoomController {
     for (int t = 1; t < 5; t++){
       redisTemplate.opsForValue().set(String.format("%d-%d", gameRoom.getId(), t), String.valueOf(t), interval * t, TimeUnit.SECONDS);
     }
+    messageService.startGame(gameRoom.getId());
+
 
     // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(new StartGameRoomResponse());
