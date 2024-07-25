@@ -17,7 +17,4 @@ public class GameSettingRequest {
 
     @Schema(description = "맵 크기", example = "100")
     private int mapSize;
-
-    @Schema(description = "자기장 활성화 여부", example = "true")
-    private boolean magenticField;
 }

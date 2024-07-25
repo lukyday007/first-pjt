@@ -1,17 +1,14 @@
 package com.boricori.entity;
 
-import com.boricori.dto.request.gameroom.StartGameRoomRequest;
+import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -34,29 +31,17 @@ public class GameRoom {
   @Column(nullable = false)
   private int mapSize;
 
-  @Column(nullable = false)
-  private boolean magneticField;
-
   private int gameTime;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  private String codeNumber;
+
+  @Column(length = 1024)
+  private String qrCode;
 
   @Builder
-  public GameRoom(String roomName, int maxPlayer, int mapSize, boolean magneticField,
-      String codeNumber) {
-    this.roomName = roomName;
-    this.maxPlayer = maxPlayer;
-    this.isActivated = true;
-    this.mapSize = mapSize;
-    this.magneticField = magneticField;
-    this.codeNumber = codeNumber;
-  }
-
-  public GameRoom(StartGameRoomRequest gameRoomRequest) {
+  public GameRoom(GameRequest gameRoomRequest) {
     roomSetting(gameRoomRequest.getSetting());
-    this.startTime = LocalDateTime.now();
-    this.codeNumber = gameRoomRequest.getCodeNum();
+    isActivated = true;
   }
 
   private void roomSetting(GameSettingRequest setting) {
@@ -64,13 +49,13 @@ public class GameRoom {
     this.maxPlayer = setting.getMaxPlayer();
     this.mapSize = setting.getMapSize();
     this.gameTime = setting.getTime();
-    this.magneticField = setting.isMagenticField();
   }
 
-  public void updateGameRoom(GameSettingRequest request) {
-    this.roomName = request.getName();
-    this.maxPlayer = request.getMaxPlayer();
-    this.mapSize = request.getMapSize();
-    this.magneticField = request.isMagenticField();
+  public void createQrCode(String qrCode){
+    this.qrCode = qrCode;
+  }
+
+  public void startGameTime(){
+    this.startTime = LocalDateTime.now();
   }
 }
