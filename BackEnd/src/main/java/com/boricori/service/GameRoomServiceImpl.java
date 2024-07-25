@@ -42,9 +42,11 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public GameRoom makeRoom(StartGameRoomRequest gameRoomInfo) {
-//    return gameRoomRepository.save(new GameRoom(gameRoomInfo));
-    return null;
+  @Transactional
+  public GameRoom updateRoom(Long id) {
+    GameRoom gameRoom = gameRoomRepository.findById(id).orElseThrow(IllegalAccessError::new);
+    gameRoom.startGameTime();
+    return gameRoom;
   }
 
   private String generateQRCodeImage(String text) throws IOException, WriterException {

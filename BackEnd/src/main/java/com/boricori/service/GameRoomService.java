@@ -13,5 +13,5 @@ public interface GameRoomService {
 
   public CreateGameRoomResponse createRoom(GameRequest request) throws IOException, WriterException;
 
-  public GameRoom makeRoom(StartGameRoomRequest request);
+  public GameRoom updateRoom(Long id);
 }

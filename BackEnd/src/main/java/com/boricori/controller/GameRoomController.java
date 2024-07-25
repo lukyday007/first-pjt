@@ -13,25 +13,18 @@ import com.boricori.entity.User;
 import com.boricori.game.GameManager;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.ParticipantsService;
-import com.boricori.util.ResponseEnum;
 import com.boricori.util.UserCircularLinkedList;
 import com.google.zxing.WriterException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import static com.boricori.util.ResponseEnum.SUCCESS;
 
@@ -88,7 +81,7 @@ public class GameRoomController {
     return null;
   }
 
-  @PostMapping("/start")
+  @PostMapping("/{id}/start")
   @Operation(summary = "게임 시작", description = "게임 시작")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "성공"),
@@ -96,9 +89,10 @@ public class GameRoomController {
       @ApiResponse(responseCode = "500", description = "서버 오류")
   })
   public ResponseEntity<StartGameRoomResponse> startGameRoom(
+          @PathVariable @Parameter(description = "게임 방id", required = true) long id,
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
-    GameRoom gameRoom = gameRoomService.makeRoom(request);
+    GameRoom gameRoom = gameRoomService.updateRoom(id);
     // 게임 참여자 튜플 생성 JPA
     List<User> users = participantsService.makeGameParticipant(gameRoom,
         request.getPlayerInfoRequests());

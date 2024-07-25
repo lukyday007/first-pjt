@@ -42,6 +42,11 @@ public class GameRoom {
   public void createQrCode(String qrCode){
     this.qrCode = qrCode;
   }
+
+  public void startGameTime(){
+    this.startTime = LocalDateTime.now();
+  }
+
   @Builder
   public GameRoom(GameRequest gameRoomRequest) {
     roomSetting(gameRoomRequest.getSetting());
