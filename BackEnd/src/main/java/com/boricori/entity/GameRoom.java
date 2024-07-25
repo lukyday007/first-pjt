@@ -4,6 +4,7 @@ import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,7 +42,7 @@ public class GameRoom {
   public void createQrCode(String qrCode){
     this.qrCode = qrCode;
   }
-
+  @Builder
   public GameRoom(GameRequest gameRoomRequest) {
     roomSetting(gameRoomRequest.getSetting());
     isActivated = true;

@@ -31,7 +31,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Override
   @Transactional
   public CreateGameRoomResponse createRoom(GameRequest gameRoomInfo) throws IOException, WriterException {
-    GameRoom gameRoom = new GameRoom(gameRoomInfo);
+    GameRoom gameRoom = GameRoom.builder().gameRoomRequest(gameRoomInfo).build();
     gameRoom = gameRoomRepository.save(gameRoom);
 
     String roomUrl = "http://runtail/join-room/" + gameRoom.getId();
