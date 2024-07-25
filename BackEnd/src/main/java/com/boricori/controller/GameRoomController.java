@@ -68,19 +68,6 @@ public class GameRoomController {
     return null;
   }
 
-  @PatchMapping("/update/setting")
-  @Operation(summary = "게임방 설정", description = "기본 값 게임방 설정 변경")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "성공"),
-      @ApiResponse(responseCode = "404", description = "실패"),
-      @ApiResponse(responseCode = "500", description = "서버 오류")
-  })
-  public ResponseEntity<GameRoomSettingResponse> updateGameRoomSetting(
-      @RequestBody @Parameter(description = "게임 설정 업데이트", required = true) GameUpdateRequest request) {
-
-    return null;
-  }
-
   @PostMapping("/{id}/start")
   @Operation(summary = "게임 시작", description = "게임 시작")
   @ApiResponses({

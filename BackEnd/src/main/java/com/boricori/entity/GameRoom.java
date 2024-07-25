@@ -38,15 +38,6 @@ public class GameRoom {
   @Column(length = 1024)
   private String qrCode;
 
-
-  public void createQrCode(String qrCode){
-    this.qrCode = qrCode;
-  }
-
-  public void startGameTime(){
-    this.startTime = LocalDateTime.now();
-  }
-
   @Builder
   public GameRoom(GameRequest gameRoomRequest) {
     roomSetting(gameRoomRequest.getSetting());
@@ -60,9 +51,11 @@ public class GameRoom {
     this.gameTime = setting.getTime();
   }
 
-  public void updateGameRoom(GameSettingRequest request) {
-    this.roomName = request.getName();
-    this.maxPlayer = request.getMaxPlayer();
-    this.mapSize = request.getMapSize();
+  public void createQrCode(String qrCode){
+    this.qrCode = qrCode;
+  }
+
+  public void startGameTime(){
+    this.startTime = LocalDateTime.now();
   }
 }
