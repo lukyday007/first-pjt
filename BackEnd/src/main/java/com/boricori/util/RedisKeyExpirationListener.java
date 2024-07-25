@@ -1,11 +1,13 @@
 package com.boricori.util;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +33,14 @@ public class RedisKeyExpirationListener implements MessageListener {
       int alertDegree = Integer.parseInt(parts[1]);
       // kafka의 topic: game-alert에 보내놓기
       String jsonData = String.format("{'system-message':null, 'alert-degree':%d}", alertDegree);
-      kafkaTemplate.send("game-alert", jsonData);
+      CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send("game-alert", gameRoomId, jsonData);
+      future.thenAccept(result -> {
+        System.out.println("Completed successfully with result: " + result);
+      });
+      future.exceptionally(ex -> {
+        System.err.println("Failed with exception: " + ex.getMessage());
+        return null;  // 예외 발생 시 기본 값을 반환할 수 있습니다.
+      });
     } else {
       System.err.println("Invalid key format: " + expiredKey);
     }

@@ -20,7 +20,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +41,9 @@ public class GameRoomController {
 
   @Autowired
   private ParticipantsService participantsService;
+
+  @Autowired
+  private RedisTemplate<String, String> redisTemplate;
 
   @GetMapping("/create")
   @Operation(summary = "게임방 생성", description = "게임방 생성")
@@ -95,6 +100,12 @@ public class GameRoomController {
         request.getPlayerInfoRequests());
     // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
     makeCatchableList(gameRoom.getId(), users);
+
+    // 알림 시간 Redis에 넣기
+    int interval = gameRoom.getGameTime() * 60 / 4;
+    for (int t = 1; t < 5; t++){
+      redisTemplate.opsForValue().set(String.format("%d-%d", gameRoom.getId(), t), String.valueOf(t), interval * t, TimeUnit.SECONDS);
+    }
 
     // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(new StartGameRoomResponse());

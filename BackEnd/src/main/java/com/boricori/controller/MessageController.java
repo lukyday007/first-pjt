@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.KafkaUtils;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -96,11 +97,15 @@ public class MessageController {
   // alertJSON의 포맷은
   // {"system-message": String,  ("START", "END")
   //  "alert-degree": int }
-  @KafkaListener(topicPattern = "game-alert", groupId = "ssafy")
+  @KafkaListener(topics = "game-alert", groupId = "ssafy")
   public void processAlertMessage(ConsumerRecord<String, String> record,
-      @Header(KafkaHeaders.KEY) byte[] gameIdBytes) {
+      @Header(KafkaHeaders.RECEIVED_KEY) byte[] gameIdBytes) {
+      String grpId = KafkaUtils.getConsumerGroupId();
+    System.out.println("GROUP" + grpId);
+      System.out.println("GAME-ALERT CONSUMER");
       String gameId = new String(gameIdBytes, StandardCharsets.UTF_8);
       String alertJSON = record.value();
+      System.out.println("MESSAGE:" + alertJSON);
       messagingTemplate.convertAndSend(String.format("/topic/alert/%s", gameId), alertJSON);
   }
 
