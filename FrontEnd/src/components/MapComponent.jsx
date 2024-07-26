@@ -1,12 +1,10 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { GameContext } from "@/context/GameContext";
-import useDistanceCalculator from "@/hooks/Map/useDistanceCalculator";
 import useKakaoMap from "@/hooks/Map/useKakaoMap";
 
 const MapComponent = () => {
-  const { areaCenter, areaRadius, myLocation, targetLocation } =
+  const { areaCenter, areaRadius, myLocation, targetLocation, distance } =
     useContext(GameContext);
-  const distance = useDistanceCalculator(myLocation, areaCenter);
   const mapRef = useKakaoMap(myLocation, areaCenter, areaRadius);
 
   return !myLocation ? (

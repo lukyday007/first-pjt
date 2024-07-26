@@ -1,16 +1,38 @@
-// src/pages/GamePlay.jsx
 import React, { useContext, useEffect } from "react";
 import MapComponent from "@/components/MapComponent";
 import { GameContext } from "@/context/GameContext";
+// import useWebSocket from "@/hooks/Map/useWebSocket";
 
 const GamePlay = () => {
-  const { gameStatus } = useContext(GameContext);
+  const {
+    gameStatus,
+    myLocation,
+    setGameStatus,
+    setTargetLocation,
+    setAreaCenter,
+    setAreaRadius,
+    gameRoomId,
+    targetId,
+  } = useContext(GameContext);
+
+  // const { sendLocation } = useWebSocket({
+  //   gameRoomId,
+  //   targetId,
+  //   setGameStatus,
+  //   setTargetLocation,
+  //   setAreaCenter,
+  //   setAreaRadius,
+  // });
 
   useEffect(() => {
-    if (gameStatus === true) {
-      // 게임이 시작되었을 때 실행할 로직
+    if (gameStatus && myLocation) {
+      const locationInterval = setInterval(() => {
+        // sendLocation({ lat: myLocation.lat, lng: myLocation.lng });
+      }, 1000); // 1초마다 위치 전송
+
+      return () => clearInterval(locationInterval); // 컴포넌트 unmount 시 interval 클리어
     }
-  }, [gameStatus]);
+  }, [gameStatus, myLocation]);
 
   return (
     <>
