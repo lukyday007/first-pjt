@@ -1,18 +1,21 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
+import { GameContext } from "@/context/GameContext";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
-const useWebSocket = ({
-  gameRoomId,
-  targetId,
-  setGameStatus,
-  setTargetLocation,
-  setAreaCenter,
-  setAreaRadius,
-}) => {
+const useWebSocket = () => {
   const stompClient = useRef(null);
 
   useEffect(() => {
+    const {
+      gameRoomId,
+      targetId,
+      setGameStatus,
+      setTargetLocation,
+      setAreaCenter,
+      setAreaRadius,
+    } = useContext(GameContext);
+    
     if (!gameRoomId || !setGameStatus) return;
 
     const socket = new SockJS("/server");
@@ -46,7 +49,7 @@ const useWebSocket = ({
     };
   }, [gameRoomId, targetId, setGameStatus]);
 
-  const handleAlertMessage = msg => {
+  const handleAlertMessage = msg => { // msgType 따라 로직 분기
     const { msgType, alertDegree } = msg;
     switch (msgType) {
       case "start":
@@ -63,7 +66,7 @@ const useWebSocket = ({
     }
   };
 
-  const handleAlertDegree = degree => {
+  const handleAlertDegree = degree => { // 반경 변동 로직
     switch (degree) {
       case 1:
         console.log("25% 경과");

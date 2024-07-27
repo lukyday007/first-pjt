@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useContext } from "react";
+import { GameContext } from "@/context/GameContext";
 
 const { kakao } = window;
 
@@ -24,7 +25,8 @@ const computeOffset = (center, distance, angle) => {
   return new kakao.maps.LatLng((lat2 * 180) / Math.PI, (lng2 * 180) / Math.PI);
 };
 
-const useCircleWithOverlay = (mapInstance, areaCenter, areaRadius) => {
+const useCircleWithOverlay = (mapInstance) => {
+  const { areaCenter, areaRadius } = useContext(GameContext);
   const polygonRef = useRef(null);
   const centerPointRef = useRef(null);
 
