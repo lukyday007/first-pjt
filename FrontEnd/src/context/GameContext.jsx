@@ -47,15 +47,15 @@ const coordToFixed = (getLat, getLng) => {
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
+  const [userId, setUserId] = useState(null); // 사용자 ID(닉네임)
   const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
   const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임)
-  const [gameStatus, setGameStatus] = useState(true); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
+  const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치 정보
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
-  const [areaCenter, setAreaCenter] = useState({ lat: 36.35600, lng: 127.35400 }); // 영역 중심 정보, 임시값
+  const [areaCenter, setAreaCenter] = useState({ lat: 36.356, lng: 127.354 }); // 영역 중심 정보, 임시값
   const [areaRadius, setAreaRadius] = useState(200); // 영역 반경 정보, 임시값
   const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
-
 
   // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
   useEffect(() => {
