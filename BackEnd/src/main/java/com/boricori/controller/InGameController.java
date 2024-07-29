@@ -2,6 +2,7 @@ package com.boricori.controller;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
 import com.boricori.dto.response.inGame.MissionResponse;
+import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.game.GameManager;
 import com.boricori.service.InGameService;
@@ -56,6 +57,7 @@ public class InGameController {
   @PostMapping("/{roomId}/completeMission")
   public void completeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
     inGameService.completeMission(gameId, email, request);
+    Item item = inGameService.getItem(gameId, email);
   }
 
   @PostMapping("/{roomId}/getItem")

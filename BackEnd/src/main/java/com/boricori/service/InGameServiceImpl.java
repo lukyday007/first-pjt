@@ -2,7 +2,9 @@ package com.boricori.service;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
 import com.boricori.entity.GameParticipants;
+import com.boricori.entity.InGameItems;
 import com.boricori.entity.InGameMissions;
+import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.repository.ParticipantRepo.ParticipantRepositoryImpl;
 import com.boricori.repository.inGameRepo.InGameRepositoryImpl;
@@ -59,8 +61,13 @@ public class InGameServiceImpl implements InGameService{
   }
 
   @Override
-  public void getItem(Long gameId, String email) {
-
+  public Item getItem(Long gameId, String email) {
+    Item item = itemRepositoryImpl.getItem();
+    GameParticipants player = participantRepository.getByEmail(email, gameId);
+    inGameMissionsRepository.saveItem(
+        InGameItems.builder().itemId(item).user(player).build()
+    );
+    return item;
   }
 
   @Override
