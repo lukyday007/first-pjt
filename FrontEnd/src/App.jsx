@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Room from "./pages/Room";
 import GamePlay from "./pages/GamePlay";
 import CamChatting from "./pages/CamChatting";
+import PrivateChatting from "./pages/PrivateChatting";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/room" element={<Room />} />
         <Route path="/game-play" element={<GamePlay />} />
         <Route path="/cam-chatting" element={<CamChatting />} />
+        <Route path="/private-chatting" element={<PrivateChatting />} />
       </Routes>
     </GameProvider>
   );

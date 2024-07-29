@@ -30,4 +30,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    port: parseInt(process.env.VITE_PORT) || 5080,
+    host: '0.0.0.0', // Bind to all network interfaces
+  },
 });
