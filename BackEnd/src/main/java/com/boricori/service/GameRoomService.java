@@ -1,6 +1,7 @@
 package com.boricori.service;
 
 import com.boricori.dto.request.gameroom.GameRequest;
+import com.boricori.dto.request.gameroom.GameUpdateRequest;
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
 import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
 import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
@@ -13,5 +14,5 @@ public interface GameRoomService {
 
   public CreateGameRoomResponse createRoom(GameRequest request) throws IOException, WriterException;
 
-  public GameRoom updateRoom(Long id);
+  public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 }

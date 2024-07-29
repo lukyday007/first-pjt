@@ -43,9 +43,10 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   @Transactional
-  public GameRoom updateRoom(Long id) {
+  public GameRoom updateRoom(Long id, StartGameRoomRequest request) {
     GameRoom gameRoom = gameRoomRepository.findById(id).orElseThrow(IllegalAccessError::new);
     gameRoom.startGameTime();
+    gameRoom.setCenter(request.getCenterLat(), request.getCenterLng());
     return gameRoom;
   }
 

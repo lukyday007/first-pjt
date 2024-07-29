@@ -91,7 +91,7 @@ public class GameRoomController {
           @PathVariable @Parameter(description = "게임 방id", required = true) long id,
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
-    GameRoom gameRoom = gameRoomService.updateRoom(id);
+    GameRoom gameRoom = gameRoomService.updateRoom(id, request);
     // 게임 참여자 튜플 생성 JPA
     List<User> users = participantsService.makeGameParticipant(gameRoom,
         request.getPlayerInfoRequests());
