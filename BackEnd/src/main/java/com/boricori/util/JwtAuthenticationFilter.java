@@ -39,6 +39,8 @@ public class JwtAuthenticationFilter implements Filter {
         // JWT 유효성 검사 로직 구현
         if (isValid(accessToken, refreshToken)) {
           // 토큰이 유효한 경우 요청을 계속 처리
+          String email = jwtUtil.getEmail(accessToken);
+          httpRequest.setAttribute("email", email);
           chain.doFilter(request, response);
         } else {
           // access token 재발급
