@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -29,5 +30,15 @@ public class InGameItems {
 
     private boolean used;
 
+    @Builder
+    public InGameItems(GameParticipants user, Item itemId){
+      this.user = user;
+      this.itemId = itemId;
+      used = false;
+    }
+
+    public void useItem(){
+      used = !used;
+    }
 
 }
