@@ -14,4 +14,8 @@ public interface GameRoomService {
   public CreateGameRoomResponse createRoom(GameRequest request) throws IOException, WriterException;
 
   public GameRoom updateRoom(Long id);
+
+  public int findMaxPlayerCountRoom(Long id);
+
+  public int getCurrentRoomPlayerCount(String roomId);
 }
