@@ -1,6 +1,7 @@
 package com.boricori.service;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
+import com.boricori.dto.request.inGame.UseItemRequest;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.InGameItems;
 import com.boricori.entity.InGameMissions;
@@ -26,7 +27,7 @@ public class InGameServiceImpl implements InGameService{
   @Autowired
   private MissionRepositoryImpl missionRepositoryImpl;
   @Autowired
-  private InGameRepositoryImpl inGameMissionsRepository;
+  private InGameRepositoryImpl inGameRepositoryImpl;
   @Autowired
   private ItemRepositoryImpl itemRepositoryImpl;
   @Autowired
@@ -38,7 +39,7 @@ public class InGameServiceImpl implements InGameService{
     GameParticipants player = participantRepository.getByEmail(email, gameId);
     for (Mission m : missions){
       InGameMissions igm = InGameMissions.builder().missionId(m).user(player).build();
-      inGameMissionsRepository.saveMission(igm);
+      inGameRepositoryImpl.saveMission(igm);
     }
     return missions;
   }
@@ -47,31 +48,32 @@ public class InGameServiceImpl implements InGameService{
   public Mission changeMission(Long gameId, String email, MissionChangeRequest request) {
     Mission newMission =  missionRepositoryImpl.changeMission(request.getMissionId());
     GameParticipants player = participantRepository.getByEmail(email, gameId);
-    inGameMissionsRepository.saveMission(
+    inGameRepositoryImpl.saveMission(
         InGameMissions.builder().missionId(newMission).user(player).build()
     );
-    inGameMissionsRepository.updateMission(request.getMissionId(), player);
+    inGameRepositoryImpl.updateMission(request.getMissionId(), player);
     return newMission;
   }
 
   @Override
   public void completeMission(Long gameId, String email, MissionChangeRequest request) {
     GameParticipants player = participantRepository.getByEmail(email, gameId);
-    inGameMissionsRepository.updateMission(request.getMissionId(), player);
+    inGameRepositoryImpl.updateMission(request.getMissionId(), player);
   }
 
   @Override
   public Item getItem(Long gameId, String email) {
     Item item = itemRepositoryImpl.getItem();
     GameParticipants player = participantRepository.getByEmail(email, gameId);
-    inGameMissionsRepository.saveItem(
+    inGameRepositoryImpl.saveItem(
         InGameItems.builder().itemId(item).user(player).build()
     );
     return item;
   }
 
   @Override
-  public void useItem(Long gameId, String email) {
-
+  public void useItem(Long gameId, String email, UseItemRequest req) {
+    GameParticipants player = participantRepository.getByEmail(email, gameId);
+    inGameRepositoryImpl.useItem(player, req.getItemId());
   }
 }

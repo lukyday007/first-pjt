@@ -1,6 +1,8 @@
 package com.boricori.controller;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
+import com.boricori.dto.request.inGame.UseItemRequest;
+import com.boricori.dto.response.inGame.ItemResponse;
 import com.boricori.dto.response.inGame.MissionResponse;
 import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
@@ -30,7 +32,7 @@ public class InGameController {
   private final GameManager gm = GameManager.getGameManager();
 
   //임시
-  String email = "";
+  String email = "ssafy";
 
   @GetMapping("/{roomId}/assignMissions")
   public ResponseEntity<List<MissionResponse>> assignMissions(@PathVariable Long roomId, HttpServletRequest request, HttpServletResponse response){
@@ -38,36 +40,34 @@ public class InGameController {
     List<Mission> missions = inGameService.assignMissions(email, roomId);
     List<MissionResponse> resp = new ArrayList<>();
     for (Mission m : missions){
-      MissionResponse newM = MissionResponse.builder()
-          .missionId(m.getId())
-          .category(m.getCategory())
-          .target(m.getTarget())
-          .targetEn(m.getTargetEn())
-          .build();
+      MissionResponse newM = MissionResponse.of(m);
       resp.add(newM);
     }
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(resp);
   }
 
   @PostMapping("/{roomId}/changeMission")
-  public void changeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
-    inGameService.changeMission(gameId, email, request);
+  public ResponseEntity<MissionResponse> changeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
+    Mission newMission = inGameService.changeMission(gameId, email, request);
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(MissionResponse.of(newMission));
   }
 
   @PostMapping("/{roomId}/completeMission")
-  public void completeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
+  public ResponseEntity<String> completeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
     inGameService.completeMission(gameId, email, request);
     Item item = inGameService.getItem(gameId, email);
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("COMPLETE");
   }
 
-  @PostMapping("/{roomId}/getItem")
-  public void getItem(@PathVariable Long gameId){
-    inGameService.getItem(gameId, email);
+  @GetMapping("/{roomId}/getItem")
+  public ResponseEntity<ItemResponse> getItem(@PathVariable Long gameId){
+    Item item = inGameService.getItem(gameId, email);
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(ItemResponse.of(item));
   }
 
   @PostMapping("/{roomId}/useItem")
-  public void useItem(@PathVariable Long gameId){
-    inGameService.useItem(gameId, email);
+  public void useItem(@PathVariable Long gameId, UseItemRequest req){
+    inGameService.useItem(gameId, email, req);
   }
 
   @PostMapping("/{roomId}/catchTarget")
