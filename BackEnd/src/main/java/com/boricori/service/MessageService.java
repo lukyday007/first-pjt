@@ -4,8 +4,10 @@ import com.boricori.dto.GpsSignal;
 import com.boricori.game.GameManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,33 +16,13 @@ public class MessageService {
 
   private final SimpMessagingTemplate messagingTemplate;
 
-  private final KafkaTemplate<String, String> kafkaTemplate;
-
   private final GameManager gameManager = GameManager.getGameManager();
 
   private final ObjectMapper mapper = new ObjectMapper();
 
 
-  public MessageService(SimpMessagingTemplate messagingTemplate, KafkaTemplate<String, String> kafkaTemplate) {
+  public MessageService(SimpMessagingTemplate messagingTemplate) {
     this.messagingTemplate = messagingTemplate;
-    this.kafkaTemplate = kafkaTemplate;
-  }
-
-
-
-  public void sendGPS(GpsSignal gps) throws Exception {
-    String json = mapper.writeValueAsString(gps);
-    var record = new ProducerRecord<String, String>("game-location", json);
-    record.headers().add("gameId", String.valueOf(gps.getGameId()).getBytes(StandardCharsets.UTF_8))
-        .add("sender", gps.getHost().getBytes(StandardCharsets.UTF_8));
-    kafkaTemplate.send(record);
-  }
-
-
-
-  public void receiveGPSInfo(String gameId, String sender, String gpsJSON){
-    messagingTemplate.convertAndSend(String.format("/topic/location/%s", sender), gpsJSON);
-
   }
 
 
@@ -51,9 +33,8 @@ public class MessageService {
     messagingTemplate.convertAndSend(String.format("/topic/alert/%d", gameRoomId), startJSON);
   }
 
-
-
   public void processAlertMessage(String gameId, String alertJSON) {
     messagingTemplate.convertAndSend(String.format("/topic/alert/%s", gameId), alertJSON);
   }
+
 }
