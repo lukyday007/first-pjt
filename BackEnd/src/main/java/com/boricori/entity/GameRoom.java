@@ -35,6 +35,10 @@ public class GameRoom {
   private LocalDateTime startTime;
   private LocalDateTime endTime;
 
+  private String centerLat;
+  private String centerLng;
+
+
   @Column(length = 1024)
   private String qrCode;
 
@@ -57,5 +61,10 @@ public class GameRoom {
 
   public void startGameTime(){
     this.startTime = LocalDateTime.now();
+  }
+
+  public void setCenter(String centerLat, String centerLng) {
+    this.centerLat = centerLat;
+    this.centerLng = centerLng;
   }
 }

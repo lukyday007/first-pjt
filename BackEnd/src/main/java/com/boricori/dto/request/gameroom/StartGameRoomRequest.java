@@ -24,4 +24,10 @@ public class StartGameRoomRequest {
 
     @Schema(description = "게임방 사용자 목록")
     private List<PlayerInfoRequest> playerInfoRequests; // 사용자 목록
+    
+    @Schema(description = "게임 맵 중심 위도")
+    private String centerLat;
+    
+    @Schema(description = "게임 맵 중심 경도")
+    private String centerLng;
 }

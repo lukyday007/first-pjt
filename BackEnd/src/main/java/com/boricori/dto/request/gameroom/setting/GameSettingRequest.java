@@ -17,4 +17,5 @@ public class GameSettingRequest {
 
     @Schema(description = "맵 크기", example = "100")
     private int mapSize;
+
 }
