@@ -11,6 +11,12 @@ import java.io.IOException;
 public interface GameRoomService {
 
   public CreateGameRoomResponse createRoom(GameRequest request) throws IOException, WriterException;
+  
+  public int findMaxPlayerCountRoom(Long id);
+
+  public int getCurrentRoomPlayerCount(String roomId);
+
+  public void enterRoom(String roomId);
 
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 

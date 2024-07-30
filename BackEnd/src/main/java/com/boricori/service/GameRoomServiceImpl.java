@@ -15,11 +15,14 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Objects;
 
 @Service
 public class GameRoomServiceImpl implements GameRoomService {
@@ -27,6 +30,8 @@ public class GameRoomServiceImpl implements GameRoomService {
   private static final Logger log = LoggerFactory.getLogger(GameRoomServiceImpl.class);
   @Autowired
   private GameRoomRepository gameRoomRepository;
+  @Autowired
+  private RedisTemplate<String, Integer> redisTemplate;
 
 @Override
   public GameRoom findGame(Long id){
@@ -66,5 +71,20 @@ public class GameRoomServiceImpl implements GameRoomService {
     MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
     byte[] pngData = pngOutputStream.toByteArray();
     return Base64.getEncoder().encodeToString(pngData);
+  }
+
+  @Override
+  public int findMaxPlayerCountRoom(Long id){
+    return gameRoomRepository.findMaxPlayerByRoomId(id);
+  }
+
+  public int getCurrentRoomPlayerCount(String roomId) {
+    return redisTemplate.opsForValue().get(roomId);
+  }
+
+  @Override
+  public void enterRoom(String roomId) {
+    ValueOperations<String, Integer> valueOperations = redisTemplate.opsForValue();
+    valueOperations.increment(roomId);
   }
 }
