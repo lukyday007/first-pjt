@@ -70,7 +70,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public int findMaxPlayerCountRoom(Long id){
-    return gameRoomRepository.findMaxPlayerByRoomId(id);
+    return gameRoomRepository.findMaxPlayerById(id);
   }
 
   public int getCurrentRoomPlayerCount(String roomId) {
