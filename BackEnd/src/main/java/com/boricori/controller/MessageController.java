@@ -1,14 +1,22 @@
 package com.boricori.controller;
 
+import com.boricori.service.GameRoomService;
 import com.boricori.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.stereotype.Controller;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import org.springframework.stereotype.Controller;
+import java.util.Map;
 
 @Controller
 public class MessageController {
 
   private final MessageService messageService;
+
+  @Autowired
+  private GameRoomService gameRoomService;
 
   public MessageController(MessageService messageService) {
     this.messageService = messageService;
@@ -18,5 +26,11 @@ public class MessageController {
   // Convert LocalDateTime to epoch seconds
   public static long localDateTimeToEpochSeconds(LocalDateTime localDateTime) {
     return localDateTime.toEpochSecond(ZoneOffset.UTC);
+  }
+
+  @MessageMapping("/leave")
+  public void leaveGame(Map<String, String> message) {
+    String roomId = message.get("roomId");
+    gameRoomService.leaveRoom(roomId);
   }
 }

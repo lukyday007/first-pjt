@@ -3,7 +3,6 @@ package com.boricori.service;
 import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
 import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
-import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
 import com.boricori.entity.GameRoom;
 import com.boricori.repository.GameRoomRepo.GameRoomRepository;
 import com.google.zxing.BarcodeFormat;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Objects;
 
 @Service
 public class GameRoomServiceImpl implements GameRoomService {
@@ -86,5 +84,10 @@ public class GameRoomServiceImpl implements GameRoomService {
   public void enterRoom(String roomId) {
     ValueOperations<String, Integer> valueOperations = redisTemplate.opsForValue();
     valueOperations.increment(roomId);
+  }
+
+  @Override
+  public void leaveRoom(String gameRoomId) {
+    redisTemplate.opsForValue().decrement(gameRoomId);
   }
 }
