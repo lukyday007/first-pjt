@@ -37,7 +37,7 @@ public class GameRoom {
   private String centerLat;
   private String centerLng;
 
-  private String codeNumber;
+  private String gameCode;
 
   @Column(length = 1024)
   private String qrCode;
@@ -56,7 +56,7 @@ public class GameRoom {
   }
 
   public void setCodeNumber(String code){
-    this.codeNumber = code;
+    this.gameCode = code;
   }
 
 

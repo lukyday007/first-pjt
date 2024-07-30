@@ -45,7 +45,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     String qrCode = generateQRCodeImage(roomUrl);
     gameRoom.createQrCode(qrCode);
     CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode,
-        gameRoom.getCodeNumber());
+        gameRoom.getGameCode());
     return response;
   }
 

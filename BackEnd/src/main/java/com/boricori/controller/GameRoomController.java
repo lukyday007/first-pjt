@@ -90,10 +90,10 @@ public class GameRoomController {
     // 게임 방 튜플 생성
     GameRoom gameRoom = gameRoomService.updateRoom(id, request);
     // 게임 참여자 튜플 생성 JPA
-    List<User> users = participantsService.makeGameParticipant(gameRoom,
-        request.getPlayerInfoRequests());
+//    List<User> users = participantsService.makeGameParticipant(gameRoom,
+//        request.getPlayerInfoRequests());
     // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
-    makeCatchableList(gameRoom.getId(), users);
+//    makeCatchableList(gameRoom.getId(), users);
 
     // 알림 시간 Redis에 넣기
     int interval = gameRoom.getGameTime() * 60 / 4;
