@@ -94,7 +94,6 @@ public class GameRoomController {
 //        request.getPlayerInfoRequests());
     // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
 //    makeCatchableList(gameRoom.getId(), users);
-
     // 알림 시간 Redis에 넣기
     int interval = gameRoom.getGameTime() * 60 / 4;
     for (int t = 1; t < 5; t++){
