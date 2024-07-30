@@ -21,10 +21,6 @@ public class InGameRepositoryImpl {
     jpaQueryFactory = qf;
   }
 
-  public void saveMission(InGameMissions igm){
-    jpaQueryFactory.insert(missions).values(igm).execute();
-  }
-
 
   public void updateMission(Long missionId, GameParticipants player) {
     jpaQueryFactory
@@ -34,18 +30,12 @@ public class InGameRepositoryImpl {
         .execute();
   }
 
-  public void saveItem(InGameItems igi) {
-    jpaQueryFactory
-        .insert(items)
-        .values(igi)
-        .execute();
-  }
 
   public void useItem(GameParticipants player, Long itemId) {
     jpaQueryFactory
         .update(items)
         .set(items.used, true)
-        .where(items.user.id.eq(player.getId()).and(items.itemId.id.eq(itemId)))
+        .where(items.user.id.eq(player.getId()).and(items.item.id.eq(itemId)))
         .execute();
   }
 }

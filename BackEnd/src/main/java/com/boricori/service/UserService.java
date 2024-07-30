@@ -15,4 +15,5 @@ public interface UserService {
   int findUserScore(String email);
   List<RankDtoResponse> findAllRank();
   UserLoginResponse login(UserLoginRequest request);
+  User findByEmail(String email);
 }

@@ -8,6 +8,8 @@ import com.boricori.entity.InGameMissions;
 import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.repository.ParticipantRepo.ParticipantRepositoryImpl;
+import com.boricori.repository.inGameRepo.InGameItemsRepository;
+import com.boricori.repository.inGameRepo.InGameMissionsRepository;
 import com.boricori.repository.inGameRepo.InGameRepositoryImpl;
 import com.boricori.repository.inGameRepo.ItemRepository;
 import com.boricori.repository.inGameRepo.ItemRepositoryImpl;
@@ -32,6 +34,10 @@ public class InGameServiceImpl implements InGameService{
   private ItemRepositoryImpl itemRepositoryImpl;
   @Autowired
   private ParticipantRepositoryImpl participantRepository;
+  @Autowired
+  private InGameMissionsRepository inGameMissionsRepository;
+  @Autowired
+  private InGameItemsRepository inGameItemsRepository;
 
   @Override
   public List<Mission> assignMissions(String email, Long gameId) {
@@ -39,7 +45,7 @@ public class InGameServiceImpl implements InGameService{
     GameParticipants player = participantRepository.getByEmail(email, gameId);
     for (Mission m : missions){
       InGameMissions igm = InGameMissions.builder().missionId(m).user(player).build();
-      inGameRepositoryImpl.saveMission(igm);
+      inGameMissionsRepository.save(igm);
     }
     return missions;
   }
@@ -48,7 +54,7 @@ public class InGameServiceImpl implements InGameService{
   public Mission changeMission(Long gameId, String email, MissionChangeRequest request) {
     Mission newMission =  missionRepositoryImpl.changeMission(request.getMissionId());
     GameParticipants player = participantRepository.getByEmail(email, gameId);
-    inGameRepositoryImpl.saveMission(
+    inGameMissionsRepository.save(
         InGameMissions.builder().missionId(newMission).user(player).build()
     );
     inGameRepositoryImpl.updateMission(request.getMissionId(), player);
@@ -65,9 +71,7 @@ public class InGameServiceImpl implements InGameService{
   public Item getItem(Long gameId, String email) {
     Item item = itemRepositoryImpl.getItem();
     GameParticipants player = participantRepository.getByEmail(email, gameId);
-    inGameRepositoryImpl.saveItem(
-        InGameItems.builder().itemId(item).user(player).build()
-    );
+    inGameItemsRepository.save(InGameItems.builder().item(item).user(player).build());
     return item;
   }
 

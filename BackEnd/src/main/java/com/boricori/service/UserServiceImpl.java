@@ -67,4 +67,9 @@ public class UserServiceImpl implements UserService {
     }
     return UserLoginResponse.of(null, null, ResponseEnum.FAIL);
   }
+
+  @Override
+  public User findByEmail(String email){
+    return userRepo.findByEmail(email);
+  }
 }

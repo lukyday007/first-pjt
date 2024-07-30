@@ -1,13 +1,9 @@
 package com.boricori.service;
 
-import com.boricori.dto.GpsSignal;
+import com.boricori.entity.GameRoom;
 import com.boricori.game.GameManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
+import java.time.format.DateTimeFormatter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +22,16 @@ public class MessageService {
   }
 
 
-  public void startGame(Long gameRoomId){
+  public void startGame(Long gameRoomId, GameRoom gameRoom){
     // 여기는 현재 방에 웹소켓으로 연결된 유저들에게 알림만 주면 되므로 kafka 거칠 필요 없음
     // pub('app/start') 받아서 sub('/topic/general/roomId') 한 유저들에게 뿌려줌
-    String startJSON = "{'msgType':'start'}";
+    String startJSON = String.format("{'msgType':'start','gameId':%d, 'mapSize':'%d', 'gameTime':'%d', 'startTime':'%s', 'lat':'%s', 'lng':'%s'}",
+        gameRoom.getId(),
+        gameRoom.getMapSize(),
+        gameRoom.getGameTime(),
+        gameRoom.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+        gameRoom.getCenterLat(),
+        gameRoom.getCenterLng());
     messagingTemplate.convertAndSend(String.format("/topic/alert/%d", gameRoomId), startJSON);
   }
 
