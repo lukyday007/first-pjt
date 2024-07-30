@@ -51,7 +51,7 @@ const DropdownRadio = ({
   );
 };
 
-const GameSettingDialog = ({ isOpen, onClose, children, dialogButtonName }) => {
+const GameSettingDialog = ({ isOpen, onClose, children }) => {
   const navigate = useNavigate();
   const [selectedCapacity, setSelectedCapacity] = useState("👪");
   const [selectedTime, setSelectedTime] = useState("⏱");
@@ -60,13 +60,11 @@ const GameSettingDialog = ({ isOpen, onClose, children, dialogButtonName }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild>
-        <Button className="mb-4 bg-theme-color-2 font-bold text-cyan-600">
-          {children}
-        </Button>
+        <Button className="mb-4 bg-theme-color-2 font-bold text-cyan-600" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="mb-2">{children}</DialogTitle>
+          <DialogTitle className="mb-2">게임 설정</DialogTitle>
           <DialogDescription>
             게임 영역의 기준점은 &quot;방장의 현재 위치&quot;입니다. <br />
             기준점으로부터 설정한 반경만큼의 원 모양으로 <br />

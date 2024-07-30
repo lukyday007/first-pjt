@@ -28,10 +28,22 @@ const Home = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    navigate("/login");
+  };
+
   return (
     <div className="h-screen bg-theme-color-2">
       <div className="m-4 flex h-screen flex-col items-center justify-center">
-        <img src={titleImage} alt="titleImage" className="mb-8 w-60" />
+        <img src={titleImage} alt="titleImage" className="w-60" />
+
+        <div className="mb-4 font-bold">XXX 님 환영합니다.</div>
+        <Button onClick={handleLogout} className="mb-12 bg-rose-600 font-bold">
+          로그아웃
+        </Button>
+
         <div className="grid grid-cols-2 gap-8">
           <ActionButton
             onClick={() => setDialogOpen(true)}
@@ -61,9 +73,7 @@ const Home = () => {
         <GameSettingDialog
           isOpen={isDialogOpen}
           onClose={() => setDialogOpen(false)}
-        >
-          게임 설정
-        </GameSettingDialog>
+        />
       </div>
     </div>
   );
