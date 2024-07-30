@@ -20,4 +20,5 @@ public interface GameRoomService {
 
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 
+  public GameRoom findGame(Long id);
 }

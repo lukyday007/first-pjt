@@ -2,16 +2,27 @@ package com.boricori.controller;
 
 import com.boricori.dto.response.ParticipantResponse;
 import com.boricori.dto.response.ParticipantsResponse;
+import com.boricori.entity.GameParticipants;
+import com.boricori.entity.GameRoom;
+import com.boricori.entity.User;
+import com.boricori.repository.userRepo.UserRepository;
+import com.boricori.service.GameRoomService;
+import com.boricori.service.GameService;
+import com.boricori.service.ParticipantsService;
+import com.boricori.service.UserService;
+import com.boricori.util.ResponseEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/participants")
 public class ParticipantController {
+
+  @Autowired
+  private UserService userService;
+
+  @Autowired
+  private GameRoomService gameRoomService;
+
+  @Autowired
+  private ParticipantsService participantsService;
 
   @GetMapping("/{playId}")
   @Operation(summary = "모든 게임 참여자 상태", description = "게임에 참여 중인 모든 인원의 상태를 반환해줍니다.")
@@ -75,6 +95,19 @@ public class ParticipantController {
       @PathVariable("playId") String playId, @PathVariable("userName") String userName) {
 
     return ResponseEntity.ok(200);
+  }
+
+  @GetMapping("{id}/enter")
+  @Operation(summary = "게임 참여 요청", description = "게임 시작 후 게임 참여자로 저장합니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "OK"),
+  })
+  public ResponseEntity<?> enterGame(@PathVariable Long gameId) {
+    String email = "ssafy"; // 필터 걸기 전 임시
+    User user = userService.findByEmail(email);
+    GameRoom game = gameRoomService.findGame(gameId);
+    participantsService.addRecord(GameParticipants.builder().gameRoom(game).user(user).build());
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("ADDED");
   }
 
 }

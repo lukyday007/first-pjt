@@ -1,5 +1,6 @@
 package com.boricori.dto.response.inGame;
 
+import com.boricori.entity.Mission;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -25,5 +26,14 @@ public class MissionResponse {
     this.category = category;
     this.target = target;
     this.targetEn = targetEn;
+  }
+
+  public static MissionResponse of(Mission mission){
+    return MissionResponse.builder()
+        .missionId(mission.getId())
+        .category(mission.getCategory())
+        .target(mission.getTarget())
+        .targetEn(mission.getTargetEn())
+        .build();
   }
 }
