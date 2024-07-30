@@ -7,9 +7,11 @@ import lombok.Data;
 public class CreateGameRoomResponse {
     private Long gameRoomId;
     private String qrCode;
+    private String gameCode;
 
-    public CreateGameRoomResponse(Long id, String qrCode) {
+    public CreateGameRoomResponse(Long id, String qrCode, String gameCode) {
         this.gameRoomId = id;
         this.qrCode = qrCode;
+        this.gameCode = gameCode;
     }
 }

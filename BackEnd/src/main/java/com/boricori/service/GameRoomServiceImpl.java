@@ -31,19 +31,24 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private RedisTemplate<String, Integer> redisTemplate;
 
+@Override
+  public GameRoom findGame(Long id){
+    return gameRoomRepository.findById(id).orElse(null);
+  }
+
   @Override
   @Transactional
   public CreateGameRoomResponse createRoom(GameRequest gameRoomInfo) throws IOException, WriterException {
     GameRoom gameRoom = GameRoom.builder().gameRoomRequest(gameRoomInfo).build();
+    String currTime = String.valueOf(System.currentTimeMillis());
+    String code = currTime.substring(currTime.length() - 8, currTime.length());
+    gameRoom.setCodeNumber(code);
     gameRoom = gameRoomRepository.save(gameRoom);
-
     String roomUrl = "http://runtail/join-room/" + gameRoom.getId();
     String qrCode = generateQRCodeImage(roomUrl);
     gameRoom.createQrCode(qrCode);
-
-    redisTemplate.opsForValue().set("roomId", 1);
-
-    CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode);
+    CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode,
+        gameRoom.getGameCode());
     return response;
   }
 

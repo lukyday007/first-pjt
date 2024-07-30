@@ -1,7 +1,6 @@
 package com.boricori.entity;
 
 
-import io.lettuce.core.dynamic.annotation.Key;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,14 +25,14 @@ public class InGameItems {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    private Item itemId;
+    private Item item;
 
     private boolean used;
 
     @Builder
-    public InGameItems(GameParticipants user, Item itemId){
+    public InGameItems(GameParticipants user, Item item){
       this.user = user;
-      this.itemId = itemId;
+      this.item = item;
       used = false;
     }
 

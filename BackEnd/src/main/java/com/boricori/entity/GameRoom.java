@@ -1,7 +1,6 @@
 package com.boricori.entity;
 
 import com.boricori.dto.request.gameroom.GameRequest;
-import com.boricori.dto.request.gameroom.setting.GameSettingRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,22 +37,28 @@ public class GameRoom {
   private String centerLat;
   private String centerLng;
 
+  private String gameCode;
 
   @Column(length = 1024)
   private String qrCode;
 
   @Builder
   public GameRoom(GameRequest gameRoomRequest) {
-    roomSetting(gameRoomRequest.getSetting());
+    roomSetting(gameRoomRequest);
     isActivated = true;
   }
 
-  private void roomSetting(GameSettingRequest setting) {
-    this.roomName = setting.getName();
-    this.maxPlayer = setting.getMaxPlayer();
-    this.mapSize = setting.getMapSize();
-    this.gameTime = setting.getTime();
+  private void roomSetting(GameRequest gameRoomRequest) {
+    this.roomName = gameRoomRequest.getName();
+    this.maxPlayer = gameRoomRequest.getMaxPlayer();
+    this.mapSize = gameRoomRequest.getMapSize();
+    this.gameTime = gameRoomRequest.getTime();
   }
+
+  public void setCodeNumber(String code){
+    this.gameCode = code;
+  }
+
 
   public void createQrCode(String qrCode){
     this.qrCode = qrCode;

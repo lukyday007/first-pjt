@@ -31,4 +31,9 @@ public class ParticipantsServiceImpl implements ParticipantsService {
 
   }
 
+  @Override
+  public void addRecord(GameParticipants participants) {
+    participantRepository.save(participants);
+  }
+
 }

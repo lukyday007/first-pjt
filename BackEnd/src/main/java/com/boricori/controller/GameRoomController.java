@@ -2,11 +2,8 @@ package com.boricori.controller;
 
 import com.boricori.dto.request.gameroom.EndGameRoomRequest;
 import com.boricori.dto.request.gameroom.GameRequest;
-import com.boricori.dto.request.gameroom.GameUpdateRequest;
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
 import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
-import com.boricori.dto.response.gameroom.GameRoomSettingResponse;
-import com.boricori.dto.response.gameroom.StartGameRoomResponse;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
 import com.boricori.entity.GameRoom;
 import com.boricori.entity.User;
@@ -87,27 +84,25 @@ public class GameRoomController {
       @ApiResponse(responseCode = "404", description = "실패"),
       @ApiResponse(responseCode = "500", description = "서버 오류")
   })
-  public ResponseEntity<StartGameRoomResponse> startGameRoom(
+  public ResponseEntity<String> startGameRoom(
           @PathVariable @Parameter(description = "게임 방id", required = true) long id,
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
     GameRoom gameRoom = gameRoomService.updateRoom(id, request);
     // 게임 참여자 튜플 생성 JPA
-    List<User> users = participantsService.makeGameParticipant(gameRoom,
-        request.getPlayerInfoRequests());
+//    List<User> users = participantsService.makeGameParticipant(gameRoom,
+//        request.getPlayerInfoRequests());
     // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
-    makeCatchableList(gameRoom.getId(), users);
-
+//    makeCatchableList(gameRoom.getId(), users);
     // 알림 시간 Redis에 넣기
     int interval = gameRoom.getGameTime() * 60 / 4;
     for (int t = 1; t < 5; t++){
       redisTemplate.opsForValue().set(String.format("%d-%d", gameRoom.getId(), t), String.valueOf(t), interval * t, TimeUnit.SECONDS);
     }
-    messageService.startGame(gameRoom.getId());
-
+    messageService.startGame(gameRoom.getId(), gameRoom);
 
     // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
-    return ResponseEntity.status(SUCCESS.getCode()).body(new StartGameRoomResponse());
+    return ResponseEntity.status(SUCCESS.getCode()).body("GAME STARTED");
   }
 
   private void makeCatchableList(Long roomId, List<User> users) {
