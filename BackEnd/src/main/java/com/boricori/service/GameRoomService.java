@@ -20,4 +20,5 @@ public interface GameRoomService {
 
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 
+  void leaveRoom(String gameRoomId);
 }
