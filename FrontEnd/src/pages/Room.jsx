@@ -4,8 +4,10 @@ import { GameContext } from "@/context/GameContext";
 import GameSettingDialog from "@components/GameSettingDialog";
 
 const Room = () => {
-  const { gameRoomId } = useContext(GameContext);
+  const { setUserId, setGameRoomId } = useContext(GameContext);
   const { connect, disconnect } = useContext(WebSocketContext);
+
+  // 방에 접속 시 userId, gameRoomId
 
   useEffect(() => {
     connect();
