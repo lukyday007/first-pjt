@@ -3,30 +3,33 @@ import { GameContext } from "@/context/GameContext";
 
 const { kakao } = window;
 
-const useMarker = mapInstance => {
+const useTargetMarker = mapInstance => {
   const markerRef = useRef(null);
-  const { myLocation } = useContext(GameContext);
+  const { targetLocation } = useContext(GameContext);
 
   // 지도 최초 생성 시, 마커 생성 후 지도에 표시
   useEffect(() => {
     if (mapInstance && !markerRef.current) {
       const marker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(myLocation.lat, myLocation.lng),
+        position: new kakao.maps.LatLng(targetLocation.lat, targetLocation.lng),
         map: mapInstance,
       });
       markerRef.current = marker;
     }
-  }, [mapInstance]);
+  }, [mapInstance, targetLocation]);
 
   // 내 위치 변동에 따라 마커를 새로 set
   useEffect(() => {
     if (markerRef.current) {
-      const newPosition = new kakao.maps.LatLng(myLocation.lat, myLocation.lng);
+      const newPosition = new kakao.maps.LatLng(
+        targetLocation.lat,
+        targetLocation.lng
+      );
       markerRef.current.setPosition(newPosition);
     }
-  }, [myLocation]);
+  }, [targetLocation]);
 
   return markerRef;
 };
 
-export default useMarker;
+export default useTargetMarker;
