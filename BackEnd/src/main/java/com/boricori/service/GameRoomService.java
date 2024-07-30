@@ -18,4 +18,6 @@ public interface GameRoomService {
   public int findMaxPlayerCountRoom(Long id);
 
   public int getCurrentRoomPlayerCount(String roomId);
+
+  public void enterRoom(String roomId);
 }

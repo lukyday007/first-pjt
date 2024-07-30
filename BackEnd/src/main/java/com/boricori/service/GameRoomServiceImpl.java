@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -30,7 +31,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private GameRoomRepository gameRoomRepository;
   @Autowired
-  private RedisTemplate<Long, String> redisTemplate;
+  private RedisTemplate<String, Integer> redisTemplate;
 
   @Override
   @Transactional
@@ -42,7 +43,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     String qrCode = generateQRCodeImage(roomUrl);
     gameRoom.createQrCode(qrCode);
 
-    redisTemplate.opsForValue().set(gameRoom.getId(), "1");
+    redisTemplate.opsForValue().set("roomId", 1);
 
     CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode);
     return response;
@@ -72,6 +73,12 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   public int getCurrentRoomPlayerCount(String roomId) {
-    return Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(roomId)));
+    return redisTemplate.opsForValue().get(roomId);
+  }
+
+  @Override
+  public void enterRoom(String roomId) {
+    ValueOperations<String, Integer> valueOperations = redisTemplate.opsForValue();
+    valueOperations.increment(roomId);
   }
 }
