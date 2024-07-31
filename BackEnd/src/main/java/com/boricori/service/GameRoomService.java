@@ -22,4 +22,6 @@ public interface GameRoomService {
 
   public GameRoom findGame(Long id);
   void leaveRoom(String roomId, String userName);
+
+  GameRoom findGameByCode(String gameCode);
 }

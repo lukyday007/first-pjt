@@ -11,4 +11,6 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
 
     @Query("SELECT g.maxPlayer FROM GameRoom g WHERE g.id = :roomId")
     int findMaxPlayerByRoomId(@Param("roomId") Long roomId);
+
+    GameRoom findByGameCode(String gameCode);
 }

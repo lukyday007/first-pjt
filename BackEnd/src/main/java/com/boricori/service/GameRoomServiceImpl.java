@@ -88,6 +88,11 @@ public class GameRoomServiceImpl implements GameRoomService {
     redisTemplate.opsForValue().set(roomId, players);
   }
 
+  @Override
+  public GameRoom findGameByCode(String gameCode) {
+    return gameRoomRepository.findByGameCode(gameCode);
+  }
+
   private String generateQRCodeImage(String text) throws IOException, WriterException {
     QRCodeWriter qrCodeWriter = new QRCodeWriter();
     BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 200, 200);
