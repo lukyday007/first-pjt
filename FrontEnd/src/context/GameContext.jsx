@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom";
 
 // const harversineDistance = (lat1, lng1, lat2, lng2) => {
 //   const R = 6371;
@@ -49,6 +50,9 @@ export const GameContext = createContext();
 export const GameProvider = ({ children }) => {
   const [userId, setUserId] = useState(null); // 사용자 ID(닉네임)
   const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
+  // const [gameRoomId, setGameRoomId] = useState(() => {
+  //   return localStorage.getItem('gameRoomId') || '';
+  // });
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
   const [areaCenter, setAreaCenter] = useState({ lat: 36.356, lng: 127.354 }); // 영역 중심 정보, 임시값
   const [areaRadius, setAreaRadius] = useState(200); // 영역 반경 정보, 임시값

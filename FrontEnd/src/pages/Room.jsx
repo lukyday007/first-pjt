@@ -2,12 +2,15 @@ import React, { useContext, useEffect } from "react";
 import { WebSocketContext } from "@/context/WebSocketContext";
 import { GameContext } from "@/context/GameContext";
 import GameSettingDialog from "@components/GameSettingDialog";
+import { useParams } from "react-router-dom";
 
 const Room = () => {
-  const { gameRoomId } = useContext(GameContext);
+  const { gameRoomId: paramGameRoomId } = useParams();
+  const { setGameRoomId } = useContext(GameContext);
   const { connect, disconnect } = useContext(WebSocketContext);
 
   useEffect(() => {
+    setGameRoomId(paramGameRoomId);
     connect();
 
     return () => {
