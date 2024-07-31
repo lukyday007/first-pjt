@@ -55,9 +55,14 @@ public class GameRoomController {
       @ApiResponse(responseCode = "500", description = "서버 오류")
   })
   public ResponseEntity<CreateGameRoomResponse> createGameRoom(
-      @RequestBody @Parameter(description = "게임방 세팅", required = true) GameRequest gameRequest) {
+      @RequestBody @Parameter(description = "게임방 세팅", required = true) GameRequest gameRequest,
+      @RequestHeader("userName") String userName) {
     try {
-      CreateGameRoomResponse room = gameRoomService.createRoom(gameRequest);
+      /*jwt 필터 필요
+      *
+      *
+       */
+      CreateGameRoomResponse room = gameRoomService.createRoom(gameRequest, userName);
       return ResponseEntity.status(200).body(room);
     } catch (WriterException | IOException e) {
       return ResponseEntity.status(500).build();
