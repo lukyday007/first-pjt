@@ -71,7 +71,7 @@ export const WebSocketProvider = ({ children }) => {
             );
             if (response.data.success) {
               // 반경, 중심, 타겟 닉네임 수신
-              setAreaRadius(response.data.mapSize);
+              setAreaRadius(parseInt(response.data.mapSize));
               setAreaCenter({
                 lat: parseFloat(response.data.centerLat).toFixed(5),
                 lng: parseFloat(response.data.centerLng).toFixed(5),
