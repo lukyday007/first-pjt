@@ -67,7 +67,7 @@ export const GameProvider = ({ children }) => {
             const { latitude, longitude } = position.coords;
             setMyLocation(coordToFixed(latitude, longitude));
           },
-          // error => console.log(error)
+          error => console.log(error)
         );
       };
       const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치를 갱신 및 거리 계산
