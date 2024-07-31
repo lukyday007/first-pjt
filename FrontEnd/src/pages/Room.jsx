@@ -9,6 +9,8 @@ const Room = () => {
   const { setGameRoomId } = useContext(GameContext);
   const { connect, disconnect } = useContext(WebSocketContext);
 
+  // 방에 접속 시 userId, gameRoomId
+
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
     connect();
@@ -16,7 +18,7 @@ const Room = () => {
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, [connect, disconnect, paramGameRoomId, setGameRoomId]);
 
   return (
     // 방 접속 시 gameRoomId를 받아야 함
