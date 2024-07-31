@@ -1,14 +1,43 @@
 import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { WebSocketContext } from "@/context/WebSocketContext";
 import { GameContext } from "@/context/GameContext";
-import { useParams } from "react-router-dom";
+import axiosInstance from "@/api/axiosInstance.js";
+
+import { Button } from "@components/ui/Button";
 
 const Room = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
-  const { gameStatus, gameRoomId, setGameRoomId } = useContext(GameContext);
+  const { gameStatus, myLocation, gameRoomId, setGameRoomId } =
+    useContext(GameContext);
   const { connect, disconnect } = useContext(WebSocketContext);
   const navigate = useNavigate();
+
+  // GameSettingDialog 컴포넌트에서 보낸 state에서 QR과 방 코드를 추출
+  const location = useLocation();
+  const { qrCode, gameCode } = location.state || {};
+
+  const handleStartGame = async () => {
+    try {
+      const response = await axiosInstance.post(
+        "/gameroom/${gameRoomId}/start",
+        {
+          centerLat: myLocation.lat,
+          centerLng: myLocation.lng,
+        }
+      );
+
+      if (response.data.result === "SUCCESS") {
+        navigate();
+      } else {
+        setError("게임 시작에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (err) {
+      setError(
+        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+      );
+    }
+  };
 
   // 방에 접속 시 userId, gameRoomId 설정 및 WebSocket 연결
   useEffect(() => {
@@ -30,11 +59,19 @@ const Room = () => {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-white">
-      <div>1. 랜덤 생성 QR code</div>
+      <div>1. QR code</div>
+      {qrCode && <img src={qrCode} alt={qrCode} className="h-40 w-40" />}
 
-      <div>2. 랜덤 생성 방 번호</div>
+      <div>2. 방 코드</div>
+      {gameCode}
 
       <div>3. 현재 참가자 목록</div>
+      <Button
+        className="mb-8 bg-theme-color-1 font-bold"
+        onClick={handleStartGame}
+      >
+        게임 시작
+      </Button>
     </div>
   );
 };

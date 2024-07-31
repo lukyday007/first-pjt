@@ -91,7 +91,7 @@ const GameSettingDialog = ({ isOpen, onClose }) => {
         mapSize,
       });
 
-      if (response.data.success) {
+      if (response.data.result === "SUCCESS") {
         navigate(`/room/${response.data.gameRoomId}`);
       } else {
         setError("방 생성에 실패했습니다. 다시 시도해주세요.");
