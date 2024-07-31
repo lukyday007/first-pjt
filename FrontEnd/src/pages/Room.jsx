@@ -21,8 +21,6 @@ const Room = () => {
   }, [connect, disconnect, paramGameRoomId, setGameRoomId]);
 
   return (
-    // 방 접속 시 gameRoomId를 받아야 함
-
     <div className="flex h-screen flex-col items-center justify-center bg-white">
       <div>1. 랜덤 생성 QR code</div>
 
