@@ -12,12 +12,12 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/user/login", {
+      const response = await axios.post("http://localhost:8080/users/login", {
         email,
         password,
       });
 
-      if (response.data.success) {
+      if (response.data.result === "SUCCESS") {
         const { accessToken, refreshToken } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
