@@ -124,8 +124,6 @@ export const GameProvider = ({ children }) => {
         setTargetId,
         gameStatus,
         setGameStatus,
-        gameTime,
-        setGameTime,
         myLocation,
         setMyLocation,
         targetLocation,
