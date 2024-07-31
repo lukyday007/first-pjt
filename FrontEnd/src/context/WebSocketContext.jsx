@@ -29,7 +29,7 @@ export const WebSocketProvider = ({ children }) => {
   const connect = useCallback(() => {
     if (!gameRoomId) return;
 
-    const socket = new SockJS("/server");
+    const socket = new SockJS("http://localhost:8080/server");
     stompClient.current = Stomp.over(socket);
     stompClient.current.connect({}, frame => {
       console.log("Connected: " + frame);
