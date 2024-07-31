@@ -27,7 +27,7 @@ const Room = () => {
         }
       );
 
-      if (response.data.result === "SUCCESS") {
+      if (response.status == 200) {
         navigate();
       } else {
         setError("게임 시작에 실패했습니다. 다시 시도해주세요.");
