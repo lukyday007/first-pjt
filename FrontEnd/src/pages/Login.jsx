@@ -17,7 +17,7 @@ const Login = () => {
         password,
       });
 
-      if (response.data.success) {
+      if (response.status == 200) {
         const { accessToken, refreshToken } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);

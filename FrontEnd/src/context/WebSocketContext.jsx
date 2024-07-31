@@ -69,7 +69,7 @@ export const WebSocketProvider = ({ children }) => {
             const response = await axiosInstance.get(
               `/gameroom/${gameRoomId}/startInfo`
             );
-            if (response.data.success) {
+            if (response.status == 200) {
               // 반경, 중심, 타겟 닉네임 수신
               setAreaRadius(parseInt(response.data.mapSize));
               setAreaCenter({
@@ -91,7 +91,7 @@ export const WebSocketProvider = ({ children }) => {
             const response = await axiosInstance.get(
               `/in-game/${gameRoomId}/assignMissions`
             );
-            if (response.data.success) {
+            if (response.status == 200) {
               // MissionResponse 관련 로직 작성
             } else {
               alert("할당된 미션 수신 과정에서 오류가 발생했습니다.");

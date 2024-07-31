@@ -14,7 +14,7 @@ import {
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,13 +22,13 @@ const Signup = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/users/signup", {
-        nickname,
+      const response = await axios.post("http://localhost:8080/user/signup", {
+        username,
         email,
         password,
       });
 
-      if (response.data.success) {
+      if (response.status == 200) {
         setIsDialogOpen(true); // 회원가입에 성공했을 때만 다이얼로그를 보여주기
       } else {
         setError("회원가입에 실패했습니다. 다시 시도해주세요.");
@@ -46,10 +46,10 @@ const Signup = () => {
       <div className="w-60">
         <Input
           type="text"
-          placeholder="nickname"
+          placeholder="username"
           className="mb-4 p-4"
-          value={nickname}
-          onChange={e => setNickname(e.target.value)}
+          value={username}
+          onChange={e => setUsername(e.target.value)}
         />
         <Input
           type="email"
