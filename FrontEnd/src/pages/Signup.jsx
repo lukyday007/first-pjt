@@ -22,13 +22,13 @@ const Signup = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/users/signup", {
+      const response = await axios.post("http://localhost:8080/user/signup", {
         username,
         email,
         password,
       });
 
-      if (response.data.result === "SUCCESS") {
+      if (response.status == 200) {
         setIsDialogOpen(true); // 회원가입에 성공했을 때만 다이얼로그를 보여주기
       } else {
         setError("회원가입에 실패했습니다. 다시 시도해주세요.");
