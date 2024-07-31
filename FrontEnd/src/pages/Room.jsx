@@ -1,6 +1,24 @@
-import GameSettingDialog from "@components/GameSettingDialog";
+import React, { useContext, useEffect } from "react";
+import { WebSocketContext } from "@/context/WebSocketContext";
+import { GameContext } from "@/context/GameContext";
+import { useParams } from "react-router-dom";
 
 const Room = () => {
+  const { gameRoomId: paramGameRoomId } = useParams();
+  const { setGameRoomId } = useContext(GameContext);
+  const { connect, disconnect } = useContext(WebSocketContext);
+
+  // 방에 접속 시 userId, gameRoomId
+
+  useEffect(() => {
+    setGameRoomId(paramGameRoomId);
+    connect();
+
+    return () => {
+      disconnect();
+    };
+  }, [connect, disconnect, paramGameRoomId, setGameRoomId]);
+
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-white">
       <div>1. 랜덤 생성 QR code</div>

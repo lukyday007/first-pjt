@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@components/ui/Button";
+import axiosInstance from "@/api/axiosInstance.js";
 
+import { Button } from "@components/ui/Button";
 import {
   Dialog,
   DialogContent,
@@ -51,22 +52,65 @@ const DropdownRadio = ({
   );
 };
 
-const GameSettingDialog = ({ isOpen, onClose, children, dialogButtonName }) => {
+const GameSettingDialog = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const [selectedCapacity, setSelectedCapacity] = useState("👪");
-  const [selectedTime, setSelectedTime] = useState("⏱");
+  const [roomName, setRoomName] = useState("");
+  const [selectedMaxPlayer, setSelectedMaxPlayer] = useState("👪");
+  const [selectedGameTime, setSelectedGameTime] = useState("⏱");
   const [selectedMapSize, setSelectedMapSize] = useState("🗺");
+  const [error, setError] = useState("");
+
+  const handleCreateRoom = async () => {
+    // 설정에 대한 유효성 검사
+    if (!roomName) {
+      setError("방의 이름을 입력해주세요.");
+      return;
+    }
+    if (selectedMaxPlayer === "👪") {
+      setError("방의 최대 정원을 선택해주세요.");
+      return;
+    }
+    if (selectedGameTime === "⏱") {
+      setError("게임 시간을 선택해주세요.");
+      return;
+    }
+    if (selectedMapSize === "🗺") {
+      setError("맵의 반경을 선택해주세요.");
+      return;
+    }
+
+    const maxPlayer = parseInt(selectedMaxPlayer.split(" ")[0]);
+    const gameTime = parseInt(selectedGameTime.split(" ")[0]);
+    const mapSize = parseInt(selectedMapSize.split(" ")[0]);
+
+    try {
+      const response = await axiosInstance.post("/gameroom/create", {
+        name: roomName,
+        maxPlayer,
+        gameTime,
+        mapSize,
+      });
+
+      if (response.data.success) {
+        navigate(`/room/${response.data.gameRoomId}`);
+      } else {
+        setError("방 생성에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (err) {
+      setError(
+        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+      );
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild>
-        <Button className="mb-4 bg-theme-color-2 font-bold text-cyan-600">
-          {children}
-        </Button>
+        <Button className="mb-4 bg-theme-color-2 font-bold text-cyan-600" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="mb-2">{children}</DialogTitle>
+          <DialogTitle className="mb-2">게임 설정</DialogTitle>
           <DialogDescription>
             게임 영역의 기준점은 &quot;방장의 현재 위치&quot;입니다. <br />
             기준점으로부터 설정한 반경만큼의 원 모양으로 <br />
@@ -78,20 +122,40 @@ const GameSettingDialog = ({ isOpen, onClose, children, dialogButtonName }) => {
           <Label htmlFor="username" className="text-right font-bold">
             방 이름
           </Label>
-          <Input id="radius" className="col-span-3" />
+          <Input
+            id="room-name"
+            className="col-span-3"
+            value={roomName}
+            onChange={e => setRoomName(e.target.value)}
+          />
         </div>
         <div className="mb-4 flex justify-between">
           <DropdownRadio
-            options={["4 명", "5 명", "6 명", "7 명", "8 명"]}
-            selectedValue={selectedCapacity}
-            setSelectedValue={setSelectedCapacity}
+            options={[
+              "4 명",
+              "5 명",
+              "6 명",
+              "7 명",
+              "8 명",
+              "1 명 (테스트용)",
+              "2 명 (테스트용)",
+            ]}
+            selectedValue={selectedMaxPlayer}
+            setSelectedValue={setSelectedMaxPlayer}
           >
             정원 ▼
           </DropdownRadio>
           <DropdownRadio
-            options={["10 분", "15 분", "20 분", "25 분", "30 분"]}
-            selectedValue={selectedTime}
-            setSelectedValue={setSelectedTime}
+            options={[
+              "10 분",
+              "15 분",
+              "20 분",
+              "25 분",
+              "30 분",
+              "3 분 (테스트용)",
+            ]}
+            selectedValue={selectedGameTime}
+            setSelectedValue={setSelectedGameTime}
           >
             시간 ▼
           </DropdownRadio>
@@ -107,13 +171,14 @@ const GameSettingDialog = ({ isOpen, onClose, children, dialogButtonName }) => {
         <DialogFooter>
           <div className="flex justify-center gap-12">
             <Button
-              onClick={() => navigate("/room")}
-              className="w-20 bg-theme-color-1 font-bold"
+              onClick={handleCreateRoom}
+              className="w-30 bg-theme-color-1 font-bold"
             >
-              시 작
+              방 만들기
             </Button>
           </div>
         </DialogFooter>
+        {error && <div className="text-red-500">{error}</div>}
       </DialogContent>
     </Dialog>
   );

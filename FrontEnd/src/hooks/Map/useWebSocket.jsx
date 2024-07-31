@@ -3,19 +3,19 @@ import { GameContext } from "@/context/GameContext";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
+// game start/end, 게임 영역 축소 신호만 수신/처리
 const useWebSocket = () => {
   const stompClient = useRef(null);
+  const {
+    gameRoomId,
+    targetId,
+    setGameStatus,
+    setAreaCenter,
+    areaRadius,
+    setAreaRadius,
+  } = useContext(GameContext);
 
   useEffect(() => {
-    const {
-      gameRoomId,
-      targetId,
-      setGameStatus,
-      setTargetLocation,
-      setAreaCenter,
-      setAreaRadius,
-    } = useContext(GameContext);
-    
     if (!gameRoomId || !setGameStatus) return;
 
     const socket = new SockJS("/server");
@@ -28,18 +28,19 @@ const useWebSocket = () => {
         handleAlertMessage(msg);
       });
 
-      if (targetId) {
-        stompClient.current.subscribe(
-          `/topic/location/${targetId}`,
-          serverMsg => {
-            const targetLocation = JSON.parse(serverMsg.body);
-            setTargetLocation({
-              lat: targetLocation.lat,
-              lng: targetLocation.lng,
-            });
-          }
-        );
-      }
+      // useFirebase.jsx로 기능 이관
+      // if (targetId) {
+      //   stompClient.current.subscribe(
+      //     `/topic/location/${targetId}`,
+      //     serverMsg => {
+      //       const targetLocation = JSON.parse(serverMsg.body);
+      //       setTargetLocation({
+      //         lat: targetLocation.lat,
+      //         lng: targetLocation.lng,
+      //       });
+      //     }
+      //   );
+      // }
     });
 
     return () => {
@@ -47,9 +48,10 @@ const useWebSocket = () => {
         stompClient.current.disconnect();
       }
     };
-  }, [gameRoomId, targetId, setGameStatus]);
+  }, []);
 
-  const handleAlertMessage = msg => { // msgType 따라 로직 분기
+  const handleAlertMessage = msg => {
+    // msgType 따라 로직 분기
     const { msgType, alertDegree } = msg;
     switch (msgType) {
       case "start":
@@ -66,16 +68,20 @@ const useWebSocket = () => {
     }
   };
 
-  const handleAlertDegree = degree => { // 반경 변동 로직
+  const handleAlertDegree = degree => {
+    // 반경 변동 로직
     switch (degree) {
       case 1:
         console.log("25% 경과");
+        setAreaRadius(areaRadius * 0.75); // 임의로 설정
         break;
       case 2:
         console.log("50% 경과");
+        setAreaRadius(areaRadius * 0.75);
         break;
       case 3:
         console.log("75% 경과");
+        setAreaRadius(areaRadius * 0.75);
         break;
       case 4:
         setGameStatus(false);
@@ -85,13 +91,14 @@ const useWebSocket = () => {
     }
   };
 
-  const sendLocation = location => {
-    if (stompClient.current) {
-      stompClient.current.send("/pub/location", {}, JSON.stringify(location));
-    }
-  };
+  // useFirebase.jsx로 기능 이관
+  // const sendLocation = location => {
+  //   if (stompClient.current) {
+  //     stompClient.current.send("/pub/location", {}, JSON.stringify(location));
+  //   }
+  // };
 
-  return { sendLocation };
+  // return { sendLocation };
 };
 
 export default useWebSocket;
