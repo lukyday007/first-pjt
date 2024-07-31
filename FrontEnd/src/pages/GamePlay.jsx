@@ -1,14 +1,18 @@
 import React, { useContext, useEffect } from "react";
 import MapComponent from "@/components/MapComponent";
 import { GameContext } from "@/context/GameContext";
-import useWebSocket from "@/hooks/Map/useWebSocket";
 import useFirebase from "@/hooks/Map/useFirebase";
+import { useParams } from "react-router-dom";
 
 const GamePlay = () => {
-  const { gameStatus, setGameStatus, userId, myLocation } =
+  const { gameRoomId: paramGameRoomId } = useParams();
+  const { setGameRoomId, gameStatus, setGameStatus, userId, myLocation } =
     useContext(GameContext);
   const { sendGPS } = useFirebase();
-  useWebSocket();
+
+  useEffect(() => {
+    setGameRoomId(paramGameRoomId);
+  }, [paramGameRoomId, setGameRoomId]);
 
   useEffect(() => {
     setGameStatus(true);
