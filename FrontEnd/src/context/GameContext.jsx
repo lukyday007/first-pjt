@@ -59,11 +59,11 @@ export const GameProvider = ({ children }) => {
   // 개인별 영역 이탈 시간 측정 관련 변수와 로직은 추후 추가 예정
 
   const [userId, setUserId] = useState(null); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
-  const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
+  // const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
   // localStorage에 값이 있다면 사용, 없다면 null
-  // const [gameRoomId, setGameRoomId] = useState(() => {
-  //   return localStorage.getItem('gameRoomId') || '';
-  // });
+  const [gameRoomId, setGameRoomId] = useState(() => {
+    return localStorage.getItem("gameRoomId") || "";
+  });
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
   const [areaCenter, setAreaCenter] = useState({ lat: 36.356, lng: 127.354 }); // 영역 중심 정보, 임시값
   const [areaRadius, setAreaRadius] = useState(200); // 영역 반경 정보, 임시값
@@ -73,11 +73,12 @@ export const GameProvider = ({ children }) => {
   const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
 
   // gameRoomId 값에 변동이 있다면 localStorage에 저장
-  // useEffect(() => {
-  //   if (gameRoomId) {
-  //     localStorage.setItem("gameRoomId", gameRoomId);
-  //   }
-  // }, [gameRoomId]);
+  // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
+  useEffect(() => {
+    if (gameRoomId) {
+      localStorage.setItem("gameRoomId", gameRoomId);
+    }
+  }, [gameRoomId]);
 
   // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
   useEffect(() => {

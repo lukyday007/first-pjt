@@ -72,6 +72,8 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
+  // /room, /game-play에서만 import해서 작동하도록
+  // 여기 context와 Room.jsx에만 connect(), disconnect() 활용
   useEffect(() => {
     connect();
 
