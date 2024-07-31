@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   LocalVideoTrack,
   RemoteParticipant,
@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/Button.jsx';
 import '../hooks/WebRTC/CamChatting.css';
 import VideoComponent from '../hooks/WebRTC/VideoComponent.jsx';
 import AudioComponent from '../hooks/WebRTC/AudioComponent.jsx';
+import { compact } from 'lodash';
 
 // 로컬 환경에서는 아래 변수들을 빈 값으로 남겨두기 
 // ==> 배포할 때, 아래의 변수들을 조건에 맞게 정확한 url을 다시 setting할 것 
@@ -49,9 +50,18 @@ const CamChatting = () => {
   const [remoteTracks, setRemoteTracks] = useState([]);                 // 본인을 제외한 참여자 
   const [participants, setParticipants] = useState([]);                 // 1:1 방 이동을 위한 변수 
   const [isAudioEnabled, setIsAudioEnabled] = useState(false);           // 음소거 관련 boolean 
-  const [participantName, setParticipantName] = useState('Participant' + Math.floor(Math.random() * 100));    // 임시 방 이름 생성 
+  const [participantName, setParticipantName] = useState('Participant' + Math.floor(Math.random() * 100));    // 임시 참가 유저명 생성 
   const [roomName, setRoomName] = useState('Test Room');                // 방 이름 초깃값 
   const [newRoomName, setNewRoomName] = useState('Room' + Math.floor(Math.random() * 100));   // 1:1 로 이동할 새로운 방 임시 명 
+
+  const webSocket = useRef(null);   // 웹소켓
+  const [messages, setMessages] = useState([]);
+
+  const [recipient, setRecipient] = useState(undefined);
+
+  const peerConnection = useRef(null);
+  const remoteStream = useRef(new MediaStream());
+
 
   // useEffect로 함수와 변수를 관리하기가 더 효율적인 것 같아서 수정 
   useEffect(() => {
@@ -66,6 +76,76 @@ const CamChatting = () => {
     }
   }, [room]);
 
+
+  // 웹소켓용 useEffect
+  useEffect(() => {
+
+    if (webSocket.current) {
+      // Close any existing WebSocket connection before creating a new one
+      webSocket.current.close();
+    }
+
+    // Construct WebSocket URL from APPLICATION_SERVER_URL
+    // const webSocketUrl = `${APPLICATION_SERVER_URL.replace('http', 'ws').replace('https', 'wss')}ChattingServer`; // Adjust path if necessary
+
+    // Create WebSocket connection
+   const ws = new WebSocket('ws://localhost:6080/ChattingServer');
+    webSocket.current = ws;
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened.');
+    };
+
+    // ws.onerror = (error) => {
+    //   console.error('WebSocket error:', error);
+    // };
+
+    ws.onmessage = async (event) => {
+      let signalData;
+      let jsonPayload;
+      let fromUser;
+      let toUser;
+      console.log('Received message:', event.data);
+      const parts = event.data.match(/^(click):(\{.*\}):([^:]*):([^:]*)$/);
+      
+      if (parts && parts.length === 5) {
+        signalData = parts[1].trim();
+        jsonPayload = parts[2].trim();
+        fromUser = parts[3].trim();
+        toUser = parts[4].trim();
+        // const [signalData, toUser, fromUser] = event.data.split(":");
+
+        console.log(`toUser: ${toUser}`);
+        console.log(`fromUser: ${fromUser}`);
+        console.log(`signalData: ${signalData}`);
+        console.log(`jsonPayload: ${jsonPayload}`);
+      }
+      
+      if (toUser === participantName) {
+        const signal = JSON.parse(jsonPayload);
+        if (signal.type === "offer") {
+          await peerConnection.current.setRemoteDescription(new RTCSessionDescription(signal));
+          const answer = await peerConnection.current.createAnswer();
+          await peerConnection.current.setLocalDescription(answer);
+          ws.send(`click:${JSON.stringify(answer)}:${fromUser}:${participantName}`);
+        } else if (signal.type === "answer") {
+          await peerConnection.current.setRemoteDescription(new RTCSessionDescription(signal));
+        } else if (signal.type === "ice-candidate") {
+          const candidate = new RTCIceCandidate(signal);
+          await peerConnection.current.addIceCandidate(candidate);
+        }
+      }
+    };
+
+    return () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+        console.log('WebSocket connection closed.');
+      }
+    };
+  }, [participantName]);
+
+
   const handleParticipantConnected = (participant) => {
     setParticipants((prev) => [...prev, participant]);
   };
@@ -73,6 +153,8 @@ const CamChatting = () => {
   const handleParticipantDisconnected = (participant) => {
     setParticipants((prev) => prev.filter((p) => p.identity !== participant.identity));
   };
+
+  
 
   async function joinRoom() {
     const room = new Room();
@@ -108,6 +190,7 @@ const CamChatting = () => {
 
       setLocalVideoTrack(videoTrack);
       setLocalAudioTrack(audioTrack);
+
     } catch (error) {
       console.log('There was an error connecting to the room:', error.message);
       await leaveRoom();
@@ -121,6 +204,10 @@ const CamChatting = () => {
     setLocalAudioTrack(undefined);
     setRemoteTracks([]);
     setParticipants([]);
+    if (webSocket.current) {
+      webSocket.current.close();
+      console.log('WebSocket connection closed.');
+    }
   }
 
   // 방 시작하마자 받는 개인 별로 받는 토큰 
@@ -145,6 +232,7 @@ const CamChatting = () => {
     return data.token;
   }
 
+
   // Mute 기능 : 하!지!만 로컬 이외의 환경에서는 음소가 on/off가 안되고 처음부터 쪽 음소거모드 
   // ==== 수정 필요 ==== 
   const toggleAudio = () => {
@@ -156,8 +244,67 @@ const CamChatting = () => {
     }
   };
 
+
+  useEffect(() => {
+    // This will run every time `recipient` changes
+    if (recipient !== undefined) {
+      console.log(`Updated recipient: ${recipient}`);
+    }
+  }, [recipient]);
+
+
+  const handleButtonClick = async (participantIdentity) => {
+    console.log(participantIdentity);
+    console.log(webSocket.current);  // Use webSocket.current to access the WebSocket instance
+    
+    if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
+      setRecipient(participantIdentity);
+      const offer = await peerConnection.current.createOffer();
+      // await peerConnection.current.setLocalDescription(offer);
+      // webSocket.current.send(`click:${JSON.stringify({ type: 'offer', sdp: offer.sdp })}:${participantIdentity}:${participantName}`);
+      console.log('Sent offer:', offer);
+    } else {
+      console.error('WebSocket is not open.');
+    }
+  };
+  
+
   // 버튼 중복 생성 방지를 위한 참가자 배열 
   const filteredRemoteTracks = remoteTracks.filter((_, index) => index % 2 === 0);
+
+
+  // OpenVidu 서버랑 WebSocket 서버가 공용하는 변수를 다시 사용해서 충돌났음 
+  // const startLocalStream = async () => {
+  //   localStream.current = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  //   document.getElementById('localVideo').srcObject = localStream.current;
+  //   localStream.current.getTracks().forEach(track => peerConnection.current.addTrack(track, localStream.current));
+  // };
+
+
+  useEffect(() => {
+    peerConnection.current = new RTCPeerConnection({
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' } // Public STUN server
+      ]
+    });
+
+    peerConnection.current.onicecandidate = (event) => {
+      console.log("=======================")
+      console.log("peerconne")
+      console.log("=======================")
+      if (event.candidate && webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
+        webSocket.current.send(`click:${JSON.stringify({ type: 'ice-candidate', candidate: event.candidate })}:${recipient}:${participantName}`);
+      }
+    };
+
+    peerConnection.current.ontrack = (event) => {
+      event.streams[0].getTracks().forEach(track => {
+        remoteStream.current.addTrack(track);
+      });
+      document.getElementById('remoteVideo').srcObject = remoteStream.current;
+    };
+  }, [participantName]);
+
 
   return (
     <>
@@ -267,7 +414,7 @@ const CamChatting = () => {
             {filteredRemoteTracks.map((remoteTrack) => (
               <Button
                 key={remoteTrack.trackPublication.trackSid}
-                onClick={() => console.log(`Token for ${remoteTrack.participantIdentity}`)}
+                onClick={() => handleButtonClick(remoteTrack.participantIdentity)}
                 variant="default"
               >
                 Token for {remoteTrack.participantIdentity}
