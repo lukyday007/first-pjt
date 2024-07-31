@@ -82,35 +82,36 @@ export const GameProvider = ({ children }) => {
 
   // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
   useEffect(() => {
-    if (!gameStatus) return;
-    if (gameStatus && navigator.geolocation) {
-      const fetchLocation = () => {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const { latitude, longitude } = position.coords;
-            setMyLocation(coordToFixed(latitude, longitude));
-          },
-          error => console.log(error)
-        );
-      };
-      const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치를 갱신 및 거리 계산
+    if (!gameStatus || !navigator.geolocation) return;
 
-      return () => clearInterval(intervalId); // 컴포넌트 unmount 시 interval 클리어
-    }
+    const fetchLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          setMyLocation(coordToFixed(latitude, longitude));
+        },
+        error => console.log(error)
+      );
+    };
+
+    const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치를 갱신 및 거리 계산
+
+    return () => clearInterval(intervalId); // 컴포넌트 unmount 시 interval 클리어
+
   }, [gameStatus]); // gameStatus가 변경될 때마다 useEffect 실행
 
   useEffect(() => {
-    if (!gameStatus) return;
-    if (myLocation && areaCenter) {
-      setDistance(
-        approximateDistance(
-          myLocation.lat,
-          myLocation.lng,
-          areaCenter.lat,
-          areaCenter.lng
-        )
-      );
-    }
+    if (!gameStatus || !myLocation || !areaCenter) return;
+
+    setDistance(
+      approximateDistance(
+        myLocation.lat,
+        myLocation.lng,
+        areaCenter.lat,
+        areaCenter.lng
+      )
+    );
+
   }, [myLocation, areaCenter]); // 내 위치가 변경될 때마다 거리 계산
 
   return (
