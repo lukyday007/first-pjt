@@ -28,12 +28,13 @@ public class ParticipantRepositoryImpl {
 
   }
 
-  public GameParticipants getByEmail(String email, Long roomId){
+  public GameParticipants getByUsername(String username, Long roomId){
     return queryFactory
         .selectFrom(participants)
         .join(participants.user, user)
-        .where(user.email.eq(email)
+        .where(user.username.eq(username)
         .and(participants.gameRoom.id.eq(roomId)))
         .fetchOne();
   }
+
 }

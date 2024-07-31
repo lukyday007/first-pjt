@@ -60,8 +60,8 @@ public class UserServiceImpl implements UserService {
     if (null != user) {
       String passwordEncoded = user.getPassword();
       if (passwordEncoder.matches(request.getPassword(), passwordEncoded)) {
-        return UserLoginResponse.of(jwtUtil.createAccessToken(request.getEmail()),
-            jwtUtil.createRefreshToken(request.getEmail()),
+        return UserLoginResponse.of(jwtUtil.createAccessToken(user.getUsername()),
+            jwtUtil.createRefreshToken(user.getUsername()),
             ResponseEnum.SUCCESS);
       }
     }

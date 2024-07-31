@@ -39,11 +39,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import static com.boricori.util.ResponseEnum.FAIL;
 import static com.boricori.util.ResponseEnum.SUCCESS;
 
 @RequestMapping("/gameroom")
@@ -83,10 +80,6 @@ public class GameRoomController {
       HttpServletRequest request) {
     String userName = (String) request.getAttribute("username");
     try {
-      /*jwt 필터 필요
-      *
-      *
-       */
       CreateGameRoomResponse room = gameRoomService.createRoom(gameRequest, userName);
       return ResponseEntity.status(200).body(room);
     } catch (WriterException | IOException e) {
@@ -94,45 +87,24 @@ public class GameRoomController {
     }
   }
 
-  @PostMapping("/checkRoom")
-  public ResponseEntity<String> checkRoom(@RequestBody String roomId) {
-    Long id = Long.parseLong(roomId);
-    int maxCount = gameRoomService.findMaxPlayerCountRoom(id);
-    int curCount = gameRoomService.getCurrentRoomPlayerCount(roomId);
-    if(curCount >= maxCount){
-      return ResponseEntity.status(200).body("full");
-    }
-    return ResponseEntity.status(200).body("available");
-  }
-
-  @GetMapping("/{id}")
-  @Operation(summary = "게임방 참여", description = "유저가 선택한 게임방 참여")
+  @GetMapping("/{gameCode}")
+  @Operation(summary = "게임방 참여", description = "게임방 인원 확인 후 입장")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "성공"),
       @ApiResponse(responseCode = "404", description = "실패"),
-      @ApiResponse(responseCode = "500", description = "서버 오류")
   })
-  public ResponseEntity<CreateGameRoomResponse> enterGameRoom(
-      @PathVariable @Parameter(description = "들어갈 방 id", required = true) int id) {
-
-    return null;
+  public ResponseEntity<String> enterGameRoom(
+      @PathVariable @Parameter(description = "방 입장 코드", required = true) String gameCode, HttpServletRequest req) {
+    String username = (String) req.getAttribute("username");
+    GameRoom game = gameRoomService.findGameByCode(gameCode);
+      int maxCount = game.getMaxPlayer();
+      int currCount = gameRoomService.getCurrentRoomPlayerCount(String.valueOf(game.getId()));
+//    int currCount = 1;
+      if(currCount >= maxCount){
+        return ResponseEntity.status(FAIL.getCode()).body("Full");
+      }
+      return ResponseEntity.status(SUCCESS.getCode()).body("Available");
   }
-
-
-
-  @GetMapping("{gameId}/startInfo")
-  @Operation(summary = "게임 초기 정보 요청", description = "게임이 실제 시작하기 전, 게임 정보와 타겟, 미션을 받습니다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "OK"),
-  })
-  public ResponseEntity<GameInfoResponse> enterGame(@PathVariable Long gameId) {
-    String email = "ssafy";
-    User target = GameManager.catchableList.get(gameId).getByEmail(email).next.data;
-    GameRoom game = gameRoomService.findGame(gameId);
-    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(
-        GameInfoResponse.of(game, target));
-  }
-
 
   @PostMapping("/{id}/start")
   @Operation(summary = "게임 시작", description = "게임 실행, 유저 DB 등록 및 유저간 잡기 순서 정하고 3초뒤 게임 시작")
@@ -143,15 +115,17 @@ public class GameRoomController {
   })
   public ResponseEntity<String> startGameRoom(
           @PathVariable @Parameter(description = "게임 방id", required = true) long id,
-      @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
+      @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request,
+      HttpServletRequest req) {
+
+    String username = (String) req.getAttribute("username");
     // 게임 방 튜플 생성
     GameRoom gameRoom = gameRoomService.updateRoom(id, request);
-    List<String> usernames = new ArrayList<>(); // Redis에서 불러올 부분
+    List<String> usernames = gameRoomService.GameRoomPlayerAll(String.valueOf(id)); // Redis에서 불러올 부분
     List<User> users = new ArrayList<>();
-    for (String username : usernames){
-      users.add(userService.findByUsername(username));
+    for (String u : usernames){
+      users.add(userService.findByUsername(u));
     }
-    users.add(userService.findByEmail("ssafy")); // 임시값!!!!!!!!!!!!!
     users.forEach(u -> participantsService.addRecord(
         GameParticipants.builder().gameRoom(gameRoom).user(u).build()));
 //     게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
@@ -179,6 +153,20 @@ public class GameRoomController {
 
     GameManager.catchableList.put(roomId, userCircularLinkedList);
   }
+
+  @GetMapping("{gameId}/startInfo")
+  @Operation(summary = "게임 초기 정보 요청", description = "게임이 실제 시작하기 전, 게임 정보와 타겟, 미션을 받습니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "OK"),
+  })
+  public ResponseEntity<GameInfoResponse> enterGame(@PathVariable Long gameId, HttpServletRequest req) {
+    String username = (String) req.getAttribute("username");
+    User target = GameManager.catchableList.get(gameId).getByUsername(username).next.data;
+    GameRoom game = gameRoomService.findGame(gameId);
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(
+        GameInfoResponse.of(game, target));
+  }
+
 
   @PatchMapping("/end")
   @Operation(summary = "게임 종료", description = "게임 종료")

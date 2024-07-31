@@ -40,15 +40,10 @@ public class InGameController {
 
   private final GameManager gm = GameManager.getGameManager();
 
-  //임시
-  String email = "ssafy";
-
-
-
   @GetMapping("/{gameId}/assignMissions")
-  public ResponseEntity<List<MissionResponse>> assignMissions(@PathVariable Long gameId, HttpServletRequest request, HttpServletResponse response){
-//    String email = (String) request.getAttribute("email");
-    List<Mission> missions = inGameService.assignMissions(email, gameId);
+  public ResponseEntity<List<MissionResponse>> assignMissions(@PathVariable Long gameId, HttpServletRequest req, HttpServletResponse response){
+    String username = (String) req.getAttribute("username");
+    List<Mission> missions = inGameService.assignMissions(username, gameId);
     List<MissionResponse> resp = new ArrayList<>();
     for (Mission m : missions){
       MissionResponse newM = MissionResponse.of(m);
@@ -59,16 +54,20 @@ public class InGameController {
 
   @Transactional
   @PostMapping("/{gameId}/changeMission")
-  public ResponseEntity<MissionResponse> changeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
-    Mission newMission = inGameService.changeMission(gameId, email, request);
+  public ResponseEntity<MissionResponse> changeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request,
+      HttpServletRequest req){
+    String username = (String) req.getAttribute("username");
+    Mission newMission = inGameService.changeMission(gameId, username, request);
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(MissionResponse.of(newMission));
   }
 
   @Transactional
   @PostMapping("/{gameId}/completeMission")
-  public ResponseEntity<ItemResponse> completeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request){
-    inGameService.completeMission(gameId, email, request);
-    Item item = inGameService.getItem(gameId, email);
+  public ResponseEntity<ItemResponse> completeMission(@PathVariable Long gameId, @RequestBody MissionChangeRequest request,
+      HttpServletRequest req){
+    String username = (String) req.getAttribute("username");
+    inGameService.completeMission(gameId, username, request);
+    Item item = inGameService.getItem(gameId, username);
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(ItemResponse.of(item));
   }
 
@@ -80,8 +79,9 @@ public class InGameController {
 
   @Transactional
   @PostMapping("/{gameId}/useItem")
-  public void useItem(@PathVariable Long gameId, UseItemRequest req){
-    inGameService.useItem(gameId, email, req);
+  public void useItem(@PathVariable Long gameId, UseItemRequest request, HttpServletRequest req){
+    String username = (String) req.getAttribute("username");
+    inGameService.useItem(gameId, username, request);
   }
 
   @PostMapping("/{roomId}/catchTarget")

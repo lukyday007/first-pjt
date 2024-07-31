@@ -12,13 +12,15 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class JwtAuthenticationFilter implements Filter {
 
-  @Autowired
   JwtUtil jwtUtil;
+
+  public JwtAuthenticationFilter(JwtUtil jwtUtil){
+    this.jwtUtil = jwtUtil;
+  }
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -33,18 +35,20 @@ public class JwtAuthenticationFilter implements Filter {
 
     String authHeader = httpRequest.getHeader("Authorization");
     String refreshToken = httpRequest.getHeader("RefreshToken").substring(7);
+    System.out.println(authHeader);
+    System.out.println(refreshToken);
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String accessToken = authHeader.substring(7);
       try {
         // JWT 유효성 검사 로직 구현
         if (isValid(accessToken, refreshToken)) {
           // 토큰이 유효한 경우 요청을 계속 처리
-          String email = jwtUtil.getEmail(accessToken);
-          httpRequest.setAttribute("email", email);
+          String username = jwtUtil.getUsername(accessToken);
+          httpRequest.setAttribute("username", username);
           chain.doFilter(request, response);
         } else {
           // access token 재발급
-          String newToken = jwtUtil.createAccessToken(jwtUtil.getEmail(accessToken));
+          String newToken = jwtUtil.createAccessToken(jwtUtil.getUsername(accessToken));
           httpResponse.addHeader("NewToken", newToken);
           httpResponse.sendError(ResponseEnum.TOKEN_RENEWED.getCode(), "토큰 재발급 완료");
         }
@@ -53,6 +57,7 @@ public class JwtAuthenticationFilter implements Filter {
       } catch (TokenExpiredException e) {
         httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Refresh Token Expired");
       } catch (Exception e) {
+        System.out.println(e.getMessage());
         httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
             "Error occurred while processing token...");
       }
@@ -74,7 +79,7 @@ public class JwtAuthenticationFilter implements Filter {
         throw new NoSuchTokenException();
       } else if (jwtUtil.isExpired(refreshToken)) {
         throw new TokenExpiredException();
-      } else if (!jwtUtil.getEmail(accessToken).equals(jwtUtil.getEmail(refreshToken))) {
+      } else if (!jwtUtil.getUsername(accessToken).equals(jwtUtil.getUsername(refreshToken))) {
         throw new NoSuchTokenException();
       }
       // valid refresh token이며 access token 재발급 가능한 상태
