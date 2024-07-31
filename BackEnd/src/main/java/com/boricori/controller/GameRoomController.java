@@ -17,8 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.boricori.util.ResponseEnum.SUCCESS;
 
@@ -56,7 +56,8 @@ public class GameRoomController {
   })
   public ResponseEntity<CreateGameRoomResponse> createGameRoom(
       @RequestBody @Parameter(description = "게임방 세팅", required = true) GameRequest gameRequest,
-      @RequestHeader("userName") String userName) {
+      HttpServletRequest request) {
+    String userName = (String) request.getAttribute("username");
     try {
       /*jwt 필터 필요
       *
@@ -67,6 +68,17 @@ public class GameRoomController {
     } catch (WriterException | IOException e) {
       return ResponseEntity.status(500).build();
     }
+  }
+
+  @PostMapping("/checkRoom")
+  public ResponseEntity<String> checkRoom(@RequestBody String roomId) {
+    Long id = Long.parseLong(roomId);
+    int maxCount = gameRoomService.findMaxPlayerCountRoom(id);
+    int curCount = gameRoomService.getCurrentRoomPlayerCount(roomId);
+    if(curCount >= maxCount){
+      return ResponseEntity.status(200).body("full");
+    }
+    return ResponseEntity.status(200).body("available");
   }
 
   @GetMapping("/{id}")
