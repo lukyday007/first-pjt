@@ -32,7 +32,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private RedisTemplate<String, List<String>> redisTemplate;
 
-@Override
+  @Override
   public GameRoom findGame(Long id){
     return gameRoomRepository.findById(id).orElse(null);
   }
@@ -65,23 +65,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     return gameRoom;
   }
 
-  private String generateQRCodeImage(String text) throws IOException, WriterException {
-    QRCodeWriter qrCodeWriter = new QRCodeWriter();
-    BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 200, 200);
-
-    ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-    MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-    byte[] pngData = pngOutputStream.toByteArray();
-    return Base64.getEncoder().encodeToString(pngData);
-  }
-
-  public void saveGameRoom(Long gameRoomId, String userName) {
-    String roomId = String.valueOf(gameRoomId);
-    List<String> players = new CopyOnWriteArrayList();
-    players.add(userName);
-    redisTemplate.opsForValue().set(roomId, players);
-  }
-
   @Override
   public int findMaxPlayerCountRoom(Long id){
     return gameRoomRepository.findMaxPlayerByRoomId(id);
@@ -101,6 +84,23 @@ public class GameRoomServiceImpl implements GameRoomService {
   public void leaveRoom(String roomId, String userName) {
     List<String> players = redisTemplate.opsForValue().get(roomId);
     players.remove(userName);
+    redisTemplate.opsForValue().set(roomId, players);
+  }
+
+  private String generateQRCodeImage(String text) throws IOException, WriterException {
+    QRCodeWriter qrCodeWriter = new QRCodeWriter();
+    BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 200, 200);
+
+    ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+    MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+    byte[] pngData = pngOutputStream.toByteArray();
+    return Base64.getEncoder().encodeToString(pngData);
+  }
+
+  private void saveGameRoom(Long gameRoomId, String userName) {
+    String roomId = String.valueOf(gameRoomId);
+    List<String> players = new CopyOnWriteArrayList();
+    players.add(userName);
     redisTemplate.opsForValue().set(roomId, players);
   }
 
