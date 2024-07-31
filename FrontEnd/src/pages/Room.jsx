@@ -1,7 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { WebSocketContext } from "@/context/WebSocketContext";
 import { GameContext } from "@/context/GameContext";
-import GameSettingDialog from "@components/GameSettingDialog";
 import { useParams } from "react-router-dom";
 
 const Room = () => {
