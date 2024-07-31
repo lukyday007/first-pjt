@@ -103,4 +103,8 @@ public class GameRoomServiceImpl implements GameRoomService {
     players.remove(userName);
     redisTemplate.opsForValue().set(roomId, players);
   }
+
+  public List<String> GameRoomPlayerAll(String roomId){
+    return redisTemplate.opsForValue().get(roomId);
+  }
 }
