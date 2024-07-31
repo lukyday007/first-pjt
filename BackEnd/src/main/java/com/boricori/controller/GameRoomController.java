@@ -1,25 +1,42 @@
 package com.boricori.controller;
 
+import com.boricori.dto.ParticipantNameDto;
 import com.boricori.dto.request.gameroom.EndGameRoomRequest;
 import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
 import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
+import com.boricori.dto.response.gameroom.GameInfoResponse;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
+import com.boricori.entity.GameParticipants;
 import com.boricori.entity.GameRoom;
+import com.boricori.entity.Mission;
 import com.boricori.entity.User;
 import com.boricori.game.GameManager;
 import com.boricori.service.GameRoomService;
+import com.boricori.service.InGameService;
 import com.boricori.service.MessageService;
 import com.boricori.service.ParticipantsService;
+import com.boricori.service.UserService;
+import com.boricori.util.Node;
+import com.boricori.util.ResponseEnum;
 import com.boricori.util.UserCircularLinkedList;
 import com.google.zxing.WriterException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +56,19 @@ public class GameRoomController {
   @Autowired
   private ParticipantsService participantsService;
 
+  @Autowired
+  private InGameService inGameService;
 
   @Autowired
   private RedisTemplate<String, String> redisTemplate;
 
   @Autowired
   private MessageService messageService;
+
+  @Autowired
+  private UserService userService;
+
+  private final GameManager gameManager = GameManager.getGameManager();
 
 
   @PostMapping("/create")
@@ -94,8 +118,24 @@ public class GameRoomController {
     return null;
   }
 
+
+
+  @GetMapping("{gameId}/startInfo")
+  @Operation(summary = "게임 초기 정보 요청", description = "게임이 실제 시작하기 전, 게임 정보와 타겟, 미션을 받습니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "OK"),
+  })
+  public ResponseEntity<GameInfoResponse> enterGame(@PathVariable Long gameId) {
+    String email = "ssafy";
+    User target = GameManager.catchableList.get(gameId).getByEmail(email).next.data;
+    GameRoom game = gameRoomService.findGame(gameId);
+    return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(
+        GameInfoResponse.of(game, target));
+  }
+
+
   @PostMapping("/{id}/start")
-  @Operation(summary = "게임 시작", description = "게임 시작")
+  @Operation(summary = "게임 시작", description = "게임 실행, 유저 DB 등록 및 유저간 잡기 순서 정하고 3초뒤 게임 시작")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "성공"),
       @ApiResponse(responseCode = "404", description = "실패"),
@@ -106,24 +146,34 @@ public class GameRoomController {
       @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
     // 게임 방 튜플 생성
     GameRoom gameRoom = gameRoomService.updateRoom(id, request);
-    // 게임 참여자 튜플 생성 JPA
-//    List<User> users = participantsService.makeGameParticipant(gameRoom,
-//        request.getPlayerInfoRequests());
-    // 게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
-//    makeCatchableList(gameRoom.getId(), users);
+    List<String> usernames = new ArrayList<>(); // Redis에서 불러올 부분
+    List<User> users = new ArrayList<>();
+    for (String username : usernames){
+      users.add(userService.findByUsername(username));
+    }
+    users.add(userService.findByEmail("ssafy")); // 임시값!!!!!!!!!!!!!
+    users.forEach(u -> participantsService.addRecord(
+        GameParticipants.builder().gameRoom(gameRoom).user(u).build()));
+//     게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
+    makeCatchableList(gameRoom.getId(), users);
     // 알림 시간 Redis에 넣기
     int interval = gameRoom.getGameTime() * 60 / 4;
     for (int t = 1; t < 5; t++){
       redisTemplate.opsForValue().set(String.format("%d-%d", gameRoom.getId(), t), String.valueOf(t), interval * t, TimeUnit.SECONDS);
     }
-    messageService.startGame(gameRoom.getId(), gameRoom);
-
-    // TODO: Response MongoDB 추가 여부에 따라 Response 달라짐
+    messageService.readyGame(gameRoom.getId(), gameRoom);
+    // 3초 대기
+    try {
+      Thread.sleep(3000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게임 시작 중 오류 발생");
+    }
+    messageService.startGame(gameRoom.getId());
     return ResponseEntity.status(SUCCESS.getCode()).body("GAME STARTED");
   }
 
   private void makeCatchableList(Long roomId, List<User> users) {
-    GameManager gameManager = GameManager.getGameManager();
     gameManager.shuffleUsers(users);
     UserCircularLinkedList userCircularLinkedList = gameManager.makeUserCatchableList(users);
 

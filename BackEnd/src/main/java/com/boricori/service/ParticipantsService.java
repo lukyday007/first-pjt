@@ -11,4 +11,5 @@ public interface ParticipantsService {
   List<User> makeGameParticipant(GameRoom gameRoom, List<PlayerInfoRequest> playerInfoRequests);
 
   void addRecord(GameParticipants participants);
+
 }
