@@ -5,12 +5,13 @@ import lombok.Data;
 
 @Data
 public class CreateGameRoomResponse {
+    private Long gameRoomId;
+    private String qrCode;
+    private String gameCode;
 
-    @Schema(description = "게임방 설정정보")
-    private GameRoomSettingResponse gameRoomSetting;
-
-    @Schema(description = "게임 참여자 정보")
-    private EnterUserInfoResponse playerInfo;
-
-
+    public CreateGameRoomResponse(Long id, String qrCode, String gameCode) {
+        this.gameRoomId = id;
+        this.qrCode = qrCode;
+        this.gameCode = gameCode;
+    }
 }

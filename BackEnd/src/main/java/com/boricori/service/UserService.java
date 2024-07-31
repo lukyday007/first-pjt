@@ -1,8 +1,20 @@
 package com.boricori.service;
 
-import org.springframework.stereotype.Service;
+import com.boricori.dto.request.User.UserLoginRequest;
+import com.boricori.dto.request.User.UserSignupRequest;
+import com.boricori.dto.response.User.RankDtoResponse;
+import com.boricori.dto.response.User.UserLoginResponse;
+import com.boricori.entity.User;
 
-@Service
-public class UserService {
+import java.util.List;
 
+
+public interface UserService {
+
+  User signup(UserSignupRequest request);
+  int findUserScore(String email);
+  List<RankDtoResponse> findAllRank();
+  UserLoginResponse login(UserLoginRequest request);
+  User findByEmail(String email);
+  User findByUsername(String username);
 }
