@@ -22,7 +22,8 @@ public class GameRoomWebSocket {
     @MessageMapping("/enter")
     public void enterRoom(RoomMessage message) throws Exception {
         String roomId = message.getRoomId();
-        gameRoomService.enterRoom(roomId);
+        String userName = message.getUsername();
+        gameRoomService.enterRoom(roomId, userName);
 
         messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
     }

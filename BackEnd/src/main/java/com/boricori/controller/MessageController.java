@@ -1,5 +1,6 @@
 package com.boricori.controller;
 
+import com.boricori.controller.websocket.RoomMessage;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,9 @@ public class MessageController {
   }
 
   @MessageMapping("/leave")
-  public void leaveGame(Map<String, String> message) {
-    String roomId = message.get("roomId");
-    gameRoomService.leaveRoom(roomId);
+  public void leaveGame(RoomMessage message) {
+    String roomId = message.getRoomId();
+    String userName = message.getUsername();
+    gameRoomService.leaveRoom(roomId, userName);
   }
 }
