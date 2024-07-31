@@ -33,6 +33,7 @@ public class ParticipantsServiceImpl implements ParticipantsService {
 
   @Override
   public void addRecord(GameParticipants participants) {
+    System.out.println("participant addRecord: " + participants.getId());
     participantRepository.save(participants);
   }
 

@@ -22,10 +22,10 @@ public class MessageService {
   }
 
 
-  public void startGame(Long gameRoomId, GameRoom gameRoom){
+  public void readyGame(Long gameRoomId, GameRoom gameRoom){
     // 여기는 현재 방에 웹소켓으로 연결된 유저들에게 알림만 주면 되므로 kafka 거칠 필요 없음
     // pub('app/start') 받아서 sub('/topic/general/roomId') 한 유저들에게 뿌려줌
-    String startJSON = String.format("{'msgType':'start','gameId':'%d', 'mapSize':'%d', 'gameTime':'%d', 'startTime':'%s', 'lat':'%s', 'lng':'%s'}",
+    String startJSON = String.format("{'msgType':'ready','gameId':'%d', 'mapSize':'%d', 'gameTime':'%d', 'startTime':'%s', 'lat':'%s', 'lng':'%s'}",
         gameRoom.getId(),
         gameRoom.getMapSize(),
         gameRoom.getGameTime(),
@@ -39,4 +39,7 @@ public class MessageService {
     messagingTemplate.convertAndSend(String.format("/topic/alert/%s", gameId), alertJSON);
   }
 
+  public void startGame(Long id) {
+    messagingTemplate.convertAndSend(String.format("/topic/alert/%d", id), "{'msgType':'start'}");
+  }
 }

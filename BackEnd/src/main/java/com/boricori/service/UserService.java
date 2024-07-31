@@ -16,4 +16,5 @@ public interface UserService {
   List<RankDtoResponse> findAllRank();
   UserLoginResponse login(UserLoginRequest request);
   User findByEmail(String email);
+  User findByUsername(String username);
 }

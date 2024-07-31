@@ -28,4 +28,19 @@ public class UserCircularLinkedList extends CircularLinkedList {
       }
     }
   }
+
+    public Node<User> getByEmail(String email) {
+      Node<User> currNode = tail.next;
+      Node<User> prevNode;
+
+      for (int i = 0; i < size; i++) {
+        prevNode = currNode;
+        currNode = currNode.next;
+
+        if (currNode.data.getEmail().equals(email)) {
+          return currNode;
+        }
+      }
+      return null;
+    }
 }
