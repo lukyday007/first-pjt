@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-=======
-import React, { createContext, useState, useEffect } from "react";
->>>>>>> 7af67ab52e5f2f73367326c1413ec4ea1b6e330d
 
 // const harversineDistance = (lat1, lng1, lat2, lng2) => {
 //   const R = 6371;
@@ -57,7 +53,7 @@ export const GameProvider = ({ children }) => {
   // 게임 시작 시 BE단에서 areaCenter, areaRadius 수신해 설정
   // 이후 targetId, targetLocation 수신해 설정 및 지속 감시
   // myLocation은 gameStatus===true일 때 getCurrentPosition을 사용해 매초 변경, Firebase를 통한 위치 전송 함수는 useFirebase.jsx에서 정의되고 GamePlay.jsx에서 사용
-  // myLocation 변경에 따라 distance 변경 
+  // myLocation 변경에 따라 distance 변경
 
   // 게임 플레이 타임 관련 정보는, 시간에 따라 BE에서 관련 정보(반경 변화 타이밍, 게임 종료 타이밍)를 전송해 주므로 별도 변수 할당 불필요
   // 개인별 영역 이탈 시간 측정 관련 변수와 로직은 추후 추가 예정
@@ -79,7 +75,7 @@ export const GameProvider = ({ children }) => {
   // gameRoomId 값에 변동이 있다면 localStorage에 저장
   // useEffect(() => {
   //   if (gameRoomId) {
-  //     localStorage.setItem('gameRoomId', gameRoomId);
+  //     localStorage.setItem("gameRoomId", gameRoomId);
   //   }
   // }, [gameRoomId]);
 
