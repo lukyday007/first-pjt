@@ -1,4 +1,4 @@
-package com.boricori.controller.websocket;
+package com.boricori.dto;
 
 import lombok.Data;
 
