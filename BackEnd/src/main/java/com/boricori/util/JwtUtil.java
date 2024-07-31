@@ -32,8 +32,8 @@ public class JwtUtil {
     secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String createAccessToken(String email) {
-      Claims claims = Jwts.claims().subject(email).build();
+    public String createAccessToken(String username) {
+      Claims claims = Jwts.claims().subject(username).build();
       long validFor = 1000 * 60 * 60; // 1 hour
       return Jwts.builder()
             .claims(claims)
@@ -50,8 +50,8 @@ public class JwtUtil {
 //    return token;
 //  }
 
-  public String createRefreshToken(String email) {
-    Claims claims = Jwts.claims().subject(email).build();
+  public String createRefreshToken(String username) {
+    Claims claims = Jwts.claims().subject(username).build();
     long validFor = 1000 * 60 * 60 * 24 * 14; // 2 weeks
     String token = Jwts.builder()
         .claims(claims)
@@ -59,7 +59,7 @@ public class JwtUtil {
         .expiration(new Date(System.currentTimeMillis() + validFor))
         .signWith(secretKey)
         .compact();
-    refreshTokens.put(token, email);
+    refreshTokens.put(token, username);
     return token;
   }
 
@@ -72,7 +72,7 @@ public class JwtUtil {
     }
   }
 
-    public String getEmail(String accessToken){
+    public String getUsername(String accessToken){
       Claims claim = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
       return claim.getSubject();
     }

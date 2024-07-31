@@ -40,9 +40,9 @@ public class InGameServiceImpl implements InGameService{
   private InGameItemsRepository inGameItemsRepository;
 
   @Override
-  public List<Mission> assignMissions(String email, Long gameId) {
+  public List<Mission> assignMissions(String username, Long gameId) {
     List<Mission> missions = missionRepositoryImpl.getMissions();
-    GameParticipants player = participantRepository.getByEmail(email, gameId);
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
     for (Mission m : missions){
       InGameMissions igm = InGameMissions.builder().missionId(m).user(player).build();
       inGameMissionsRepository.save(igm);
@@ -51,9 +51,9 @@ public class InGameServiceImpl implements InGameService{
   }
 
   @Override
-  public Mission changeMission(Long gameId, String email, MissionChangeRequest request) {
+  public Mission changeMission(Long gameId, String username, MissionChangeRequest request) {
     Mission newMission =  missionRepositoryImpl.changeMission(request.getMissionId());
-    GameParticipants player = participantRepository.getByEmail(email, gameId);
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
     inGameMissionsRepository.save(
         InGameMissions.builder().missionId(newMission).user(player).build()
     );
@@ -62,22 +62,22 @@ public class InGameServiceImpl implements InGameService{
   }
 
   @Override
-  public void completeMission(Long gameId, String email, MissionChangeRequest request) {
-    GameParticipants player = participantRepository.getByEmail(email, gameId);
+  public void completeMission(Long gameId, String username, MissionChangeRequest request) {
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
     inGameRepositoryImpl.updateMission(request.getMissionId(), player);
   }
 
   @Override
-  public Item getItem(Long gameId, String email) {
+  public Item getItem(Long gameId, String username) {
     Item item = itemRepositoryImpl.getItem();
-    GameParticipants player = participantRepository.getByEmail(email, gameId);
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
     inGameItemsRepository.save(InGameItems.builder().item(item).user(player).build());
     return item;
   }
 
   @Override
-  public void useItem(Long gameId, String email, UseItemRequest req) {
-    GameParticipants player = participantRepository.getByEmail(email, gameId);
+  public void useItem(Long gameId, String username, UseItemRequest req) {
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
     inGameRepositoryImpl.useItem(player, req.getItemId());
   }
 }

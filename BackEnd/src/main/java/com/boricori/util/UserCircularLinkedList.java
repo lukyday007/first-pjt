@@ -29,7 +29,7 @@ public class UserCircularLinkedList extends CircularLinkedList {
     }
   }
 
-    public Node<User> getByEmail(String email) {
+    public Node<User> getByUsername(String username) {
       Node<User> currNode = tail.next;
       Node<User> prevNode;
 
@@ -37,7 +37,7 @@ public class UserCircularLinkedList extends CircularLinkedList {
         prevNode = currNode;
         currNode = currNode.next;
 
-        if (currNode.data.getEmail().equals(email)) {
+        if (currNode.data.getUsername().equals(username)) {
           return currNode;
         }
       }

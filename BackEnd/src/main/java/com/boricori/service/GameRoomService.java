@@ -7,6 +7,7 @@ import com.boricori.entity.GameRoom;
 import com.google.zxing.WriterException;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface GameRoomService {
 
@@ -24,4 +25,6 @@ public interface GameRoomService {
   void leaveRoom(String roomId, String userName);
 
   GameRoom findGameByCode(String gameCode);
+
+  List<String> GameRoomPlayerAll(String roomId);
 }

@@ -39,11 +39,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static com.boricori.util.ResponseEnum.FAIL;
 import static com.boricori.util.ResponseEnum.SUCCESS;
 
@@ -84,10 +80,6 @@ public class GameRoomController {
       HttpServletRequest request) {
     String userName = (String) request.getAttribute("username");
     try {
-      /*jwt 필터 필요
-      *
-      *
-       */
       CreateGameRoomResponse room = gameRoomService.createRoom(gameRequest, userName);
       return ResponseEntity.status(200).body(room);
     } catch (WriterException | IOException e) {
@@ -102,8 +94,9 @@ public class GameRoomController {
       @ApiResponse(responseCode = "404", description = "실패"),
   })
   public ResponseEntity<String> enterGameRoom(
-      @PathVariable @Parameter(description = "방 입장 코드", required = true) String gameCode) {
-      GameRoom game = gameRoomService.findGameByCode(gameCode);
+      @PathVariable @Parameter(description = "방 입장 코드", required = true) String gameCode, HttpServletRequest req) {
+    String username = (String) req.getAttribute("username");
+    GameRoom game = gameRoomService.findGameByCode(gameCode);
       int maxCount = game.getMaxPlayer();
       int currCount = gameRoomService.getCurrentRoomPlayerCount(String.valueOf(game.getId()));
 //    int currCount = 1;
@@ -122,15 +115,17 @@ public class GameRoomController {
   })
   public ResponseEntity<String> startGameRoom(
           @PathVariable @Parameter(description = "게임 방id", required = true) long id,
-      @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request) {
+      @RequestBody @Parameter(description = "게임 시작 서버 데이터 전달", required = true) StartGameRoomRequest request,
+      HttpServletRequest req) {
+
+    String username = (String) req.getAttribute("username");
     // 게임 방 튜플 생성
     GameRoom gameRoom = gameRoomService.updateRoom(id, request);
-    List<String> usernames = new ArrayList<>(); // Redis에서 불러올 부분
+    List<String> usernames = gameRoomService.GameRoomPlayerAll(String.valueOf(id)); // Redis에서 불러올 부분
     List<User> users = new ArrayList<>();
-    for (String username : usernames){
-      users.add(userService.findByUsername(username));
+    for (String u : usernames){
+      users.add(userService.findByUsername(u));
     }
-    users.add(userService.findByEmail("ssafy")); // 임시값!!!!!!!!!!!!!
     users.forEach(u -> participantsService.addRecord(
         GameParticipants.builder().gameRoom(gameRoom).user(u).build()));
 //     게임 참여 방 id에 맞게 꼬리잡기 리스트 생성 Map<int, List<ParticipantNameDto>>
@@ -164,9 +159,9 @@ public class GameRoomController {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "OK"),
   })
-  public ResponseEntity<GameInfoResponse> enterGame(@PathVariable Long gameId) {
-    String email = "ssafy";
-    User target = GameManager.catchableList.get(gameId).getByEmail(email).next.data;
+  public ResponseEntity<GameInfoResponse> enterGame(@PathVariable Long gameId, HttpServletRequest req) {
+    String username = (String) req.getAttribute("username");
+    User target = GameManager.catchableList.get(gameId).getByUsername(username).next.data;
     GameRoom game = gameRoomService.findGame(gameId);
     return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(
         GameInfoResponse.of(game, target));
