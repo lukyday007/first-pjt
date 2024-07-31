@@ -65,8 +65,8 @@ export const GameProvider = ({ children }) => {
     return localStorage.getItem("gameRoomId") || "";
   });
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
-  const [areaCenter, setAreaCenter] = useState({ lat: 36.356, lng: 127.354 }); // 영역 중심 정보, 임시값
-  const [areaRadius, setAreaRadius] = useState(200); // 영역 반경 정보, 임시값
+  const [areaCenter, setAreaCenter] = useState({ lat: 0, lng: 0 }); // 영역 중심 정보
+  const [areaRadius, setAreaRadius] = useState(null); // 영역 반경 정보
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치 정보
   const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임)
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
@@ -97,7 +97,6 @@ export const GameProvider = ({ children }) => {
     const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치를 갱신 및 거리 계산
 
     return () => clearInterval(intervalId); // 컴포넌트 unmount 시 interval 클리어
-
   }, [gameStatus]); // gameStatus가 변경될 때마다 useEffect 실행
 
   useEffect(() => {
@@ -111,7 +110,6 @@ export const GameProvider = ({ children }) => {
         areaCenter.lng
       )
     );
-
   }, [myLocation, areaCenter]); // 내 위치가 변경될 때마다 거리 계산
 
   return (

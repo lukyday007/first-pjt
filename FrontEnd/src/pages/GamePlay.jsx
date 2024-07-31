@@ -15,8 +15,6 @@ const GamePlay = () => {
   }, [paramGameRoomId, setGameRoomId]);
 
   useEffect(() => {
-    setGameStatus(true);
-
     return () => setGameStatus(false);
   }, [setGameStatus]);
 

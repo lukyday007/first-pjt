@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
+import axiosInstance from "@/api/axiosInstance.js";
 import { GameContext } from "@/context/GameContext";
 
 // WebSocket은 게임 방 접속시부터 실행되어야 함
@@ -14,7 +15,14 @@ import { GameContext } from "@/context/GameContext";
 export const WebSocketContext = createContext();
 
 export const WebSocketProvider = ({ children }) => {
-  const { gameRoomId, setGameStatus, setAreaRadius } = useContext(GameContext);
+  const {
+    userId,
+    gameRoomId,
+    setGameStatus,
+    setTargetId,
+    setAreaCenter,
+    setAreaRadius,
+  } = useContext(GameContext);
   const stompClient = useRef(null);
 
   // connect, disconnect 함수 정의
@@ -45,12 +53,62 @@ export const WebSocketProvider = ({ children }) => {
     switch (msgType) {
       case "start":
         setGameStatus(true);
+        // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":
         handleAlertDegree(alertDegree);
         break;
       case "end":
         setGameStatus(false);
+        break;
+      case "ready":
+        // IIFE(즉시 실행 함수 표현): 함수를 정의하고 즉시 실행하는 방법
+        (async () => {
+          // gameroom/${gameRoomId}/startInfo로 요청
+          try {
+            const response = await axiosInstance.get(
+              `/gameroom/${gameRoomId}/startInfo`
+            );
+            if (response.data.success) {
+              // 반경, 중심, 타겟 닉네임 수신
+              setAreaRadius(parseInt(response.data.mapSize));
+              setAreaCenter({
+                lat: parseFloat(response.data.centerLat).toFixed(5),
+                lng: parseFloat(response.data.centerLng).toFixed(5),
+              });
+              setTargetId(response.data.targetName);
+            } else {
+              alert("게임 시작 관련 정보를 가져오는 중 오류가 발생했습니다.");
+            }
+          } catch (err) {
+            alert(
+              "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+            );
+          }
+
+          // in-game/${gameRoomId}/assignMissions로 요청
+          try {
+            const response = await axiosInstance.get(
+              `/in-game/${gameRoomId}/assignMissions`
+            );
+            if (response.data.success) {
+              // MissionResponse 관련 로직 작성
+            } else {
+              alert("할당된 미션 수신 과정에서 오류가 발생했습니다.");
+            }
+          } catch (err) {
+            alert(
+              "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+            );
+          }
+        })();
+        break;
+      case "target":
+        // 타겟이 죽거나 나가서 변동사항 발생 시
+        const hunter = msg.hunter;
+        if (hunter === userId) {
+          setTargetId(msg.target);
+        }
         break;
       default:
         break;
