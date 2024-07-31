@@ -37,7 +37,7 @@ const useFirebase = () => {
       targetGPSRef.current = ref(db, "locate/" + targetId);
 
       // 타겟의 위치를 watch
-      const unsubscribe = onValue(targetGPSRef.current, snapshot => {
+      onValue(targetGPSRef.current, snapshot => {
         const data = snapshot.val();
         if (data) {
           setTargetLocation({
@@ -46,14 +46,14 @@ const useFirebase = () => {
           });
         }
       });
-
-      // 컴포넌트 언마운트 시 리스너 해제
-      return () => {
-        if (targetGPSRef.current) {
-          off(targetGPSRef.current);
-        }
-      };
     }
+
+    // 컴포넌트 언마운트 시 리스너 해제
+    return () => {
+      if (targetGPSRef.current) {
+        off(targetGPSRef.current);
+      }
+    };
   }, [targetId, setTargetLocation]);
 
   const sendGPS = (userId, lat, lng) => {
