@@ -8,7 +8,7 @@ import { Button } from "@components/ui/Button";
 
 const Room = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
-  const { gameStatus, myLocation, gameRoomId, setGameRoomId } =
+  const { gameStatus, myLocation, gameRoomId, setGameRoomId, gameRoomUsers } =
     useContext(GameContext);
   const { connect, disconnect } = useContext(WebSocketContext);
   const navigate = useNavigate();
@@ -66,6 +66,12 @@ const Room = () => {
       {gameCode}
 
       <div>3. 현재 참가자 목록</div>
+      <ul>
+        {gameRoomUsers.map((user, index) => {
+          <li key={index}>{user.username}</li>;
+        })}
+      </ul>
+
       <Button
         className="mb-8 bg-theme-color-1 font-bold"
         onClick={handleStartGame}

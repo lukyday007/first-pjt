@@ -18,6 +18,7 @@ export const WebSocketProvider = ({ children }) => {
   const {
     userId,
     gameRoomId,
+    setGameRoomUsers,
     setGameStatus,
     setTargetId,
     setAreaCenter,
@@ -49,14 +50,13 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   const handleAlertMessage = msg => {
-    const { msgType, alertDegree } = msg;
-    switch (msgType) {
+    switch (msg.msgType) {
       case "start":
         setGameStatus(true);
         // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":
-        handleAlertDegree(alertDegree);
+        handleAlertDegree(msg.alertDegree);
         break;
       case "end":
         setGameStatus(false);
@@ -109,6 +109,9 @@ export const WebSocketProvider = ({ children }) => {
         if (hunter === userId) {
           setTargetId(msg.target);
         }
+        break;
+      case "users":
+        setGameRoomUsers(msg.users);
         break;
       default:
         break;
