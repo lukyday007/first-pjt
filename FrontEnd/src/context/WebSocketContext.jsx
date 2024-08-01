@@ -17,7 +17,7 @@ export const WebSocketContext = createContext();
 
 export const WebSocketProvider = ({ children }) => {
   const {
-    userId,
+    username,
     gameRoomId,
     setGameRoomUsers,
     setGameStatus,
@@ -107,7 +107,7 @@ export const WebSocketProvider = ({ children }) => {
       case "target":
         // 타겟이 죽거나 나가서 변동사항 발생 시
         const hunter = msg.hunter;
-        if (hunter === userId) {
+        if (hunter === username) {
           setTargetId(msg.target);
         }
         break;

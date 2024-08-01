@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useParams } from "react-router-dom";
 
 // const harversineDistance = (lat1, lng1, lat2, lng2) => {
@@ -48,7 +49,7 @@ const coordToFixed = (getLat, getLng) => {
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-  // /room/:gameRoomId 입장 시 userId, gameRoomId 설정
+  // /room/:gameRoomId 입장 시 username, gameRoomId 설정
   // WebSocket 통신 msg 통해 gameStatus를 true로 전환, 이후 게임 종료 조건에 따라 false로 전환
   // 게임 시작 시 BE단에서 areaCenter, areaRadius 수신해 설정
   // 이후 targetId, targetLocation 수신해 설정 및 지속 감시
@@ -58,7 +59,7 @@ export const GameProvider = ({ children }) => {
   // 게임 플레이 타임 관련 정보는, 시간에 따라 BE에서 관련 정보(반경 변화 타이밍, 게임 종료 타이밍)를 전송해 주므로 별도 변수 할당 불필요
   // 개인별 영역 이탈 시간 측정 관련 변수와 로직은 추후 추가 예정
 
-  const [userId, setUserId] = useState(null); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
+  const [username, setUsername] = useState(null); // 사용자 닉네임 - sendGPS 함수에서 활용 (useFirebase.jsx)
   // const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
   // localStorage에 값이 있다면 사용, 없다면 null
   const [gameRoomId, setGameRoomId] = useState(() => {
@@ -72,6 +73,15 @@ export const GameProvider = ({ children }) => {
   const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임)
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
   const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
+
+  // localStorage에서 username 추출해 저장
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken")?.replace("Bearer ", "");
+    if (token) {
+      const decodePayload = jwtDecode(token, { payload: true });
+      setUsername(decodePayload.username);
+    }
+  });
 
   // gameRoomId 값에 변동이 있다면 localStorage에 저장
   // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
@@ -116,8 +126,8 @@ export const GameProvider = ({ children }) => {
   return (
     <GameContext.Provider
       value={{
-        userId,
-        setUserId,
+        username,
+        setUsername,
         gameRoomId,
         setGameRoomId,
         gameRoomUsers,

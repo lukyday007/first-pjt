@@ -20,7 +20,7 @@ const Room = () => {
   const handleStartGame = async () => {
     try {
       const response = await axiosInstance.post(
-        "/gameroom/${gameRoomId}/start",
+        `/gameroom/${gameRoomId}/start`,
         {
           centerLat: myLocation.lat,
           centerLng: myLocation.lng,
@@ -39,7 +39,7 @@ const Room = () => {
     }
   };
 
-  // 방에 접속 시 userId, gameRoomId 설정 및 WebSocket 연결
+  // 방에 접속 시 username, gameRoomId 설정 및 WebSocket 연결
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
     connect();
