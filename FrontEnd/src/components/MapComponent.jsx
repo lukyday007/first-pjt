@@ -1,17 +1,36 @@
 import React, { useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import useKakaoMap from "@/hooks/Map/useKakaoMap";
-import crosshair from "@/assets/app-icon.png";
+import { MapCenterButton } from "@/components/MapCenterButton";
 
 const MapComponent = () => {
-  const { areaCenter, myLocation, distance, targetLocation } = useContext(GameContext);
+  const { areaCenter, myLocation, distance, targetLocation } =
+    useContext(GameContext);
   const { mapRef, panToMyLocation } = useKakaoMap();
 
   const handleCenter = () => {
     if (myLocation) {
       panToMyLocation(myLocation.lat, myLocation.lng);
     }
-  }
+  };
+
+  const styles = {
+    mapWrap: {
+      position: "relative",
+    },
+    map: {
+      width: "100%",
+      height: "500px",
+      border: "1px solid black",
+      zIndex: 1,
+    },
+    mapControl: {
+      position: "absolute",
+      top: "1%",
+      right: "1%",
+      zIndex: 2,
+    },
+  };
 
   return !myLocation ? (
     <div>
@@ -27,27 +46,10 @@ const MapComponent = () => {
       </h3>
       <h3>Distance: {distance}m</h3>
 
-      <div id="map-wrap" style={{ position: "relative" }}>
-        <div
-          id="map"
-          ref={mapRef}
-          style={{ width: "100%", height: "500px", border: "1px solid black", zIndex: 1 }}
-        />
-        <div id="map-control" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
-          <button
-            style={{
-              background: "white",
-              border: "2px solid black",
-              borderRadius: "20%",
-              padding: "5px",
-              cursor: "pointer",
-              width: "40px",
-              height: "40px",
-            }}
-            onClick={handleCenter}
-          >
-            <img src={crosshair} alt="Crosshair" style={{ width: "100%", height: "100%" }} />
-          </button>
+      <div id="map-wrap" style={styles.mapWrap}>
+        <div id="map" ref={mapRef} style={styles.map} />
+        <div id="map-control" style={styles.mapControl}>
+          <MapCenterButton onClick={handleCenter} />
         </div>
       </div>
 
