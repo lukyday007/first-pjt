@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useContext } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import axiosInstance from "@/api/axiosInstance.js";
 
@@ -8,7 +8,6 @@ const useTimer = initialTime => {
     const savedTime = localStorage.getItem("remainingTime");
     return savedTime !== null ? parseInt(savedTime, 10) : initialTime; // localStorage에 시간 정보가 있으면 사용
   });
-  const intervalRef = useRef(null);
 
   const decreaseTime = useCallback(() => {
     setTime(prevTime => prevTime - 1);

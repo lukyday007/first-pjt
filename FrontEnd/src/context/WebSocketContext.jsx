@@ -21,8 +21,11 @@ export const WebSocketProvider = ({ children }) => {
     gameRoomId,
     setGameRoomUsers,
     setGameStatus,
+    targetId,
     setTargetId,
+    areaCenter,
     setAreaCenter,
+    areaRadius,
     setAreaRadius,
   } = useContext(GameContext);
   const stompClient = useRef(null);
@@ -72,12 +75,22 @@ export const WebSocketProvider = ({ children }) => {
             );
             if (response.status == 200) {
               // 반경, 중심, 타겟 닉네임 수신
-              setAreaRadius(parseInt(response.data.mapSize));
-              setAreaCenter({
+              const newAreaRadius = parseInt(response.data.mapSize, 10);
+              const newAreaCenter = {
                 lat: parseFloat(response.data.centerLat).toFixed(5),
                 lng: parseFloat(response.data.centerLng).toFixed(5),
-              });
-              setTargetId(response.data.targetName);
+              };
+              const newTargetId = response.data.targetName;
+
+              // 상태 업데이트
+              setAreaRadius(newAreaRadius);
+              setAreaCenter(newAreaCenter);
+              setTargetId(newTargetId);
+
+              // 반경, 중심, 타겟 닉네임 localStorage에 저장
+              localStorage.setItem("areaRadius", newAreaRadius); // handleAlertDegree에서 별도 관리
+              localStorage.setItem("areaCenter", newAreaCenter); // 게임 종료 시까지 불변
+              localStorage.setItem("targetId", newTargetId); // "target" msgType에서 관리
             } else {
               alert("게임 시작 관련 정보를 가져오는 중 오류가 발생했습니다.");
             }
@@ -108,7 +121,9 @@ export const WebSocketProvider = ({ children }) => {
         // 타겟이 죽거나 나가서 변동사항 발생 시
         const hunter = msg.hunter;
         if (hunter === userId) {
-          setTargetId(msg.target);
+          const newTargetId = msg.target;
+          setTargetId(newTargetId);
+          localStorage.setItem("targetId", newTargetId);
         }
         break;
       case "users":
@@ -124,7 +139,9 @@ export const WebSocketProvider = ({ children }) => {
       case 1:
       case 2:
       case 3:
-        setAreaRadius(prev => prev * 0.75); // 임의로 설정
+        const newAreaRadius = areaRadius * 0.75;
+        setAreaRadius(newAreaRadius);
+        localStorage.setItem("areaRadius", newAreaRadius);
         break;
       case 4:
         setGameStatus(false);

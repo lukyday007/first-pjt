@@ -66,12 +66,13 @@ export const GameProvider = ({ children }) => {
   });
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 게임 방에 참여 중인 인원 목록
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
-  const [areaCenter, setAreaCenter] = useState({ lat: 0, lng: 0 }); // 영역 중심 정보
-  const [areaRadius, setAreaRadius] = useState(null); // 영역 반경 정보
+  const [areaCenter, setAreaCenter] = useState({ lat: 0, lng: 0 }); // 영역 중심 정보, localStorage 관리
+  const [areaRadius, setAreaRadius] = useState(null); // 영역 반경 정보, localStorage 관리
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치 정보
-  const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임)
+  const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임), localStorage 관리
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
   const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
+  const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
 
   // gameRoomId 값에 변동이 있다면 localStorage에 저장
   // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
@@ -81,37 +82,48 @@ export const GameProvider = ({ children }) => {
     }
   }, [gameRoomId]);
 
+  // 내 위치를 잡고, 거리를 계산하는 함수
+  const fetchLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        const newLocation = coordToFixed(latitude, longitude);
+        setMyLocation(newLocation);
+
+        if (areaCenter) {
+          setDistance(
+            approximateDistance(
+              newLocation.lat,
+              newLocation.lng,
+              areaCenter.lat,
+              areaCenter.lng
+            )
+          );
+        }
+
+        if (targetLocation) {
+          setDistToTarget(
+            approximateDistance(
+              newLocation.lat,
+              newLocation.lng,
+              targetLocation.lat,
+              targetLocation.lng
+            )
+          );
+        }
+      },
+      error => console.log(error)
+    );
+  };
+
   // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
   useEffect(() => {
     if (!gameStatus || !navigator.geolocation) return;
 
-    const fetchLocation = () => {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          setMyLocation(coordToFixed(latitude, longitude));
-        },
-        error => console.log(error)
-      );
-    };
-
-    const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치를 갱신 및 거리 계산
+    const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치 및 거리 계산 함수 실행
 
     return () => clearInterval(intervalId); // 컴포넌트 unmount 시 interval 클리어
-  }, [gameStatus]); // gameStatus가 변경될 때마다 useEffect 실행
-
-  useEffect(() => {
-    if (!gameStatus || !myLocation || !areaCenter) return;
-
-    setDistance(
-      approximateDistance(
-        myLocation.lat,
-        myLocation.lng,
-        areaCenter.lat,
-        areaCenter.lng
-      )
-    );
-  }, [myLocation, areaCenter]); // 내 위치가 변경될 때마다 거리 계산
+  }, [gameStatus, areaCenter]); // gameStatus가 변경 시 실행
 
   return (
     <GameContext.Provider
@@ -136,6 +148,8 @@ export const GameProvider = ({ children }) => {
         setAreaRadius,
         distance,
         setDistance,
+        distToTarget,
+        setDistToTarget,
       }}
     >
       {children}
