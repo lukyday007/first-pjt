@@ -64,6 +64,7 @@ export const GameProvider = ({ children }) => {
   const [gameRoomId, setGameRoomId] = useState(() => {
     return localStorage.getItem("gameRoomId") || "";
   });
+  const [gameRoomUsers, setGameRoomUsers] = useState([]); // 게임 방에 참여 중인 인원 목록
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
   const [areaCenter, setAreaCenter] = useState({ lat: 0, lng: 0 }); // 영역 중심 정보
   const [areaRadius, setAreaRadius] = useState(null); // 영역 반경 정보
@@ -119,6 +120,8 @@ export const GameProvider = ({ children }) => {
         setUserId,
         gameRoomId,
         setGameRoomId,
+        gameRoomUsers,
+        setGameRoomUsers,
         targetId,
         setTargetId,
         gameStatus,
