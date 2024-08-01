@@ -52,7 +52,7 @@ const Home = () => {
             label="방 만들기"
           />
           <ActionButton
-            onClick={() => navigate("/qrcode")}
+            onClick={() => navigate("/room-number")}
             icon={qrcodeIcon}
             color="bg-teal-300"
             label="방 코드 찍기"

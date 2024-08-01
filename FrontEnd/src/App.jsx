@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
+import RoomNumber from "./pages/RoomNumber";
 import GamePlay from "./pages/GamePlay";
 import CamChatting from "./pages/CamChatting";
 import PrivateChatting from "./pages/PrivateChatting";
@@ -30,6 +31,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/room-number" element={<RoomNumber />} />
       <Route path="/cam-chatting" element={<CamChatting />} />
       <Route path="/private-chatting" element={<PrivateChatting />} />
       <Route path="/*" element={<GameRoutes />} />

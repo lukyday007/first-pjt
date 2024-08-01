@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
-
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog";
+
+import { BASE_URL } from "@/constants/baseURL";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ const Signup = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/user/signup", {
+      const response = await axios.post(`${BASE_URL}/user/signup`, {
         username,
         email,
         password,
