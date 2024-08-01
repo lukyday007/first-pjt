@@ -59,17 +59,24 @@ export const GameProvider = ({ children }) => {
   // 개인별 영역 이탈 시간 측정 관련 변수와 로직은 추후 추가 예정
 
   const [userId, setUserId] = useState(null); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
-  // const [gameRoomId, setGameRoomId] = useState(1); // 게임 방 번호, 임시값
-  // localStorage에 값이 있다면 사용, 없다면 null
   const [gameRoomId, setGameRoomId] = useState(() => {
     return localStorage.getItem("gameRoomId") || "";
-  });
+  }); // 게임 방 번호, localStorage 관리
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 게임 방에 참여 중인 인원 목록
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
-  const [areaCenter, setAreaCenter] = useState({ lat: 0, lng: 0 }); // 영역 중심 정보, localStorage 관리
-  const [areaRadius, setAreaRadius] = useState(null); // 영역 반경 정보, localStorage 관리
+  const [areaCenter, setAreaCenter] = useState(() => {
+    const savedCenter = localStorage.getItem("areaCenter");
+    return savedCenter ? JSON.parse(savedCenter) : { lat: 0, lng: 0 };
+  }); // 영역 중심 정보, localStorage 관리
+  const [areaRadius, setAreaRadius] = useState(() => {
+    const savedRadius = localStorage.getItem("areaRadius");
+    return savedRadius !== null ? parseFloat(savedRadius) : null;
+  }); // 영역 반경 정보, localStorage 관리
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치 정보
-  const [targetId, setTargetId] = useState(null); // 타겟 ID(닉네임), localStorage 관리
+  const [targetId, setTargetId] = useState(() => {
+    const savedTargetId = localStorage.getItem("targetId");
+    return savedTargetId !== null ? savedTargetId : null;
+  }); // 타겟 ID(닉네임), localStorage 관리
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
   const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
