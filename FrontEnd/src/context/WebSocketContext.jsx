@@ -9,6 +9,7 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import axiosInstance from "@/api/axiosInstance.js";
 import { GameContext } from "@/context/GameContext";
+import { BASE_URL } from "@/constants/baseURL";
 
 // WebSocket은 게임 방 접속시부터 실행되어야 함
 // 게임 내(gameStatus===true)에서 WebSocket은 게임 상태(start-true, end-false), 영역 축소 신호만 수신 및 처리
@@ -30,7 +31,7 @@ export const WebSocketProvider = ({ children }) => {
   const connect = useCallback(() => {
     if (!gameRoomId) return;
 
-    const socket = new SockJS("http://localhost:8080/server");
+    const socket = new SockJS(`${BASE_URL}/server`);
     stompClient.current = Stomp.over(socket);
     stompClient.current.connect({}, frame => {
       console.log("Connected: " + frame);
