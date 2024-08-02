@@ -28,7 +28,7 @@ export const GameContext = createContext();
 export const GameProvider = ({ children }) => {
   const [gameRoomId, setGameRoomId] = useState(() => {
     return sessionStorage.getItem("gameRoomId") || "";
-  }); // 게임 방 번호, sessionStorage 관리
+  }); // 게임 방 번호
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 여부 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
   const [areaCenter, setAreaCenter] = useState(() => {
@@ -41,16 +41,16 @@ export const GameProvider = ({ children }) => {
       };
     }
     return { lat: 0, lng: 0 };
-  }); // 영역 중심, sessionStorage 관리
+  }); // 영역 중심
   const [areaRadius, setAreaRadius] = useState(() => {
     const savedRadius = sessionStorage.getItem("areaRadius");
     return savedRadius !== null ? parseFloat(savedRadius) : null;
-  }); // 영역 반경, sessionStorage 관리
+  }); // 영역 반경
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치
   const [targetId, setTargetId] = useState(() => {
     const savedTargetId = sessionStorage.getItem("targetId");
     return savedTargetId !== null ? savedTargetId : null;
-  }); // 타겟 ID(닉네임), sessionStorage 관리
+  }); // 타겟 ID(닉네임)
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
