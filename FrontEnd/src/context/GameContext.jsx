@@ -54,7 +54,8 @@ export const GameProvider = ({ children }) => {
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
-  const username = sessionStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
+  const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
+  // 로그인 시 setItem 대상이 sessionStorage로 변경되면 이 부분도 같이 변경되어야 함
 
   // 내 위치를 잡고, 거리를 계산하는 함수
   const fetchLocation = () => {
