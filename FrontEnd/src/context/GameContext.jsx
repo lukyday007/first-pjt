@@ -26,21 +26,11 @@ const coordToFixed = (getLat, getLng) => {
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-  // /room/:gameRoomId 입장 시 userId, gameRoomId 설정
-  // WebSocket 통신 msg 통해 gameStatus를 true로 전환, 이후 게임 종료 조건에 따라 false로 전환
-  // 게임 시작 시 BE단에서 areaCenter, areaRadius 수신해 설정
-  // 이후 targetId, targetLocation 수신해 설정 및 지속 감시
-  // myLocation은 gameStatus===true일 때 getCurrentPosition을 사용해 매초 변경, Firebase를 통한 위치 전송 함수는 useFirebase.jsx에서 정의되고 GamePlay.jsx에서 사용
-  // myLocation 변경에 따라 distance 변경
-
-  const [userId, setUserId] = useState(() => {
-    return localStorage.getItem("username");
-  }); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
   const [gameRoomId, setGameRoomId] = useState(() => {
     return localStorage.getItem("gameRoomId") || "";
   }); // 게임 방 번호, localStorage 관리
-  const [gameRoomUsers, setGameRoomUsers] = useState([]); // 게임 방에 참여 중인 인원 목록
-  const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
+  const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
+  const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 여부 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = localStorage.getItem("areaCenter");
     if (savedCenter) {
@@ -51,27 +41,20 @@ export const GameProvider = ({ children }) => {
       };
     }
     return { lat: 0, lng: 0 };
-  }); // 영역 중심 정보, localStorage 관리
+  }); // 영역 중심, localStorage 관리
   const [areaRadius, setAreaRadius] = useState(() => {
     const savedRadius = localStorage.getItem("areaRadius");
     return savedRadius !== null ? parseFloat(savedRadius) : null;
-  }); // 영역 반경 정보, localStorage 관리
-  const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치 정보
+  }); // 영역 반경, localStorage 관리
+  const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치
   const [targetId, setTargetId] = useState(() => {
     const savedTargetId = localStorage.getItem("targetId");
     return savedTargetId !== null ? savedTargetId : null;
   }); // 타겟 ID(닉네임), localStorage 관리
-  const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치 정보
-  const [distance, setDistance] = useState(null); // 사용자와 게임 영역 중심 간 거리
+  const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치
+  const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
-
-  // gameRoomId 값에 변동이 있다면 localStorage에 저장
-  // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
-  useEffect(() => {
-    if (gameRoomId) {
-      localStorage.setItem("gameRoomId", gameRoomId);
-    }
-  }, [gameRoomId]);
+  const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
 
   // 내 위치를 잡고, 거리를 계산하는 함수
   const fetchLocation = () => {
@@ -107,20 +90,28 @@ export const GameProvider = ({ children }) => {
     );
   };
 
+  // gameRoomId 값에 변동이 있다면 localStorage에 저장
+  // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
+  useEffect(() => {
+    if (gameRoomId) {
+      localStorage.setItem("gameRoomId", gameRoomId);
+    }
+  }, [gameRoomId]);
+
   // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
+  // 내 위치를 실시간으로 변경
+  // - 한편 위치 전송은 useFirebase에서 수행하고 GamePlay에서 사용
   useEffect(() => {
     if (!gameStatus || !navigator.geolocation) return;
 
     const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치 및 거리 계산 함수 실행
 
-    return () => clearInterval(intervalId); // 컴포넌트 unmount 시 interval 클리어
-  }, [gameStatus, areaCenter]); // gameStatus가 변경 시 실행
+    return () => clearInterval(intervalId);
+  }, [gameStatus, areaCenter]);
 
   return (
     <GameContext.Provider
       value={{
-        userId,
-        setUserId,
         gameRoomId,
         setGameRoomId,
         gameRoomUsers,
@@ -141,6 +132,7 @@ export const GameProvider = ({ children }) => {
         setDistance,
         distToTarget,
         setDistToTarget,
+        username,
       }}
     >
       {children}

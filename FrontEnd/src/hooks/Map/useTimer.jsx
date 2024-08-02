@@ -3,7 +3,7 @@ import { GameContext } from "@/context/GameContext";
 import axiosInstance from "@/api/axiosInstance.js";
 
 const useTimer = initialTime => {
-  const { gameRoomId, userId, setGameStatus } = useContext(GameContext);
+  const { gameRoomId, setGameStatus, username } = useContext(GameContext);
   const [time, setTime] = useState(() => {
     const savedTime = localStorage.getItem("remainingTime");
     return savedTime !== null ? parseInt(savedTime, 10) : initialTime; // localStorage에 시간 정보가 있으면 사용
@@ -19,7 +19,7 @@ const useTimer = initialTime => {
       (async () => {
         try {
           const response = await axiosInstance.patch(
-            `/participants/${gameRoomId}/${userId}/die`
+            `/participants/${gameRoomId}/${username}/die`
           );
           if (response.status == 200) {
             // 타이머 종료로 인한 사망 후 처리 부분 입력
@@ -34,7 +34,7 @@ const useTimer = initialTime => {
     }
 
     localStorage.setItem("remainingTime", time);
-  }, [time, gameRoomId, userId]);
+  }, [time, gameRoomId, username]);
 
   return { time, decreaseTime };
 };

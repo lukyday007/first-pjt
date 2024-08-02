@@ -21,9 +21,12 @@ const Login = () => {
       });
 
       if (response.status == 200) {
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, refreshToken, username, email } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
+
         navigate("/home");
       } else {
         setError("로그인에 실패했습니다. 다시 시도해주세요.");

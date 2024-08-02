@@ -27,7 +27,7 @@ const db = getDatabase(app);
 // 사용자의 타겟의 위치를 지속적으로 수신 및 사용자의 위치 전송 함수 정의
 // 사용자의 위치 전송은 pages/GamePlay.jsx에서 1초마다 실행
 const useFirebase = () => {
-  const { userId, gameRoomId, targetId, setGameStatus, setTargetLocation } =
+  const { username, gameRoomId, targetId, setGameStatus, setTargetLocation } =
     useContext(GameContext);
   const targetGPSRef = useRef(null);
 
@@ -63,10 +63,10 @@ const useFirebase = () => {
     };
   }, [targetId, setTargetLocation]);
 
-  const sendGPS = (userId, lat, lng) => {
-    const myGPSRef = ref(db, "locate/" + userId);
+  const sendGPS = (username, lat, lng) => {
+    const myGPSRef = ref(db, "locate/" + username);
     set(myGPSRef, {
-      host: userId,
+      host: username,
       lat: lat.toString(),
       lng: lng.toString(),
     })
