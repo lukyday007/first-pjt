@@ -92,24 +92,6 @@ const useCircleWithOverlay = mapInstance => {
     }
   }, [mapInstance, areaCenter, areaRadius]);
 
-  // useEffect(() => {
-  //   if (polygonRef.current) {
-  //     const innerPath = [];
-  //     const points = 360;
-  //     for (let i = 0; i < points; i++) {
-  //       const angle = (i * 360) / points;
-  //       const latLng = computeOffset(
-  //         new kakao.maps.LatLng(areaCenter.lat, areaCenter.lng),
-  //         areaRadius,
-  //         angle
-  //       );
-  //       innerPath.push(latLng);
-  //     }
-
-  //     polygonRef.current.setPath([polygonRef.current.getPath()[0], innerPath]);
-  //   }
-  // }, [areaCenter, areaRadius]);
-
   return { polygonRef, centerPointRef };
 };
 

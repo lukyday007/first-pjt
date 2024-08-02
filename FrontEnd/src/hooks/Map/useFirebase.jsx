@@ -39,11 +39,18 @@ const useFirebase = () => {
       // 타겟의 위치를 watch
       onValue(targetGPSRef.current, snapshot => {
         const data = snapshot.val();
-        if (data) {
+        if (
+          data &&
+          typeof data.lat === "string" &&
+          typeof data.lng === "string"
+        ) {
           setTargetLocation({
             lat: parseFloat(data.lat),
             lng: parseFloat(data.lng),
           });
+        } else {
+          // 타겟 위치 수신에 문제 발생 시
+          console.log("Invalid data format received:", data);
         }
       });
     }

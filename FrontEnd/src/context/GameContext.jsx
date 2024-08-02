@@ -1,26 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
-
-// const harversineDistance = (lat1, lng1, lat2, lng2) => {
-//   const R = 6371;
-//   const toRadians = angle => angle * (Math.PI / 180);
-
-//   const dLat = toRadians(lat2 - lat1);
-//   const dLng = toRadians(lng2 - lng1);
-//   const lat1Rad = toRadians(lat1);
-//   const lat2Rad = toRadians(lat2);
-
-//   const a =
-//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//     Math.cos(lat1Rad) *
-//       Math.cos(lat2Rad) *
-//       Math.sin(dLng / 2) *
-//       Math.sin(dLng / 2);
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-//   const distance = R * c;
-//   return (distance * 1000).toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
-// };
+import React, { createContext, useState, useEffect } from "react";
 
 const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371; // 지구의 반지름 (km)
@@ -55,10 +33,9 @@ export const GameProvider = ({ children }) => {
   // myLocation은 gameStatus===true일 때 getCurrentPosition을 사용해 매초 변경, Firebase를 통한 위치 전송 함수는 useFirebase.jsx에서 정의되고 GamePlay.jsx에서 사용
   // myLocation 변경에 따라 distance 변경
 
-  // 게임 플레이 타임 관련 정보는, 시간에 따라 BE에서 관련 정보(반경 변화 타이밍, 게임 종료 타이밍)를 전송해 주므로 별도 변수 할당 불필요
-  // 개인별 영역 이탈 시간 측정 관련 변수와 로직은 추후 추가 예정
-
-  const [userId, setUserId] = useState(null); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
+  const [userId, setUserId] = useState(() => {
+    return localStorage.getItem("username");
+  }); // 사용자 ID(닉네임) - sendGPS 함수에서 활용 (useFirebase.jsx)
   const [gameRoomId, setGameRoomId] = useState(() => {
     return localStorage.getItem("gameRoomId") || "";
   }); // 게임 방 번호, localStorage 관리
@@ -66,7 +43,14 @@ export const GameProvider = ({ children }) => {
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 상태 여부, true: 게임 중, false: 게임 중이 아님
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = localStorage.getItem("areaCenter");
-    return savedCenter ? JSON.parse(savedCenter) : { lat: 0, lng: 0 };
+    if (savedCenter) {
+      const parsedCenter = JSON.parse(savedCenter);
+      return {
+        lat: parseFloat(parsedCenter.lat),
+        lng: parseFloat(parsedCenter.lng),
+      };
+    }
+    return { lat: 0, lng: 0 };
   }); // 영역 중심 정보, localStorage 관리
   const [areaRadius, setAreaRadius] = useState(() => {
     const savedRadius = localStorage.getItem("areaRadius");

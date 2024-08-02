@@ -107,6 +107,7 @@ export const WebSocketProvider = ({ children }) => {
             );
             if (response.status == 200) {
               // MissionResponse 관련 로직 작성
+              console.log(response.data);
             } else {
               alert("할당된 미션 수신 과정에서 오류가 발생했습니다.");
             }
