@@ -40,7 +40,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
         });
         ChangeListJsonAndSend(session, roomId, players);
     }
-    
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        String username = (String)session.getAttributes().get("username");
+        String roomId = session.getUri().getPath().split("/gameRoom/")[1];
+        System.out.println("close: "+username+" // "+ roomId);
+        List<String> players = gameRoomService.leaveRoom(roomId, username);
+        roomSessions.get(roomId).remove(session);
+        ChangeListJsonAndSend(session, roomId, players);
+    }
+
     private void ChangeListJsonAndSend(WebSocketSession originSession, String roomId, List<String> players) throws IOException {
         List<WebSocketSession> sessions = roomSessions.get(roomId);
         String jsonMessage = objectMapper.writeValueAsString(players);
