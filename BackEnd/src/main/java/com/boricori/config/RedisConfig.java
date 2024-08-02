@@ -55,13 +55,4 @@ public class RedisConfig {
     container.addMessageListener(new MessageListenerAdapter(keyExpirationListener), new PatternTopic("__keyevent@0__:expired"));
     return container;
   }
-
-  @Bean
-  public RedisTemplate<String, List<String>> integerRedisTemplate(RedisConnectionFactory connectionFactory) {
-    RedisTemplate<String, List<String>> redisTemplate = new RedisTemplate<>();
-    redisTemplate.setConnectionFactory(connectionFactory);
-    redisTemplate.setKeySerializer(new StringRedisSerializer());
-    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    return redisTemplate;
-  }
 }

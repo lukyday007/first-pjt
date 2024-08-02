@@ -22,7 +22,7 @@ public interface GameRoomService {
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 
   public GameRoom findGame(Long id);
-  void leaveRoom(String roomId, String userName);
+  List<String> leaveRoom(String roomId, String userName);
 
   GameRoom findGameByCode(String gameCode);
 

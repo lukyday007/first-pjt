@@ -19,11 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
-
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class GameRoomServiceImpl implements GameRoomService {
@@ -32,7 +29,7 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private GameRoomRepository gameRoomRepository;
   @Autowired
-  private RedisTemplate<String, List<String>> redisTemplate;
+  private RedisTemplate<String, String> redisTemplate;
 
   @Override
   public GameRoom findGame(Long id){
@@ -53,8 +50,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode,
         gameRoom.getGameCode());
 
-    saveGameRoom(gameRoom.getId(), userName);
-
     return response;
   }
 
@@ -74,28 +69,21 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public int getCurrentRoomPlayerCount(String roomId) {
-    return redisTemplate.opsForValue().get(roomId).size();
+    return redisTemplate.opsForList().range(roomId, 0, -1).size();
   }
 
   @Override
   public List<String> enterRoom(String roomId, String userName) {
-    List<String> players = redisTemplate.opsForValue().get(roomId);
-    if(players == null){
-      players = new CopyOnWriteArrayList<>();
-      players.add(userName);
-      redisTemplate.opsForValue().set(roomId, players);
-    }else{
-      players.add(userName);
-      redisTemplate.opsForValue().get(roomId).add(userName);
-    }
+    redisTemplate.opsForList().rightPush(roomId, userName);
+    List<String> players = redisTemplate.opsForList().range(roomId, 0, -1);
     return players;
   }
 
   @Override
-  public void leaveRoom(String roomId, String userName) {
-    List<String> players = redisTemplate.opsForValue().get(roomId);
-    players.remove(userName);
-    redisTemplate.opsForValue().set(roomId, players);
+  public List<String> leaveRoom(String roomId, String userName) {
+    redisTemplate.opsForList().remove(roomId,1, userName);
+    List<String> players = redisTemplate.opsForList().range(roomId, 0, -1);
+    return players;
   }
 
   @Override
@@ -113,14 +101,7 @@ public class GameRoomServiceImpl implements GameRoomService {
     return Base64.getEncoder().encodeToString(pngData);
   }
 
-  private void saveGameRoom(Long gameRoomId, String userName) {
-    String roomId = String.valueOf(gameRoomId);
-    List<String> players = new CopyOnWriteArrayList();
-    players.add(userName);
-    redisTemplate.opsForValue().set(roomId, players);
-  }
-
   public List<String> GameRoomPlayerAll(String roomId){
-    return redisTemplate.opsForValue().get(roomId);
+    return redisTemplate.opsForList().range(roomId, 0, -1);
   }
 }
