@@ -45,7 +45,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         String username = (String)session.getAttributes().get("username");
         String roomId = session.getUri().getPath().split("/gameRoom/")[1];
-        System.out.println("close: "+username+" // "+ roomId);
         List<String> players = gameRoomService.leaveRoom(roomId, username);
         roomSessions.get(roomId).remove(session);
         ChangeListJsonAndSend(session, roomId, players);
