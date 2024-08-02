@@ -32,19 +32,19 @@ public class MessageController {
     return localDateTime.toEpochSecond(ZoneOffset.UTC);
   }
 
-  @MessageMapping("/enter")
-  public void enterRoom(RoomMessage message) throws Exception {
-    String roomId = message.getRoomId();
-    String userName = message.getUsername();
-    gameRoomService.enterRoom(roomId, userName);
-
-    messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
-  }
-
-  @MessageMapping("/leave")
-  public void leaveGame(RoomMessage message) {
-    String roomId = message.getRoomId();
-    String userName = message.getUsername();
-    gameRoomService.leaveRoom(roomId, userName);
-  }
+//  @MessageMapping("/enter")
+//  public void enterRoom(RoomMessage message) throws Exception {
+//    String roomId = message.getRoomId();
+//    String userName = message.getUsername();
+//    gameRoomService.enterRoom(roomId, userName);
+//
+//    messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
+//  }
+//
+//  @MessageMapping("/leave")
+//  public void leaveGame(RoomMessage message) {
+//    String roomId = message.getRoomId();
+//    String userName = message.getUsername();
+//    gameRoomService.leaveRoom(roomId, userName);
+//  }
 }
