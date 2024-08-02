@@ -78,15 +78,17 @@ public class GameRoomServiceImpl implements GameRoomService {
   }
 
   @Override
-  public void enterRoom(String roomId, String userName) {
+  public List<String> enterRoom(String roomId, String userName) {
     List<String> players = redisTemplate.opsForValue().get(roomId);
     if(players == null){
       players = new CopyOnWriteArrayList<>();
       players.add(userName);
       redisTemplate.opsForValue().set(roomId, players);
     }else{
+      players.add(userName);
       redisTemplate.opsForValue().get(roomId).add(userName);
     }
+    return players;
   }
 
   @Override

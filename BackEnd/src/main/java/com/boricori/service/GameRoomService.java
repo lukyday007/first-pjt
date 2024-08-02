@@ -17,7 +17,7 @@ public interface GameRoomService {
 
   public int getCurrentRoomPlayerCount(String roomId);
 
-  public void enterRoom(String roomId, String userName);
+  public List<String> enterRoom(String roomId, String userName);
 
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 
