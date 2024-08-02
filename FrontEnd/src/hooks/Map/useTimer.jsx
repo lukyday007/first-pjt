@@ -5,8 +5,8 @@ import axiosInstance from "@/api/axiosInstance.js";
 const useTimer = initialTime => {
   const { gameRoomId, setGameStatus, username } = useContext(GameContext);
   const [time, setTime] = useState(() => {
-    const savedTime = localStorage.getItem("remainingTime");
-    return savedTime !== null ? parseInt(savedTime, 10) : initialTime; // localStorage에 시간 정보가 있으면 사용
+    const savedTime = sessionStorage.getItem("remainingTime");
+    return savedTime !== null ? parseInt(savedTime, 10) : initialTime; // sessionStorage에 시간 정보가 있으면 사용
   });
 
   const decreaseTime = useCallback(() => {
@@ -33,7 +33,7 @@ const useTimer = initialTime => {
       })();
     }
 
-    localStorage.setItem("remainingTime", time);
+    sessionStorage.setItem("remainingTime", time);
   }, [time, gameRoomId, username]);
 
   return { time, decreaseTime };

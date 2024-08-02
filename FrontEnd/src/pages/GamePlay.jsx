@@ -5,7 +5,7 @@ import { GameContext } from "@/context/GameContext";
 import useFirebase from "@/hooks/Map/useFirebase";
 import useTimer from "@/hooks/Map/useTimer";
 
-const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (localStorage의 값과 비교해 사용)
+const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (sessionStorage 값과 비교해 사용)
 
 const GamePlay = () => {
   const { gameRoomId: paramGameRoomId } = useParams();

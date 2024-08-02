@@ -17,8 +17,8 @@ const GameRoutes = () => (
   <GameProvider>
     <WebSocketProvider>
       <Routes>
-        <Route path="/room" element={<Room />} />
-        <Route path="/game-play" element={<GamePlay />} />
+        <Route path="/room/:gameRoomId" element={<Room />} />
+        <Route path="/game-play/:gameRoomId" element={<GamePlay />} />
       </Routes>
     </WebSocketProvider>
   </GameProvider>
