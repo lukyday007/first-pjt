@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 
 import java.util.List;
@@ -78,7 +79,14 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public void enterRoom(String roomId, String userName) {
-    redisTemplate.opsForValue().get(roomId).add(userName);
+    List<String> players = redisTemplate.opsForValue().get(roomId);
+    if(players == null){
+      players = new CopyOnWriteArrayList<>();
+      players.add(userName);
+      redisTemplate.opsForValue().set(roomId, players);
+    }else{
+      redisTemplate.opsForValue().get(roomId).add(userName);
+    }
   }
 
   @Override
