@@ -26,7 +26,6 @@ const coordToFixed = (getLat, getLng) => {
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-  // 플레이 타임 관련 정보는, 시간에 따라 BE에서 관련 정보(반경 변화 타이밍, 게임 종료 타이밍)를 전송해 주므로 별도 변수 할당 불필요
   const [gameRoomId, setGameRoomId] = useState(
     () => localStorage.getItem("gameRoomId") || ""
   );
