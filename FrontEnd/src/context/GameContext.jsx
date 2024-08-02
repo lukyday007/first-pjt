@@ -27,12 +27,12 @@ export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
   const [gameRoomId, setGameRoomId] = useState(() => {
-    return localStorage.getItem("gameRoomId") || "";
-  }); // 게임 방 번호, localStorage 관리
+    return sessionStorage.getItem("gameRoomId") || "";
+  }); // 게임 방 번호, sessionStorage 관리
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
   const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 여부 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
   const [areaCenter, setAreaCenter] = useState(() => {
-    const savedCenter = localStorage.getItem("areaCenter");
+    const savedCenter = sessionStorage.getItem("areaCenter");
     if (savedCenter) {
       const parsedCenter = JSON.parse(savedCenter);
       return {
@@ -41,20 +41,20 @@ export const GameProvider = ({ children }) => {
       };
     }
     return { lat: 0, lng: 0 };
-  }); // 영역 중심, localStorage 관리
+  }); // 영역 중심, sessionStorage 관리
   const [areaRadius, setAreaRadius] = useState(() => {
-    const savedRadius = localStorage.getItem("areaRadius");
+    const savedRadius = sessionStorage.getItem("areaRadius");
     return savedRadius !== null ? parseFloat(savedRadius) : null;
-  }); // 영역 반경, localStorage 관리
+  }); // 영역 반경, sessionStorage 관리
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치
   const [targetId, setTargetId] = useState(() => {
-    const savedTargetId = localStorage.getItem("targetId");
+    const savedTargetId = sessionStorage.getItem("targetId");
     return savedTargetId !== null ? savedTargetId : null;
-  }); // 타겟 ID(닉네임), localStorage 관리
+  }); // 타겟 ID(닉네임), sessionStorage 관리
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
-  const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
+  const username = sessionStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
 
   // 내 위치를 잡고, 거리를 계산하는 함수
   const fetchLocation = () => {
@@ -90,11 +90,11 @@ export const GameProvider = ({ children }) => {
     );
   };
 
-  // gameRoomId 값에 변동이 있다면 localStorage에 저장
-  // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 localStorage에 저장
+  // gameRoomId 값에 변동이 있다면 sessionStorage에 저장
+  // 기본적으로 /room 접속 시 useParams 활용해 gameRoomId를 세팅하나, 새로고침 등을 대비해 sessionStorage에 저장
   useEffect(() => {
     if (gameRoomId) {
-      localStorage.setItem("gameRoomId", gameRoomId);
+      sessionStorage.setItem("gameRoomId", gameRoomId);
     }
   }, [gameRoomId]);
 
