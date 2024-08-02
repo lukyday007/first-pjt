@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 
 const GamePlay = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
-  const { setGameRoomId, gameStatus, setGameStatus, userId, myLocation } =
+  const { setGameRoomId, gameStatus, setGameStatus, username, myLocation } =
     useContext(GameContext);
   const { sendGPS } = useFirebase();
 
@@ -21,12 +21,12 @@ const GamePlay = () => {
   useEffect(() => {
     if (gameStatus && myLocation) {
       const locationInterval = setInterval(() => {
-        sendGPS(userId, myLocation.lat, myLocation.lng);
+        sendGPS(username, myLocation.lat, myLocation.lng);
       }, 1000); // 1초마다 위치 전송
 
       return () => clearInterval(locationInterval); // 컴포넌트 unmount 시 interval 클리어
     }
-  }, [gameStatus, myLocation, sendGPS, userId]);
+  }, [gameStatus, myLocation, sendGPS, username]);
 
   return (
     <>
