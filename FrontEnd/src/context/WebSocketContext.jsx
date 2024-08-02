@@ -65,13 +65,11 @@ export const WebSocketProvider = ({ children }) => {
       case "ready":
         // IIFE(즉시 실행 함수 표현): 함수를 정의하고 즉시 실행하는 방법
         (async () => {
-          // gameroom/${gameRoomId}/startInfo로 요청
           try {
             const response = await axiosInstance.get(
               `/gameroom/${gameRoomId}/startInfo`
             );
             if (response.status == 200) {
-              // 반경, 중심, 타겟 닉네임 수신
               setAreaRadius(parseInt(response.data.mapSize));
               setAreaCenter({
                 lat: parseFloat(response.data.centerLat).toFixed(5),
@@ -87,7 +85,6 @@ export const WebSocketProvider = ({ children }) => {
             );
           }
 
-          // in-game/${gameRoomId}/assignMissions로 요청
           try {
             const response = await axiosInstance.get(
               `/in-game/${gameRoomId}/assignMissions`
