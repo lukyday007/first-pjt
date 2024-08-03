@@ -5,8 +5,6 @@ import { GameContext } from "@/context/GameContext";
 import useFirebase from "@/hooks/Map/useFirebase";
 import useTimer from "@/hooks/Map/useTimer";
 
-const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (sessionStorage 값과 비교해 사용)
-
 const GamePlay = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
   const {
@@ -19,7 +17,7 @@ const GamePlay = () => {
     username,
   } = useContext(GameContext);
   const { sendGPS } = useFirebase();
-  const { decreaseTime } = useTimer(INITIAL_SAFETY_TIME);
+  const { decreaseTime } = useTimer();
 
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
@@ -39,7 +37,7 @@ const GamePlay = () => {
         }
       }, 1000);
 
-      return () => clearInterval(locationInterval); // 컴포넌트 unmount 시 interval 클리어
+      return () => clearInterval(locationInterval);
     }
   }, [gameStatus, myLocation, sendGPS, username, decreaseTime]);
 

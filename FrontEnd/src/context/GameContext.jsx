@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 
 const approximateDistance = (lat1, lng1, lat2, lng2) => {
-  const R = 6371; // 지구의 반지름 (km)
+  const R = 6371000; // 지구의 반지름 (m)
   const toRadians = angle => angle * (Math.PI / 180);
 
   const dLat = toRadians(lat2 - lat1);
@@ -13,7 +13,7 @@ const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const x = dLng * Math.cos(avgLatRad);
   const distance = Math.sqrt(dLat * dLat + x * x) * R;
 
-  return (distance * 1000).toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
+  return distance.toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
 };
 
 const coordToFixed = (getLat, getLng) => {
@@ -28,9 +28,16 @@ export const GameContext = createContext();
 export const GameProvider = ({ children }) => {
   const [gameRoomId, setGameRoomId] = useState(() => {
     return sessionStorage.getItem("gameRoomId") || "";
-  }); // 게임 방 번호, sessionStorage 관리
+  }); // 게임 방 번호
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
-  const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 여부 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
+  const [gameStatus, setGameStatus] = useState(() => {
+    const savedGameStatus = sessionStorage.getItem("gameStatus");
+    return savedGameStatus === "true";
+  }); // 게임방 플레이 상태 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
+  const [isAlive, setIsAlive] = useState(() => {
+    const savedIsAlive = sessionStorage.getItem("isAlive");
+    return savedIsAlive === "true";
+  }); // 플레이어의 생존 상태 (게임 시작 시 true로 전환되고 sessionStorage에 저장됨)
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = sessionStorage.getItem("areaCenter");
     if (savedCenter) {
@@ -41,20 +48,21 @@ export const GameProvider = ({ children }) => {
       };
     }
     return { lat: 0, lng: 0 };
-  }); // 영역 중심, sessionStorage 관리
+  }); // 영역 중심
   const [areaRadius, setAreaRadius] = useState(() => {
     const savedRadius = sessionStorage.getItem("areaRadius");
     return savedRadius !== null ? parseFloat(savedRadius) : null;
-  }); // 영역 반경, sessionStorage 관리
+  }); // 영역 반경
   const [myLocation, setMyLocation] = useState({ lat: 0, lng: 0 }); // 내 위치
   const [targetId, setTargetId] = useState(() => {
     const savedTargetId = sessionStorage.getItem("targetId");
     return savedTargetId !== null ? savedTargetId : null;
-  }); // 타겟 ID(닉네임), sessionStorage 관리
+  }); // 타겟 ID(닉네임)
   const [targetLocation, setTargetLocation] = useState(null); // 타겟 위치
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
-  const username = sessionStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
+  const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
+  // 로그인 시 setItem 대상이 sessionStorage로 변경되면 이 부분도 같이 변경되어야 함
 
   // 내 위치를 잡고, 거리를 계산하는 함수
   const fetchLocation = () => {
@@ -120,6 +128,8 @@ export const GameProvider = ({ children }) => {
         setTargetId,
         gameStatus,
         setGameStatus,
+        isAlive,
+        setIsAlive,
         myLocation,
         setMyLocation,
         targetLocation,
