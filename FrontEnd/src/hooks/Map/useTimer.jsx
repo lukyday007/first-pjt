@@ -6,17 +6,19 @@ const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세�
 
 const useTimer = () => {
   const { gameRoomId, setIsAlive, username } = useContext(GameContext);
-  const [time, setTime] = useState(() => {
-    const savedTime = sessionStorage.getItem("remainingTime");
-    return savedTime !== null ? parseInt(savedTime, 10) : INITIAL_SAFETY_TIME; // sessionStorage에 시간 정보가 있으면 사용
+  const [remainingTime, setRemainingTime] = useState(() => {
+    const savedRemainingTime = sessionStorage.getItem("remainingTime");
+    return savedRemainingTime !== null
+      ? parseInt(savedRemainingTime, 10)
+      : INITIAL_SAFETY_TIME; // sessionStorage에 시간 정보가 있으면 사용
   });
 
   const decreaseTime = useCallback(() => {
-    setTime(prevTime => prevTime - 1);
+    setRemainingTime(prevRemainingTime => prevRemainingTime - 1);
   }, []);
 
   useEffect(() => {
-    if (time <= 0) {
+    if (remainingTime <= 0) {
       // 주어진 시간을 모두 소진 시 사망 처리 및 axios
       (async () => {
         try {
@@ -36,8 +38,8 @@ const useTimer = () => {
       })();
     }
 
-    sessionStorage.setItem("remainingTime", time);
-  }, [time, gameRoomId, username]);
+    sessionStorage.setItem("remainingTime", remainingTime);
+  }, [remainingTime, gameRoomId, username]);
 
   return { decreaseTime };
 };
