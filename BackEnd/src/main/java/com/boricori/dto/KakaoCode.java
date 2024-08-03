@@ -7,4 +7,6 @@ public class KakaoCode {
 
   private String code;
 
+  private String state;
+
 }
