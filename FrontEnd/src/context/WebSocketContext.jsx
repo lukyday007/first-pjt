@@ -21,6 +21,7 @@ export const WebSocketProvider = ({ children }) => {
     gameRoomId,
     setGameRoomUsers,
     setGameStatus,
+    setIsLive,
     targetId,
     setTargetId,
     areaCenter,
@@ -57,6 +58,9 @@ export const WebSocketProvider = ({ children }) => {
     switch (msg.msgType) {
       case "start":
         setGameStatus(true);
+        setIsLive(true);
+        sessionStorage.setItem("gameStatus", true);
+        sessionStorage.setItem("isLive", true);
         // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":

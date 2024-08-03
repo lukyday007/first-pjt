@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 
 const approximateDistance = (lat1, lng1, lat2, lng2) => {
-  const R = 6371; // 지구의 반지름 (km)
+  const R = 6371000; // 지구의 반지름 (m)
   const toRadians = angle => angle * (Math.PI / 180);
 
   const dLat = toRadians(lat2 - lat1);
@@ -13,7 +13,7 @@ const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const x = dLng * Math.cos(avgLatRad);
   const distance = Math.sqrt(dLat * dLat + x * x) * R;
 
-  return (distance * 1000).toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
+  return distance.toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
 };
 
 const coordToFixed = (getLat, getLng) => {
@@ -30,7 +30,14 @@ export const GameProvider = ({ children }) => {
     return sessionStorage.getItem("gameRoomId") || "";
   }); // 게임 방 번호
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
-  const [gameStatus, setGameStatus] = useState(false); // 게임 플레이 여부 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
+  const [gameStatus, setGameStatus] = useState(() => {
+    const savedGameStatus = sessionStorage.getItem("gameStatus");
+    return savedGameStatus === "true";
+  }); // 게임방 플레이 상태 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
+  const [isLive, setIsLive] = useState(() => {
+    const savedIsLive = sessionStorage.getItem("isLive");
+    return savedIsLive === "true";
+  }); // 플레이어의 생존 상태 (게임 시작 시 true로 전환되고 sessionStorage에 저장됨)
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = sessionStorage.getItem("areaCenter");
     if (savedCenter) {
@@ -121,6 +128,8 @@ export const GameProvider = ({ children }) => {
         setTargetId,
         gameStatus,
         setGameStatus,
+        isLive,
+        setIsLive,
         myLocation,
         setMyLocation,
         targetLocation,

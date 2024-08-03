@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import axiosInstance from "@/api/axiosInstance.js";
 
-const useTimer = initialTime => {
-  const { gameRoomId, setGameStatus, username } = useContext(GameContext);
+const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (sessionStorage 값과 비교해 사용)
+
+const useTimer = () => {
+  const { gameRoomId, setIsLive, username } = useContext(GameContext);
   const [time, setTime] = useState(() => {
     const savedTime = sessionStorage.getItem("remainingTime");
-    return savedTime !== null ? parseInt(savedTime, 10) : initialTime; // sessionStorage에 시간 정보가 있으면 사용
+    return savedTime !== null ? parseInt(savedTime, 10) : INITIAL_SAFETY_TIME; // sessionStorage에 시간 정보가 있으면 사용
   });
 
   const decreaseTime = useCallback(() => {
@@ -23,7 +25,8 @@ const useTimer = initialTime => {
           );
           if (response.status == 200) {
             // 타이머 종료로 인한 사망 후 처리 부분 입력
-            setGameStatus(false);
+            setIsLive(false);
+            sessionStorage.setItem("isLive", false);
           } else {
             // 타이머 종료 상태를 서버에 보냈으나 실패 시 부분 입력
           }
@@ -36,7 +39,7 @@ const useTimer = initialTime => {
     sessionStorage.setItem("remainingTime", time);
   }, [time, gameRoomId, username]);
 
-  return { time, decreaseTime };
+  return { decreaseTime };
 };
 
 export default useTimer;
