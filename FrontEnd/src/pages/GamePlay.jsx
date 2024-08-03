@@ -1,6 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
+
+import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
+
 import { GameContext } from "@/context/GameContext";
 import useFirebase from "@/hooks/Map/useFirebase";
 import useTimer from "@/hooks/Map/useTimer";
@@ -43,6 +46,7 @@ const GamePlay = () => {
 
   return (
     <>
+      {/* <GameHeader /> */}
       <div>GamePlay Page</div>
       <MapComponent />
     </>
