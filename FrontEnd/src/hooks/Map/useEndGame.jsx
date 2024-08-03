@@ -1,7 +1,7 @@
 const useEndGame = () => {
   const removeSessionStorageList = [
     "gameStatus",
-    "isLive",
+    "isAlive",
     "gameRoomId",
     "areaCenter",
     "areaRadius",

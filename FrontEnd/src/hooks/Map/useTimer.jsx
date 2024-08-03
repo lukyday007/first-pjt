@@ -5,7 +5,7 @@ import axiosInstance from "@/api/axiosInstance.js";
 const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (sessionStorage 값과 비교해 사용)
 
 const useTimer = () => {
-  const { gameRoomId, setIsLive, username } = useContext(GameContext);
+  const { gameRoomId, setIsAlive, username } = useContext(GameContext);
   const [time, setTime] = useState(() => {
     const savedTime = sessionStorage.getItem("remainingTime");
     return savedTime !== null ? parseInt(savedTime, 10) : INITIAL_SAFETY_TIME; // sessionStorage에 시간 정보가 있으면 사용
@@ -25,8 +25,8 @@ const useTimer = () => {
           );
           if (response.status == 200) {
             // 타이머 종료로 인한 사망 후 처리 부분 입력
-            setIsLive(false);
-            sessionStorage.setItem("isLive", false);
+            setIsAlive(false);
+            sessionStorage.setItem("isAlive", false);
           } else {
             // 타이머 종료 상태를 서버에 보냈으나 실패 시 부분 입력
           }

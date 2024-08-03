@@ -34,9 +34,9 @@ export const GameProvider = ({ children }) => {
     const savedGameStatus = sessionStorage.getItem("gameStatus");
     return savedGameStatus === "true";
   }); // 게임방 플레이 상태 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
-  const [isLive, setIsLive] = useState(() => {
-    const savedIsLive = sessionStorage.getItem("isLive");
-    return savedIsLive === "true";
+  const [isAlive, setIsAlive] = useState(() => {
+    const savedIsAlive = sessionStorage.getItem("isAlive");
+    return savedIsAlive === "true";
   }); // 플레이어의 생존 상태 (게임 시작 시 true로 전환되고 sessionStorage에 저장됨)
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = sessionStorage.getItem("areaCenter");
@@ -128,8 +128,8 @@ export const GameProvider = ({ children }) => {
         setTargetId,
         gameStatus,
         setGameStatus,
-        isLive,
-        setIsLive,
+        isAlive,
+        setIsAlive,
         myLocation,
         setMyLocation,
         targetLocation,
