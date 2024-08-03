@@ -21,6 +21,7 @@ export const WebSocketProvider = ({ children }) => {
     gameRoomId,
     setGameRoomUsers,
     setGameStatus,
+    setIsAlive,
     targetId,
     setTargetId,
     areaCenter,
@@ -57,6 +58,9 @@ export const WebSocketProvider = ({ children }) => {
     switch (msg.msgType) {
       case "start":
         setGameStatus(true);
+        setIsAlive(true);
+        sessionStorage.setItem("gameStatus", true);
+        sessionStorage.setItem("isAlive", true);
         // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":
@@ -86,10 +90,9 @@ export const WebSocketProvider = ({ children }) => {
               setAreaCenter(newAreaCenter);
               setTargetId(newTargetId);
 
-              // 반경, 중심, 타겟 닉네임 localStorage에 저장
-              localStorage.setItem("areaRadius", newAreaRadius); // handleAlertDegree에서 별도 관리
-              localStorage.setItem("areaCenter", newAreaCenter); // 게임 종료 시까지 불변
-              localStorage.setItem("targetId", newTargetId); // "target" msgType에서 관리
+              sessionStorage.setItem("areaRadius", newAreaRadius); // handleAlertDegree에서 별도 관리
+              sessionStorage.setItem("areaCenter", newAreaCenter); // 게임 종료 시까지 불변
+              sessionStorage.setItem("targetId", newTargetId); // "target" msgType에서 관리
             } else {
               alert("게임 시작 관련 정보를 가져오는 중 오류가 발생했습니다.");
             }
@@ -122,7 +125,7 @@ export const WebSocketProvider = ({ children }) => {
         if (hunter === username) {
           const newTargetId = msg.target;
           setTargetId(newTargetId);
-          localStorage.setItem("targetId", newTargetId);
+          sessionStorage.setItem("targetId", newTargetId);
         }
         break;
       case "users":
@@ -140,7 +143,7 @@ export const WebSocketProvider = ({ children }) => {
       case 3:
         const newAreaRadius = areaRadius * 0.75;
         setAreaRadius(newAreaRadius);
-        localStorage.setItem("areaRadius", newAreaRadius);
+        sessionStorage.setItem("areaRadius", newAreaRadius);
         break;
       case 4:
         setGameStatus(false);
