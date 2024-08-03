@@ -32,6 +32,6 @@ export default defineConfig({
   },
   server: {
     port: parseInt(process.env.VITE_PORT) || 5080,
-    host: '0.0.0.0', // Bind to all network interfaces
+    host: "0.0.0.0", // Bind to all network interfaces
   },
 });
