@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
+import KakaoLogin from "./pages/KakaoLogin";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
@@ -29,6 +30,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Onboarding />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/kakao" element={<KakaoLogin />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<Home />} />
       <Route path="/room-number" element={<RoomNumber />} />

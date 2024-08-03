@@ -6,6 +6,8 @@ import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
 
 import { BASE_URL } from "@/constants/baseURL";
+import kaKaoLoginImg from "@/assets/kakao-login.png";
+import googleLoginImg from "@/assets/google-login.svg";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,6 +40,19 @@ const Login = () => {
     }
   };
 
+  const handleKakaoLogin = () => {
+    const REST_API_KEY = ""; // env에서 import 해야함
+    const REDIRECT_URI = "http://localhost:5080/auth/kakao";
+
+    // 카카오 서버에 로그인 요청
+    // - 카카오에서 요청 처리 후 인가코드와 함께 KakaoLogin 페이지로 리다이렉트
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+  };
+
+  const handleGoogleLogin = () => {
+    // 구글 로그인
+  };
+
   return (
     <div className="m-4 flex h-screen flex-col items-center justify-center">
       <h1 className="mb-4 p-4 text-2xl font-bold">로그인</h1>
@@ -59,16 +74,36 @@ const Login = () => {
       </div>
       <Button
         type="submit"
-        className="mb-8 bg-theme-color-1 font-bold"
+        className="mb-8 w-60 bg-theme-color-1 font-bold"
         onClick={handleLogin}
       >
         Login &gt;
       </Button>
-      {error && <div className="text-red-500">{error}</div>}
-      <div className="cursor-pointer" onClick={() => navigate("/signup")}>
+      <div className="mb-8 cursor-pointer" onClick={() => navigate("/signup")}>
         계정이 없으신가요?{" "}
         <span className="font-bold text-rose-500">회원가입</span>
       </div>
+
+      {/* 구분선 */}
+      <div className="mb-8 flex w-full items-center">
+        <div className="border-lightGray/30 flex-grow border-t"></div>
+        <span className="mx-4 text-gray-400">또는</span>
+        <div className="border-lightGray/30 flex-grow border-t"></div>
+      </div>
+
+      <img
+        src={kaKaoLoginImg}
+        alt="Kakao Login"
+        className="mb-4 w-60 cursor-pointer"
+        onClick={handleKakaoLogin}
+      />
+      <img
+        src={googleLoginImg}
+        alt="Google Login"
+        className="w-60 cursor-pointer"
+        onClick={handleGoogleLogin}
+      />
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
