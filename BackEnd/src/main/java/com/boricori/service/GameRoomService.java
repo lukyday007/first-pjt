@@ -17,12 +17,12 @@ public interface GameRoomService {
 
   public int getCurrentRoomPlayerCount(String roomId);
 
-  public void enterRoom(String roomId, String userName);
+  public void enterRoom(String roomId, String sessionId, String userName);
 
   public GameRoom updateRoom(Long id, StartGameRoomRequest request);
 
   public GameRoom findGame(Long id);
-  void leaveRoom(String roomId, String userName);
+  List<String> leaveRoom(String roomId, String sessionId);
 
   GameRoom findGameByCode(String gameCode);
 

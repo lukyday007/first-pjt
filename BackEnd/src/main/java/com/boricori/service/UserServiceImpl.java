@@ -6,8 +6,11 @@ import com.boricori.dto.response.User.RankDtoResponse;
 import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.entity.User;
 import com.boricori.repository.userRepo.UserRepository;
+import com.boricori.util.CookieUtil;
 import com.boricori.util.JwtUtil;
 import com.boricori.util.ResponseEnum;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,17 +58,22 @@ public class UserServiceImpl implements UserService {
     return rankList;
   }
 
-  public UserLoginResponse login(UserLoginRequest request) {
+  public UserLoginResponse login(UserLoginRequest request, HttpServletResponse response) {
     User user = userRepo.findByEmail(request.getEmail());
     if (null != user) {
       String passwordEncoded = user.getPassword();
       if (passwordEncoder.matches(request.getPassword(), passwordEncoded)) {
-        return UserLoginResponse.of(jwtUtil.createAccessToken(user.getUsername()),
-            jwtUtil.createRefreshToken(user.getUsername()),
-            ResponseEnum.SUCCESS);
+        String access = jwtUtil.createAccessToken(user.getUsername());
+        Cookie cookie = CookieUtil.createCookie("refreshToken", jwtUtil.createRefreshToken(user.getUsername()));
+        response.addCookie(cookie);
+        return UserLoginResponse.builder()
+            .email(user.getEmail())
+            .username(user.getUsername())
+            .accessToken(access)
+            .build();
       }
     }
-    return UserLoginResponse.of(null, null, ResponseEnum.FAIL);
+    return null;
   }
 
   @Override
