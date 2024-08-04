@@ -11,6 +11,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.transaction.Transactional;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class GameRoomServiceImpl implements GameRoomService {
@@ -31,7 +32,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private GameRoomRepository gameRoomRepository;
   @Autowired
-  private RedisTemplate<String, List<String>> redisTemplate;
+  private RedisTemplate<String, Object> redisObjectTemplate;
+  @Autowired
+  private RedissonClient redissonClient;
 
   @Override
   public GameRoom findGame(Long id){
@@ -52,8 +55,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     CreateGameRoomResponse response = new CreateGameRoomResponse(gameRoom.getId(), qrCode,
         gameRoom.getGameCode());
 
-    saveGameRoom(gameRoom.getId(), userName);
-
     return response;
   }
 
@@ -73,19 +74,81 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public int getCurrentRoomPlayerCount(String roomId) {
-    return redisTemplate.opsForValue().get(roomId).size();
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        return room != null ? room.size() : 0;
+      } else {
+        log.info("Unable to acquire lock for room: {}" , roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired) {
+        lock.unlock();
+      }
+    }
+    return 0;
   }
 
   @Override
-  public void enterRoom(String roomId, String userName) {
-    redisTemplate.opsForValue().get(roomId).add(userName);
+  public void enterRoom(String roomId, String sessionId, String userName) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, Object> room = (Map<String, Object>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        if (room == null) {
+          room = new HashMap<>();
+        }
+        room.put(sessionId, userName);
+        redisObjectTemplate.opsForHash().put("roomId", roomId, room);
+      } else {
+        log.info("{} 아직 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired) {
+        lock.unlock();
+      }
+    }
   }
 
   @Override
-  public void leaveRoom(String roomId, String userName) {
-    List<String> players = redisTemplate.opsForValue().get(roomId);
-    players.remove(userName);
-    redisTemplate.opsForValue().set(roomId, players);
+  public List<String> leaveRoom(String roomId, String sessionId) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    List<String> result = Collections.emptyList();
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<Object, Object> room = redisObjectTemplate.opsForHash().entries(roomId);
+        if (room != null && room.containsKey(sessionId)) {
+          redisObjectTemplate.opsForHash().delete(roomId, sessionId);
+          // room 데이터를 다시 가져옴
+          room = redisObjectTemplate.opsForHash().entries(roomId);
+          result = room.values().stream()
+                  .map(Object::toString)
+                  .collect(Collectors.toList());
+        } else {
+          log.info("유저가 떠난 방을 찾을 수 없습니다.");
+        }
+      } else {
+        log.info("떠나야 하는 {}방을 아직 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired && lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
+    return result;
   }
 
   @Override
@@ -103,14 +166,32 @@ public class GameRoomServiceImpl implements GameRoomService {
     return Base64.getEncoder().encodeToString(pngData);
   }
 
-  private void saveGameRoom(Long gameRoomId, String userName) {
-    String roomId = String.valueOf(gameRoomId);
-    List<String> players = new CopyOnWriteArrayList();
-    players.add(userName);
-    redisTemplate.opsForValue().set(roomId, players);
-  }
-
-  public List<String> GameRoomPlayerAll(String roomId){
-    return redisTemplate.opsForValue().get(roomId);
+  @Override
+  public List<String> GameRoomPlayerAll(String roomId) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    List<String> result = Collections.emptyList();
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        if (room != null) {
+          result = room.values().stream()
+                  .map(Object::toString)
+                  .collect(Collectors.toList());
+        } else {
+          log.info("getUsers를 위한 {}방에 아직 들어갈 수 없습니다", roomId);
+        }
+      } else {
+        log.info("getUsers를 위한 방{}에 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired && lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
+    return result;
   }
 }
