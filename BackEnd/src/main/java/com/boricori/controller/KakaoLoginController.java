@@ -1,6 +1,6 @@
 package com.boricori.controller;
 
-import com.boricori.dto.KakaoCode;
+
 import com.boricori.dto.KakaoToken;
 import com.boricori.dto.KakaoUserResponse;
 import com.boricori.dto.request.User.SocialLoginRequest;

@@ -1,4 +1,4 @@
-package com.boricori.dto.response;
+package com.boricori.dto;
 
 import lombok.Data;
 

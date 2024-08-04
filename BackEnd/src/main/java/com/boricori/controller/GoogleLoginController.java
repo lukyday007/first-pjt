@@ -2,9 +2,8 @@ package com.boricori.controller;
 
 import com.boricori.dto.SocialProfile;
 import com.boricori.dto.request.User.SocialLoginRequest;
-import com.boricori.dto.response.AuthToken;
+import com.boricori.dto.AuthToken;
 import com.boricori.dto.response.User.UserLoginResponse;
-import com.boricori.dto.response.User.UserResponse;
 import com.boricori.entity.User;
 import com.boricori.service.UserService;
 import com.boricori.util.CookieUtil;
@@ -27,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
