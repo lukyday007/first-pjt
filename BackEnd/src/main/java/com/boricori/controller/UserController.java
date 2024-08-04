@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +47,13 @@ public class UserController {
       @ApiResponse(responseCode = "200", description = "로그인 성공"),
       @ApiResponse(responseCode = "400", description = "로그인 실패"),
   })
-  public ResponseEntity<UserLoginResponse> login(@RequestBody @Parameter(name = "유저 로그인 폼") UserLoginRequest loginRequest){
-    UserLoginResponse res = userService.login(loginRequest);
-    if (res.getResult() == ResponseEnum.SUCCESS){
+  public ResponseEntity<UserLoginResponse> login(@RequestBody @Parameter(name = "유저 로그인 폼") UserLoginRequest loginRequest
+  , HttpServletResponse response){
+    UserLoginResponse res = userService.login(loginRequest, response);
+    if (res != null){
       return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(res);
     }
-    return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(res);
+    return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
   }
 
   @PostMapping("/signup")
@@ -67,6 +69,17 @@ public class UserController {
     }
     return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
   }
+
+  @PostMapping("/social-signup")
+  public ResponseEntity<?> socialSignup(@RequestBody UserSignupRequest request){
+    request.setPassword("db_GP1_ylS*JU");
+    User user = userService.signup(request);
+    if (user != null){
+      return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(UserResponse.of(user));
+    }
+    return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
+  }
+
 
   // 로그아웃은 프론트에서 처리, 백에서 할 일 없음
   @GetMapping("/logout")

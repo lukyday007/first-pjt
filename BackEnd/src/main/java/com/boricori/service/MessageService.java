@@ -32,14 +32,14 @@ public class MessageService {
         gameRoom.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
         gameRoom.getCenterLat(),
         gameRoom.getCenterLng());
-    messagingTemplate.convertAndSend(String.format("/topic/alert/%d", gameRoomId), startJSON);
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d", gameRoomId), startJSON);
   }
 
   public void processAlertMessage(String gameId, String alertJSON) {
-    messagingTemplate.convertAndSend(String.format("/topic/alert/%s", gameId), alertJSON);
+    messagingTemplate.convertAndSend(String.format("/topic/room/%s", gameId), alertJSON);
   }
 
   public void startGame(Long id) {
-    messagingTemplate.convertAndSend(String.format("/topic/alert/%d", id), "{'msgType':'start'}");
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d", id), "{'msgType':'start'}");
   }
 }

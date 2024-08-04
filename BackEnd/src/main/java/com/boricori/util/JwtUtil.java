@@ -10,9 +10,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,12 +26,11 @@ public class JwtUtil {
 
     private SecretKey secretKey;
 
-
-    private Map<String, String> refreshTokens = new HashMap<>();
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
   @PostConstruct
     protected void init(){
-    System.out.println("secret: " + secret);
     secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
@@ -44,24 +46,24 @@ public class JwtUtil {
     }
 
 
-//  public UUID createRefreshToken(String email) {
-//    UUID token = UUID.randomUUID();
-//    refreshTokens.put(token, email);
-//    return token;
-//  }
-
   public String createRefreshToken(String username) {
-    Claims claims = Jwts.claims().subject(username).build();
-    long validFor = 1000 * 60 * 60 * 24 * 14; // 2 weeks
-    String token = Jwts.builder()
-        .claims(claims)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + validFor))
-        .signWith(secretKey)
-        .compact();
-    refreshTokens.put(token, username);
+    String token = UUID.randomUUID().toString();
+    redisTemplate.opsForValue().set(username + "-refresh", token, 100 * 60 * 60 * 24 * 14, TimeUnit.SECONDS);
     return token;
   }
+
+//  public String createRefreshToken(String username) {
+//    Claims claims = Jwts.claims().subject(username).build();
+//    long validFor = 1000 * 60 * 60 * 24 * 14; // 2 weeks
+//    String token = Jwts.builder()
+//        .claims(claims)
+//        .issuedAt(new Date(System.currentTimeMillis()))
+//        .expiration(new Date(System.currentTimeMillis() + validFor))
+//        .signWith(secretKey)
+//        .compact();
+//
+//    return token;
+//  }
 
 
   public Boolean isExpired(String token) throws NoSuchTokenException {
@@ -78,8 +80,9 @@ public class JwtUtil {
     }
 
 
-    public boolean isValidRefreshToken(String refreshToken){
-      return refreshTokens.getOrDefault(refreshToken, null) != null;
+    public boolean isValidRefreshToken(String username, String refreshToken){
+      String token = redisTemplate.opsForValue().get(username + "-refresh");
+      return refreshToken.equals(token);
     }
 
 }

@@ -5,6 +5,7 @@ import com.boricori.dto.request.gameroom.EndGameRoomRequest;
 import com.boricori.dto.request.gameroom.GameRequest;
 import com.boricori.dto.request.gameroom.StartGameRoomRequest;
 import com.boricori.dto.response.gameroom.CreateGameRoomResponse;
+import com.boricori.dto.response.gameroom.EnterRoomResponse;
 import com.boricori.dto.response.gameroom.GameInfoResponse;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
 import com.boricori.entity.GameParticipants;
@@ -93,7 +94,7 @@ public class GameRoomController {
       @ApiResponse(responseCode = "200", description = "성공"),
       @ApiResponse(responseCode = "404", description = "실패"),
   })
-  public ResponseEntity<String> enterGameRoom(
+  public ResponseEntity<EnterRoomResponse> enterGameRoom(
       @PathVariable @Parameter(description = "방 입장 코드", required = true) String gameCode, HttpServletRequest req) {
     String username = (String) req.getAttribute("username");
     GameRoom game = gameRoomService.findGameByCode(gameCode);
@@ -101,9 +102,10 @@ public class GameRoomController {
       int currCount = gameRoomService.getCurrentRoomPlayerCount(String.valueOf(game.getId()));
 //    int currCount = 1;
       if(currCount >= maxCount){
-        return ResponseEntity.status(FAIL.getCode()).body("Full");
+        return ResponseEntity.status(FAIL.getCode()).body(new EnterRoomResponse("Full", null));
       }
-      return ResponseEntity.status(SUCCESS.getCode()).body("Available");
+      return ResponseEntity.status(SUCCESS.getCode()).body(new EnterRoomResponse("Available",
+          game.getId()));
   }
 
   @PostMapping("/{id}/start")
