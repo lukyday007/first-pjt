@@ -28,6 +28,7 @@ export const WebSocketProvider = ({ children }) => {
     setAreaCenter,
     areaRadius,
     setAreaRadius,
+    setMissionList,
   } = useContext(GameContext);
   const stompClient = useRef(null);
 
@@ -102,13 +103,14 @@ export const WebSocketProvider = ({ children }) => {
             );
           }
 
+          // 초기 미션 지급
           try {
             const response = await axiosInstance.get(
               `/in-game/${gameRoomId}/assignMissions`
             );
             if (response.status == 200) {
-              // MissionResponse 관련 로직 작성
-              console.log(response.data);
+              setMissionList(response.data);
+              sessionStorage.setItem("missionList", response.data);
             } else {
               alert("할당된 미션 수신 과정에서 오류가 발생했습니다.");
             }

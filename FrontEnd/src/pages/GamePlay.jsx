@@ -46,8 +46,7 @@ const GamePlay = () => {
 
   return (
     <>
-      {/* <GameHeader /> */}
-      <div>GamePlay Page</div>
+      <GameHeader />
       <MapComponent />
     </>
   );
