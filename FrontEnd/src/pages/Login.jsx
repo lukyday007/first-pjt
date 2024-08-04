@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import { Button } from "@components/ui/Button";
 import { Input } from "@components/ui/Input";
+
+import { BASE_URL } from "@/constants/baseURL";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,15 +15,18 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/user/login", {
+      const response = await axios.post(`${BASE_URL}/user/login`, {
         email,
         password,
       });
 
       if (response.status == 200) {
-        const { accessToken, refreshToken } = response.data;
+        const { accessToken, refreshToken, username, email } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
+
         navigate("/home");
       } else {
         setError("로그인에 실패했습니다. 다시 시도해주세요.");
