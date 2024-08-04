@@ -38,7 +38,9 @@ export const WebSocketProvider = ({ children }) => {
 
     const socket = new SockJS(`${BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
-    stompClient.current.connect({}, frame => {
+
+    const username = localStorage.getItem("username");
+    stompClient.current.connect({ username: username }, frame => {
       console.log("Connected: " + frame);
 
       stompClient.current.subscribe(`/topic/room/${gameRoomId}`, serverMsg => {
