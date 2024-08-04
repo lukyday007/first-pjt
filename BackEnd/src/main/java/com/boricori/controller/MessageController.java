@@ -4,12 +4,18 @@ import com.boricori.dto.RoomMessage;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Controller
 public class MessageController {
@@ -32,19 +38,39 @@ public class MessageController {
     return localDateTime.toEpochSecond(ZoneOffset.UTC);
   }
 
-//  @MessageMapping("/enter")
-//  public void enterRoom(RoomMessage message) throws Exception {
+  @MessageMapping("/enter")
+  public void enterRoom(RoomMessage message) throws Exception {
 //    String roomId = message.getRoomId();
 //    String userName = message.getUsername();
 //    gameRoomService.enterRoom(roomId, userName);
-//
 //    messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
-//  }
-//
-//  @MessageMapping("/leave")
-//  public void leaveGame(RoomMessage message) {
+  }
+
+  @MessageMapping("/leave")
+  public void leaveGame(RoomMessage message) {
 //    String roomId = message.getRoomId();
 //    String userName = message.getUsername();
 //    gameRoomService.leaveRoom(roomId, userName);
-//  }
+  }
+
+
+  @EventListener
+  public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String destination = headerAccessor.getDestination();
+    String roomId = destination.split("/")[2];
+    List<String> message = gameRoomService.GameRoomPlayerAll(roomId);
+    messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
+  }
+
+  @EventListener
+  public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
+    String destination = headerAccessor.getDestination();
+    String roomId = destination.split("/")[2];
+    List<String> message = gameRoomService.leaveRoom(roomId, sessionId);
+
+    messagingTemplate.convertAndSend("/topic/room/"+roomId, message);
+  }
 }
