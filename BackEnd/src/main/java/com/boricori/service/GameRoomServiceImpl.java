@@ -11,6 +11,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.transaction.Transactional;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class GameRoomServiceImpl implements GameRoomService {
@@ -29,7 +32,9 @@ public class GameRoomServiceImpl implements GameRoomService {
   @Autowired
   private GameRoomRepository gameRoomRepository;
   @Autowired
-  private RedisTemplate<String, String> redisTemplate;
+  private RedisTemplate<String, Object> redisObjectTemplate;
+  @Autowired
+  private RedissonClient redissonClient;
 
   @Override
   public GameRoom findGame(Long id){
@@ -69,21 +74,82 @@ public class GameRoomServiceImpl implements GameRoomService {
 
   @Override
   public int getCurrentRoomPlayerCount(String roomId) {
-    return redisTemplate.opsForList().range(roomId, 0, -1).size();
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    try {
+      // 락을 획득 (최대 10초 동안 대기, 10초 동안 유지)
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        return room != null ? room.size() : 0;
+      } else {
+        log.info("Unable to acquire lock for room: {}" , roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired) {
+        lock.unlock();
+      }
+    }
+    return 0;
   }
 
   @Override
-  public List<String> enterRoom(String roomId, String userName) {
-    redisTemplate.opsForList().rightPush(roomId, userName);
-    List<String> players = redisTemplate.opsForList().range(roomId, 0, -1);
-    return players;
+  public void enterRoom(String roomId, String sessionId, String userName) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, Object> room = (Map<String, Object>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        if (room == null) {
+          room = new HashMap<>();
+        }
+        room.put(sessionId, userName);
+        redisObjectTemplate.opsForHash().put("roomId", roomId, room);
+      } else {
+        log.info("{} 아직 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired) {
+        lock.unlock();
+      }
+    }
   }
 
   @Override
-  public List<String> leaveRoom(String roomId, String userName) {
-    redisTemplate.opsForList().remove(roomId,1, userName);
-    List<String> players = redisTemplate.opsForList().range(roomId, 0, -1);
-    return players;
+  public List<String> leaveRoom(String roomId, String sessionId) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    List<String> result = Collections.emptyList();
+    try {
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<Object, Object> room = redisObjectTemplate.opsForHash().entries(roomId);
+        if (room != null && room.containsKey(sessionId)) {
+          redisObjectTemplate.opsForHash().delete(roomId, sessionId);
+          // room 데이터를 다시 가져옴
+          room = redisObjectTemplate.opsForHash().entries(roomId);
+          result = room.values().stream()
+                  .map(Object::toString)
+                  .collect(Collectors.toList());
+        } else {
+          log.info("유저가 떠난 방을 찾을 수 없습니다.");
+        }
+      } else {
+        log.info("떠나야 하는 {}방을 아직 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired && lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
+    return result;
   }
 
   @Override
@@ -101,7 +167,33 @@ public class GameRoomServiceImpl implements GameRoomService {
     return Base64.getEncoder().encodeToString(pngData);
   }
 
-  public List<String> GameRoomPlayerAll(String roomId){
-    return redisTemplate.opsForList().range(roomId, 0, -1);
+  @Override
+  public List<String> GameRoomPlayerAll(String roomId) {
+    RLock lock = redissonClient.getLock("lock:room:" + roomId);
+    boolean acquired = false;
+    List<String> result = Collections.emptyList();
+    try {
+      // 락을 획득 (최대 10초 동안 대기, 10초 동안 유지)
+      acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      if (acquired) {
+        Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
+        if (room != null) {
+          result = room.values().stream()
+                  .map(Object::toString)
+                  .collect(Collectors.toList());
+        } else {
+          log.info("getUsers를 위한 {}방에 아직 들어갈 수 없습니다", roomId);
+        }
+      } else {
+        log.info("getUsers를 위한 방{}에 들어갈 수 없습니다", roomId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      if (acquired && lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
+    return result;
   }
 }
