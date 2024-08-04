@@ -8,6 +8,7 @@ import React, {
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import axiosInstance from "@/api/axiosInstance.js";
+import useEndGame from "@/hooks/Map/useEndGame";
 import { GameContext } from "@/context/GameContext";
 import { BASE_URL } from "@/constants/baseURL";
 
@@ -36,12 +37,14 @@ export const WebSocketProvider = ({ children }) => {
   const connect = useCallback(() => {
     if (!gameRoomId) return;
 
-    const socket = new SockJS(`${BASE_URL}/server`);
+    const socket = new SockJS(`${BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
-    stompClient.current.connect({}, frame => {
+
+    const username = localStorage.getItem("username");
+    stompClient.current.connect({ username: username }, frame => {
       console.log("Connected: " + frame);
 
-      stompClient.current.subscribe(`/topic/alert/${gameRoomId}`, serverMsg => {
+      stompClient.current.subscribe(`/topic/room/${gameRoomId}`, serverMsg => {
         const msg = JSON.parse(serverMsg.body);
         handleAlertMessage(msg);
       });
@@ -69,6 +72,7 @@ export const WebSocketProvider = ({ children }) => {
         break;
       case "end":
         setGameStatus(false);
+        useEndGame();
         break;
       case "ready":
         // IIFE(즉시 실행 함수 표현): 함수를 정의하고 즉시 실행하는 방법
@@ -94,6 +98,15 @@ export const WebSocketProvider = ({ children }) => {
               sessionStorage.setItem("areaRadius", newAreaRadius); // handleAlertDegree에서 별도 관리
               sessionStorage.setItem("areaCenter", newAreaCenter); // 게임 종료 시까지 불변
               sessionStorage.setItem("targetId", newTargetId); // "target" msgType에서 관리
+
+              // 이하는 sessionStorage를 통해 PlotGameTime.jsx에서만 사용되는 부분
+              const newGamePlayTime = parseInt(response.data.time, 10); // 분 단위
+              const newStartTime = response.data.startTime;
+              sessionStorage.setItem(
+                "gamePlayTime",
+                newGamePlayTime.toString()
+              );
+              sessionStorage.setItem("startTime", newStartTime);
             } else {
               alert("게임 시작 관련 정보를 가져오는 중 오류가 발생했습니다.");
             }
