@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/Button";
-import catchTargetButtonImage from "@/assets/catch-target-button-image.png";
+import catchTargetButtonImage from "@/assets/gameplay-icon/catch-target-button-image.png";
 
 const CatchTargetButton = ({ onClick, isDisabled }) => {
   return (

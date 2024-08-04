@@ -7,6 +7,9 @@ const useEndGame = () => {
     "areaRadius",
     "targetId",
     "remainingTime",
+    "startTime",
+    "gamePlayTime",
+    "remainingPlayTime",
   ];
   removeSessionStorageList.forEach(value => {
     sessionStorage.removeItem(value);
