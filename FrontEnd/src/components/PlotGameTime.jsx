@@ -2,16 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 
 const PlotGameTime = () => {
   const gamePlayTime =
-    parseInt(sessionStorage.getItem("gamePlayTime"), 10) * 60; // 초 단위로 환산
+    parseInt(sessionStorage.getItem("gamePlayTime"), 10) * 60 || 0; // 초 단위로 환산
   const startTime = sessionStorage.getItem("startTime");
 
-  const [remainingPlayTime, setRemainingPlayTime] = useState(() => {
-    // 초기 남은 시간 설정
+  const initializeRemainingPlayTime = () => {
     const storedRemainingTime = sessionStorage.getItem("remainingPlayTime");
     return storedRemainingTime
       ? parseInt(storedRemainingTime, 10)
       : gamePlayTime;
-  });
+  };
+  const [remainingPlayTime, setRemainingPlayTime] = useState(
+    initializeRemainingPlayTime
+  );
   const intervalIdRef = useRef(null);
 
   // 화면에 표시하는 부분으로 return하는 함수
@@ -22,6 +24,8 @@ const PlotGameTime = () => {
   };
 
   useEffect(() => {
+    if (!startTime) return; // 시작 시간이 없으면 타이머를 설정하지 않음
+
     const start = new Date(startTime).getTime();
 
     const updateTimer = () => {
@@ -30,9 +34,11 @@ const PlotGameTime = () => {
       const newRemainingPlayTime = gamePlayTime - elapsedTime; // 초 단위로 연산
 
       if (newRemainingPlayTime <= 0) {
-        setRemainingPlayTime(0);
         clearInterval(intervalIdRef.current); // 남은 시간이 0이 되면 타이머 정지
-        sessionStorage.setItem("remainingPlayTime", "0");
+        if (remainingPlayTime !== 0) {
+          setRemainingPlayTime(0);
+          sessionStorage.setItem("remainingPlayTime", "0");
+        }
       } else {
         setRemainingPlayTime(newRemainingPlayTime);
         sessionStorage.setItem(
