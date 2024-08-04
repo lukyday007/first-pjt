@@ -4,6 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class KakaoAccount {
+public class SocialProfile {
   private String email;
 }

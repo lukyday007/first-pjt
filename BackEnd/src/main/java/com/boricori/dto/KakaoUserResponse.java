@@ -7,5 +7,5 @@ public class KakaoUserResponse {
 
   private Long id;
 
-  private KakaoAccount kakao_account;
+  private SocialProfile kakao_account;
 }

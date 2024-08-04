@@ -1,11 +1,15 @@
 package com.boricori.controller;
 
-import com.boricori.dto.KakaoAccount;
-import com.boricori.dto.KakaoUserResponse;
+import com.boricori.dto.SocialProfile;
+import com.boricori.dto.request.User.SocialLoginRequest;
 import com.boricori.dto.response.AuthToken;
+import com.boricori.dto.response.User.UserLoginResponse;
+import com.boricori.dto.response.User.UserResponse;
 import com.boricori.entity.User;
 import com.boricori.service.UserService;
+import com.boricori.util.CookieUtil;
 import com.boricori.util.JwtUtil;
+import com.boricori.util.ResponseEnum;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,10 +22,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,9 +47,10 @@ public class GoogleLoginController {
   @Autowired
   private JwtUtil jwtUtil;
 
-  private String scope = "https://www.googleapis.com/auth/userinfo.email";
+  private static final String scope = "https://www.googleapis.com/auth/userinfo.email";
 
   private static RestTemplate restTemplate = new RestTemplate();
+
   @Autowired
   private UserService userService;
 
@@ -66,21 +73,44 @@ public class GoogleLoginController {
     return ResponseEntity.status(200).body(url);
   }
 
-  @GetMapping("/getCode")
-  public void getCode(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    String code = req.getParameter("code");
-    String error = req.getParameter("error");
-    String state = req.getParameter("state");
-
-    if (error != null){
-//      return "에러남: " + error; // 에ㅔ러값 리턴해서 콘솔에 찍어주자
-    }
-
+  @GetMapping("/getToken")
+  public ResponseEntity<UserLoginResponse> getToken(@RequestBody SocialLoginRequest socReq,HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String code = socReq.getCode();
+    String state = socReq.getState();
     HttpSession session = req.getSession();
-    if (!session.getAttribute("state").equals(state)){
+    if (session.getAttribute("state") == null || !session.getAttribute("state").equals(state)){
+      return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);
 //      return "state 안맞음, expected: " + session.getAttribute("state") + ", actual: " + state; // 누군가 탈취한 정보로 접근중
     }
 
+    try{
+      AuthToken token = exchangeCodeForToken(code);
+      String email = getGoogleEmail(token.getAccess_token());
+      User user = userService.findByEmail(email);
+      if (user == null) {
+        // 새로 가입할 유저
+        UserLoginResponse userLoginResponse = UserLoginResponse.builder()
+            .email(email)
+            .build();
+        return ResponseEntity.status(ResponseEnum.SIGNUP.getCode()).body(userLoginResponse);
+      } else {
+        // 기존 유저 로그인 수행
+        String access = jwtUtil.createAccessToken(user.getUsername());
+        Cookie cookie = CookieUtil.createCookie("refreshToken", jwtUtil.createRefreshToken(user.getUsername()));
+        resp.addCookie(cookie);
+        UserLoginResponse userLoginResponse = UserLoginResponse.builder()
+            .email(user.getEmail())
+            .username(user.getUsername())
+            .accessToken(access)
+            .build();
+        return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(userLoginResponse);
+      }
+    }catch(Exception e){
+      return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);
+    }
+  }
+
+  private AuthToken exchangeCodeForToken(String code){
     String requestURL = "https://oauth2.googleapis.com/token";
 
     MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -91,7 +121,7 @@ public class GoogleLoginController {
     formData.add("redirect_uri", REDIRECT_URL);
 
     HttpHeaders headers = new HttpHeaders();
-    headers.set("Content-Type", "application/x-www-form-urlencoded");
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
     HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(formData, headers);
 
     ResponseEntity<AuthToken> responseEntity = restTemplate.exchange(
@@ -101,36 +131,7 @@ public class GoogleLoginController {
         AuthToken.class
     );
 
-    AuthToken responseBody = responseEntity.getBody();
-    try{
-      String email = getGoogleEmail(responseBody.getAccess_token());
-      User user = userService.findByEmail(email);
-      if (user == null){
-        // 새로운 유저
-        Cookie emailCookie = new Cookie("email", email);
-        emailCookie.setHttpOnly(true); // Prevent JavaScript access
-        emailCookie.setSecure(true);   // Only sent over HTTPS
-        emailCookie.setPath("/");      // Valid for the entire application
-        emailCookie.setMaxAge(60);   // 1 min expiration
-        resp.addCookie(emailCookie);
-        // Redirect to the frontend
-        resp.sendRedirect("https://your-frontend.com/home"); // 닉네임 생성페이지로
-      }else{
-        Cookie accessCookie = new Cookie("access", jwtUtil.createAccessToken(user.getUsername()));
-        Cookie refreshCookie = new Cookie("refresh", jwtUtil.createRefreshToken(user.getUsername()));
-        accessCookie.setHttpOnly(true); // Prevent JavaScript access
-        accessCookie.setSecure(true);   // Only sent over HTTPS
-        accessCookie.setPath("/");      // Valid for the entire application
-        accessCookie.setMaxAge(60);   // 1 min expiration
-        resp.addCookie(accessCookie);
-        resp.addCookie(refreshCookie);
-        // Redirect to the frontend
-        resp.sendRedirect("https://your-frontend.com/home"); // 닉네임 생성페이지로
-      }
-    }catch(Exception e){
-        resp.sendRedirect(""); // 로그인페이지로
-    }
-
+    return responseEntity.getBody();
   }
 
 
@@ -142,12 +143,14 @@ public class GoogleLoginController {
 
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
-      ResponseEntity<KakaoAccount> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
-          entity, KakaoAccount.class);
-      if (responseEntity.getBody() == null) {
-        throw new RuntimeException();
-      }
-      return responseEntity.getBody().getEmail();
+    ResponseEntity<SocialProfile> responseEntity = restTemplate.exchange(url, HttpMethod.GET,
+          entity, SocialProfile.class);
+    SocialProfile body = responseEntity.getBody();
+    if (body == null){
+      throw new RuntimeException();
+    }
+    return body.getEmail();
   }
+
 
 }

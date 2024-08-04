@@ -6,6 +6,7 @@ import com.boricori.dto.response.User.RankDtoResponse;
 import com.boricori.dto.response.User.UserLoginResponse;
 import com.boricori.entity.User;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
@@ -14,7 +15,7 @@ public interface UserService {
   User signup(UserSignupRequest request);
   int findUserScore(String email);
   List<RankDtoResponse> findAllRank();
-  UserLoginResponse login(UserLoginRequest request);
+  UserLoginResponse login(UserLoginRequest request, HttpServletResponse response);
   User findByEmail(String email);
   User findByUsername(String username);
 }
