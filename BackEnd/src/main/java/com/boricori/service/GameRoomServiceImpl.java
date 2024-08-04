@@ -77,7 +77,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     RLock lock = redissonClient.getLock("lock:room:" + roomId);
     boolean acquired = false;
     try {
-      // 락을 획득 (최대 10초 동안 대기, 10초 동안 유지)
       acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
       if (acquired) {
         Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
@@ -173,7 +172,6 @@ public class GameRoomServiceImpl implements GameRoomService {
     boolean acquired = false;
     List<String> result = Collections.emptyList();
     try {
-      // 락을 획득 (최대 10초 동안 대기, 10초 동안 유지)
       acquired = lock.tryLock(10, 10, TimeUnit.SECONDS);
       if (acquired) {
         Map<String, String> room = (Map<String, String>) redisObjectTemplate.opsForHash().get("roomId", roomId);
