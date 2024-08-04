@@ -23,6 +23,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/server");
+    registry.addEndpoint("/gameRoom/{rooId}");
   }
 
   @Override
