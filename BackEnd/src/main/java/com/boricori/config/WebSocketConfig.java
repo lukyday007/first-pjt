@@ -9,10 +9,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @Configuration
 @EnableWebSocketMessageBroker
 @EnableWebSocket
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer {
-
-  @Autowired
-  private WebSocketHandler webSocketHandler;
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -22,14 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/server");
-    registry.addEndpoint("/gameRoom/{rooId}");
+    registry.addEndpoint("/gameroom/{rooId}");
   }
 
-  @Override
-  public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    registry.addHandler(webSocketHandler, "/gameRoom/{rooId}")
-            .setAllowedOrigins("*")
-            .addInterceptors(new HttpSessionHandshakeInterceptor());
-  }
 }

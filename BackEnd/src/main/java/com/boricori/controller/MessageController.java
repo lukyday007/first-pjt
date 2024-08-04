@@ -1,6 +1,7 @@
 package com.boricori.controller;
 
 import com.boricori.dto.RoomMessage;
+import com.boricori.dto.response.gameroom.EnterMessageResponse;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +58,14 @@ public class MessageController {
   @EventListener
   public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String sessionId = headerAccessor.getSessionId();
     String destination = headerAccessor.getDestination();
     String roomId = destination.split("/")[2];
-    List<String> message = gameRoomService.GameRoomPlayerAll(roomId);
+    String username = headerAccessor.getFirstNativeHeader("username");
+
+    gameRoomService.enterRoom(roomId, sessionId, username);
+    List<String> users = gameRoomService.GameRoomPlayerAll(roomId);
+    EnterMessageResponse message = new EnterMessageResponse("users", users);
     messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
   }
 
