@@ -1,8 +1,9 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
+import CamChattingComponent from "@/components/CamChattingComponent";
 
 import { GameContext } from "@/context/GameContext";
 import useFirebase from "@/hooks/Map/useFirebase";
@@ -27,6 +28,7 @@ const GamePlay = () => {
   const { sendGPS } = useFirebase();
   const { decreaseTime } = useTimer();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
+  const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
 
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
@@ -54,28 +56,41 @@ const GamePlay = () => {
     decreaseTime,
   ]);
 
+  const toggleCamChatting = () => {
+    setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
+  };
+
   return (
     <>
       <GameHeader />
-      <MapComponent />
-      <PlotGameTime />
-      <div className="flex justify-between">
-        <div />
-        <div />
-        <div id="catch-button" className="flex justify-center">
-          <CatchTargetButton
-            onClick={handleOnClickCatchTarget}
-            isDisabled={!isAbleToCatchTarget}
-          />
-        </div>
-        <div />
-        <div id="mini-buttons" className="mx-3 flex flex-col">
-          <CheckMyItemButton />
-          <CamChattingButton />
-          <GiveUpButton />
-        </div>
-        <div />
-      </div>
+      {camChatting ? (
+        <>
+          <PlotGameTime />
+          <CamChattingComponent />
+        </>
+      ) : (
+        <>
+          <MapComponent />
+          <PlotGameTime />
+          <div className="flex justify-between">
+            <div />
+            <div />
+            <div id="catch-button" className="flex justify-center">
+              <CatchTargetButton
+                onClick={handleOnClickCatchTarget}
+                isDisabled={!isAbleToCatchTarget}
+              />
+            </div>
+            <div />
+            <div id="mini-buttons" className="mx-3 flex flex-col">
+              <CheckMyItemButton />
+              <CamChattingButton onClick={toggleCamChatting} /> 
+              <GiveUpButton />
+            </div>
+            <div />
+          </div>
+        </>
+      )}
     </>
   );
 };
