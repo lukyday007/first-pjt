@@ -1,19 +1,18 @@
 import React, {
   createContext,
+  useState,
   useRef,
   useEffect,
   useContext,
   useCallback,
 } from "react";
-import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import axiosInstance from "@/api/axiosInstance.js";
 import useEndGame from "@/hooks/Map/useEndGame";
 import { GameContext } from "@/context/GameContext";
-import { BASE_URL } from "@/constants/baseURL";
+import { WS_BASE_URL } from "@/constants/baseURL";
 
 // WebSocket은 게임 방 접속시부터 실행되어야 함
-// 게임 내(gameStatus===true)에서 WebSocket은 게임 상태(start-true, end-false), 영역 축소 신호만 수신 및 처리
 export const WebSocketContext = createContext();
 
 export const WebSocketProvider = ({ children }) => {
@@ -33,28 +32,75 @@ export const WebSocketProvider = ({ children }) => {
   } = useContext(GameContext);
   const stompClient = useRef(null);
 
+  const MAX_RECONNECTION_ATTEMPTS = 5; // 최대 재연결 시도 횟수
+  const RECONNECT_INTERVAL = 1000; // 재연결 간격 (1초)
+
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
   // connect, disconnect 함수 정의
   const connect = useCallback(() => {
-    if (!gameRoomId) return;
+    if (
+      !gameRoomId ||
+      stompClient.current ||
+      reconnectAttempts >= MAX_RECONNECTION_ATTEMPTS
+    )
+      return; // 이미 연결된 상태인지 확인
 
-    const socket = new SockJS(`${BASE_URL}/gameRoom/${gameRoomId}`);
+    // WebSocket 연결 생성
+    const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
 
+    // 사용자 이름 가져오기
     const username = localStorage.getItem("username");
-    stompClient.current.connect({ username: username }, frame => {
-      console.log("Connected: " + frame);
 
-      stompClient.current.subscribe(`/topic/room/${gameRoomId}`, serverMsg => {
-        const msg = JSON.parse(serverMsg.body);
-        handleAlertMessage(msg);
-      });
-    });
+    // STOMP 연결 설정
+    stompClient.current.connect(
+      { username: username }, // 헤더에 username 추가
+      frame => {
+        console.log("Connected: " + frame);
+        setReconnectAttempts(0); // 연결 성공 시 재연결 시도 횟수 초기화
+
+        // 메시지 구독 설정
+        stompClient.current.subscribe(
+          `/topic/room/${gameRoomId}`,
+          serverMsg => {
+            const msg = JSON.parse(serverMsg.body);
+            handleAlertMessage(msg);
+          }
+        );
+      },
+      error => {
+        // STOMP 연결 실패 시 에러 로깅 및 재연결 시도
+        console.error("STOMP connection error:", error);
+        if (reconnectAttempts < MAX_RECONNECTION_ATTEMPTS) {
+          setReconnectAttempts(prev => prev + 1);
+          setTimeout(connect, RECONNECT_INTERVAL);
+        } else {
+          alert("연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        }
+      }
+    );
+
+    // WebSocket 연결이 닫힐 때 자동 재연결
+    socket.onclose = () => {
+      console.log("WebSocket closed, attempting to reconnect...");
+      if (reconnectAttempts < MAX_RECONNECTION_ATTEMPTS) {
+        setReconnectAttempts(prev => prev + 1);
+        setTimeout(connect, RECONNECT_INTERVAL);
+      } else {
+        alert("연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      }
+    };
   }, [gameRoomId]);
 
   const disconnect = useCallback(() => {
-    if (stompClient.current) {
-      stompClient.current.disconnect();
-      console.log("Disconnected");
+    if (
+      stompClient.current &&
+      stompClient.current.ws.readyState === WebSocket.OPEN
+    ) {
+      stompClient.current.disconnect(() => {
+        console.log("Disconnected");
+      });
     }
   }, []);
 
@@ -171,12 +217,14 @@ export const WebSocketProvider = ({ children }) => {
   // /room, /game-play에서만 import해서 작동하도록
   // 여기 context와 Room.jsx에만 connect(), disconnect() 활용
   useEffect(() => {
-    connect();
+    if (gameRoomId) {
+      connect();
+    }
 
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, [connect, disconnect, gameRoomId]);
 
   return (
     <WebSocketContext.Provider value={{ connect, disconnect }}>
