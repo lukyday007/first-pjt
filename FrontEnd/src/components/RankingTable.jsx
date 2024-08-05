@@ -1,9 +1,8 @@
 import { Card } from "@/components/ui/Card";
 
 const RankingTable = () => {
-  const gameRoomUsers = sessionStorage.getItem("gameRoomUsers");
-
-  // 랭킹 관련 로직 추가, 필요시 분리
+  // 랭킹 관련 로직 추가
+  // 임시 목록
   const rankingList = [
     {
       id: "Bill Rizer",

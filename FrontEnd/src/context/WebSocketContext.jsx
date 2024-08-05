@@ -111,7 +111,6 @@ export const WebSocketProvider = ({ children }) => {
         setIsAlive(true);
         sessionStorage.setItem("gameStatus", true);
         sessionStorage.setItem("isAlive", true);
-        sessionStorage.setItem("gameRoomUsers", setGameRoomUsers); // 시작 시 유저 목록을 별도로 저장해 Ending.jsx에서 활용
         // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":
