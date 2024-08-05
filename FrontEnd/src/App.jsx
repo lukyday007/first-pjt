@@ -16,12 +16,12 @@ import { WebSocketProvider } from "./context/WebSocketContext";
 // /room과 /game-play에서만 WebSocket이 동작하도록 설정
 const GameRoutes = () => (
   <GameProvider>
-    {/* <WebSocketProvider> */}
-    <Routes>
-      <Route path="/room/:gameRoomId" element={<Room />} />
-      <Route path="/game-play/:gameRoomId" element={<GamePlay />} />
-    </Routes>
-    {/* </WebSocketProvider> */}
+    <WebSocketProvider>
+      <Routes>
+        <Route path="/room/:gameRoomId" element={<Room />} />
+        <Route path="/game-play/:gameRoomId" element={<GamePlay />} />
+      </Routes>
+    </WebSocketProvider>
   </GameProvider>
 );
 
