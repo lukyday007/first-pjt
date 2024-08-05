@@ -46,7 +46,7 @@ function configureUrls() {
   }
 }
 
-const CamChatting = () => {
+const CamChattingComponent = () => {
   const [room, setRoom] = useState(undefined);                          // 방 생성 시 사용
   const [localVideoTrack, setLocalVideoTrack] = useState(undefined);    // 화상 채팅 때 사용하는 비디오 변수 
   const [localAudioTrack, setLocalAudioTrack] = useState(undefined);    // 음소거 관련
@@ -483,13 +483,6 @@ const CamChatting = () => {
       console.log('WebSocket connection closed.');
     }
 
-    //   // leaveRoom을 호출한 참가자 자신의 상태는 업데이트하지 않음???!?!?!?!??!?!!
-    // setParticipants(prev => {
-    //   const updatedParticipants = prev.filter(p => p.identity !== room.localParticipant.identity);
-    //   console.log('Participants after leaving room:', updatedParticipants);
-    //   return updatedParticipants;
-    // });
-
     console.log('====>>Participants after leaving room:', participants);
   }
 
@@ -657,4 +650,4 @@ const CamChatting = () => {
   );
 };
 
-export default CamChatting;
+export default CamChattingComponent;
