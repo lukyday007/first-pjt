@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        TARGET_BRANCH = 'back-dev'  // 목표 브랜치 이름 설정
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // GitLab에서 제공하는 환경 변수로 브랜치 이름을 가져옴
+                    def branch = env.gitlabSourceBranch ?: 'back-dev'  // 기본 브랜치 설정
+                    if (branch != env.TARGET_BRANCH) {
+                        error "This build is only for the '${env.TARGET_BRANCH}' branch, but was run on '${branch}'"
+                    }
+                    // Git SCM을 사용하여 체크아웃
+                    checkout scm
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                dir('backend') {
+                    sh './gradlew clean build'
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // backend 디렉토리에 위치한 Dockerfile을 사용하여 Docker 이미지 빌드
+                    def image = docker.build("backend:${env.BUILD_ID}", 'backend/.')
+                    image.push()
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit '**/backend/build/test-results/test/*.xml'
+            archiveArtifacts artifacts: '**/backend/build/libs/*.jar', fingerprint: true
+        }
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
