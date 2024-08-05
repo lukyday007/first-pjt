@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -40,17 +40,34 @@ const Login = () => {
     }
   };
 
-  const handleKakaoLogin = () => {
-    const REST_API_KEY = ""; // env에서 import 해야함
-    const REDIRECT_URI = "http://localhost:5080/auth/kakao";
+  const handleKakaoLogin = async () => {
+    try {
+      await axios.get(`${BASE_URL}/auth/kakao/getURL`).then(resp => {
+        url = resp.data;
+      });
 
-    // 카카오 서버에 로그인 요청
-    // - 카카오에서 요청 처리 후 인가코드와 함께 KakaoLogin 페이지로 리다이렉트
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+      Kakao.Auth.authorize({
+        redirectUri: url,
+      });
+    } catch (err) {
+      setError(
+        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+      );
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // 구글 로그인
+  const handleGoogleLogin = async () => {
+    try {
+      await axios.get(`${BASE_URL}/auth/google/getURL`).then(resp => {
+        url = resp.data;
+      });
+
+      window.location.href = url;
+    } catch (err) {
+      setError(
+        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+      );
+    }
   };
 
   return (
