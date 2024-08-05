@@ -66,6 +66,8 @@ const CamChatting = () => {
   const fromUser = useRef("")
   const toUser = useRef("")
 
+  const WebSocketUsers = useRef({});
+
   const remoteStream = useRef(new MediaStream());
   const navigate = useNavigate();
 
@@ -138,8 +140,8 @@ const CamChatting = () => {
     }
   }, [room]);
 
-  // WebRTC의 RTCPeerConnection 객체를 설정 
-  // WebRTC 연결을 설정하고 원격 스트림 처리 
+  // RTCPeerConnection 객체를 설정 
+  // 연결을 설정하고 원격 스트림 처리 
   useEffect(() => {
 
     // RTCPeerConnection 객체 생성 및 ICE 서버 (google STUN 서버 사용)
@@ -246,8 +248,6 @@ const CamChatting = () => {
           onClick={async () => {
             await handleAcceptClick(toUser.current);
 
-
-            
             if (room) {
               room.disconnect();
               const localParticipant = room.localParticipant;
@@ -326,6 +326,7 @@ const CamChatting = () => {
     const room = new Room();
     setRoom(room);
     
+    
     // 웹소켓 연결 활성화
     const ws = new WebSocket('ws://localhost:6080/ChattingServer');
     webSocket.current = ws;
@@ -398,28 +399,7 @@ const CamChatting = () => {
     } catch (error) {
       console.log('There was an error connecting to the room:', error.message);
       await leaveRoom();
-      // 카메라와 마이크 끄기
-      if (room) {
-        const localParticipant = room.localParticipant;
-
-        // 비디오 트랙 끄기
-        if (localParticipant.videoTrackPublications) {
-          localParticipant.videoTrackPublications.forEach(publication => {
-            if (publication.track) {
-              publication.track.stop();
-            }
-          });
-        }
-
-        // 오디오 트랙 끄기
-        if (localParticipant.audioTrackPublications) {
-          localParticipant.audioTrackPublications.forEach(publication => {
-            if (publication.track) {
-              publication.track.stop();
-            }
-          });
-        }
-      }
+      
     }
   }
 
@@ -428,67 +408,35 @@ const CamChatting = () => {
   async function leaveRoom() {
     console.log('leaveRoom called');
 
-    if (room) {
-      // 트랙이 존재하는지 확인한 후 forEach 호출
-      if (room.localParticipant && room.localParticipant.tracks) {
-        room.localParticipant.tracks.forEach(publication => {
-          if (publication.track) {
-            publication.track.stop();
-            room.localParticipant.unpublishTrack(publication.track);
-          }
-        });
-      }
+    // 이벤트 리스너 제거
+    room.off(RoomEvent.TrackSubscribed, handleTrackSubscribed);
+    room.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed);
+    room.off(RoomEvent.ParticipantConnected, handleParticipantConnected);
+    room.off(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected);
 
-      // 참가자가 존재하는지 확인한 후 forEach 호출
-      if (room.participants) {
-        room.participants.forEach(participant => {
-          if (participant.tracks) {
-            participant.tracks.forEach(publication => {
-              if (publication.track) {
-                publication.track.stop();
-                participant.unpublishTrack(publication.track);
-              }
-            });
-          }
-        });
-      }
+    await room.disconnect(); // 방 연결 끊기
+    console.log('Disconnected from room');
 
-      // 이벤트 리스너 제거
-      room.off(RoomEvent.TrackSubscribed, handleTrackSubscribed);
-      room.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed);
-      room.off(RoomEvent.ParticipantConnected, handleParticipantConnected);
-      room.off(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected);
+    setRoom(undefined);
+    setLocalVideoTrack(undefined);
+    setLocalAudioTrack(undefined);
+    setRemoteTracks([]);
+    setParticipants([]);
 
-      await room.disconnect(); // 방 연결 끊기
-      console.log('Disconnected from room');
-
-      setRoom(undefined);
-      setLocalVideoTrack(undefined);
-      setLocalAudioTrack(undefined);
-      setRemoteTracks([]);
-      setParticipants([]);
-
-      console.log("---- fromUser and toUser ----->")
-      console.log(`fromUser: ${fromUser.data}`)
-      console.log(`toUser: ${toUser.data}`)
+    console.log("---- fromUser and toUser ----->")
+    console.log(`fromUser: ${fromUser.data}`)
+    console.log(`toUser: ${toUser.data}`)
 
 
-      console.log('=== State after room disconnection: ===>');
-      console.log('Participants:', participants);
-      console.log('RemoteTracks:', remoteTracks);
-    }
+    console.log('=== State after room disconnection: ===>');
+    console.log('Participants:', participants);
+    console.log('RemoteTracks:', remoteTracks);
+  
 
     if (webSocket.current) {
       webSocket.current.close(); // WebSocket 연결 닫기
       console.log('WebSocket connection closed.');
     }
-
-    //   // leaveRoom을 호출한 참가자 자신의 상태는 업데이트하지 않음???!?!?!?!??!?!!
-    // setParticipants(prev => {
-    //   const updatedParticipants = prev.filter(p => p.identity !== room.localParticipant.identity);
-    //   console.log('Participants after leaving room:', updatedParticipants);
-    //   return updatedParticipants;
-    // });
 
     console.log('====>>Participants after leaving room:', participants);
   }
