@@ -13,7 +13,7 @@ const useCatchTarget = () => {
   // 한번 활성화되면 GPS가 튀어 상대가 범위를 벗어나더라도 2초간은 버튼 클릭을 할 수 있도록 함
   const countCatchTimeout = useCallback(() => {
     // 초기 mount시 버튼 활성화 방지
-    if (distToTarget !== null) {
+    if (distToTarget >= 0) {
       setIsAbleToCatchTarget(true);
       catchTimeoutRef.current = setTimeout(() => {
         setIsAbleToCatchTarget(false);
@@ -21,6 +21,20 @@ const useCatchTarget = () => {
       }, 2000);
     }
   }, []);
+
+  const handleOnClickCatchTarget = async () => {
+    try {
+      // 잡기 관련 로직 추가
+      const response = await axiosInstance.patch(
+        `/in-game/${gameRoomId}/catchTarget`
+      );
+      if (response.status === 200) {
+        alert("Target caught successfully!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     if (distToTarget < DISTANCE_TO_CATCH) {
@@ -34,20 +48,6 @@ const useCatchTarget = () => {
       clearTimeout(catchTimeoutRef.current);
     };
   }, [distToTarget]);
-
-  const handleOnClickCatchTarget = async () => {
-    try {
-      // 잡기 관련 로직 추가
-      const response = await axiosInstance.patch(
-        `/in-game/${gameRoomId}/catchTarget`
-      );
-      if (response.status === 200) {
-        console.log("Target caught successfully!");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return { isAbleToCatchTarget, handleOnClickCatchTarget };
 };
