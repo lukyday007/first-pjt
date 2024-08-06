@@ -4,7 +4,6 @@ const useEndGame = () => {
   const navigate = useNavigate();
   const gameRoomId = sessionStorage.getItem("gameRoomId");
 
-  // gameRoomUsers는 Ending.jsx에서 활용 후 remove
   const removeSessionStorageList = [
     "gameStatus",
     "isAlive",

@@ -1,23 +1,15 @@
-import React, { useContext } from "react";
-import { GameContext } from "@/context/GameContext";
+import React from "react";
 import useKakaoMap from "@/hooks/Map/useKakaoMap";
 import MapCenterButton from "./MapCenterButton";
 
 const MapComponent = () => {
-  const { myLocation } = useContext(GameContext);
   const { mapRef, panToMyLocation } = useKakaoMap();
 
   const handleOnClickCenter = () => {
-    if (myLocation) {
-      panToMyLocation(myLocation.lat, myLocation.lng);
-    }
+    panToMyLocation(myLocation.lat, myLocation.lng);
   };
 
-  return !myLocation ? (
-    <div>
-      <h1>Loading...</h1>
-    </div>
-  ) : (
+  return (
     <div className="flex justify-center">
       <div className="w-full p-2">
         <div id="map-wrap" className="relative">

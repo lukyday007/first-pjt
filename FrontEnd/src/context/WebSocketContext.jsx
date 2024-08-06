@@ -107,10 +107,10 @@ export const WebSocketProvider = ({ children }) => {
   const handleAlertMessage = msg => {
     switch (msg.msgType) {
       case "start":
-        setGameStatus(true);
-        setIsAlive(true);
         sessionStorage.setItem("gameStatus", true);
         sessionStorage.setItem("isAlive", true);
+        setIsAlive(true);
+        setGameStatus(true);
         // gameStatus가 true로 변동 시, Room.jsx에서 GamePlay.jsx로 navigate
         break;
       case "alert":

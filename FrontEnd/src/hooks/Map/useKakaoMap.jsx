@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useContext } from "react";
+import { useRef, useEffect, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import useMarker from "./useMarker";
 import useTargetMarker from "./useTargetMarker";
@@ -7,25 +7,22 @@ import useCircleWithOverlay from "./useCircleWithOverlay";
 const { kakao } = window;
 
 const useKakaoMap = () => {
-  const { gameStatus, areaCenter } = useContext(GameContext);
+  const { gameStatus, areaCenter, myLocation } = useContext(GameContext);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
   // 내 위치로 이동하는 버튼 함수
-  const panToMyLocation = useCallback(
-    (lat, lng) => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.setLevel(1, {
-          anchor: new kakao.maps.LatLng(lat, lng),
-          animate: {
-            duration: 500,
-          },
-        });
-      }
-    },
-    [gameStatus]
-  );
+  const panToMyLocation = () => {
+    if (mapInstanceRef.current && myLocation) {
+      mapInstanceRef.current.setLevel(1, {
+        anchor: new kakao.maps.LatLng(myLocation.lat, myLocation.lng),
+        animate: {
+          duration: 500,
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     if (gameStatus && mapRef.current && !mapInstanceRef.current) {
