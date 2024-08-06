@@ -4,7 +4,7 @@ pipeline {
     environment {
         TARGET_BRANCH = 'back-dev'  // 목표 브랜치 이름 설정
         JENKINS_USER = 'boricori'
-        JENKINS_TOKEN = credentials('gitlab-token')
+        JENKINS_TOKEN = credentials('dbstjr9898')
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
                               doGenerateSubmoduleConfigurations: false,
                               extensions: [[$class: 'CleanCheckout']],
                               userRemoteConfigs: [[url: 'https://lab.ssafy.com/s11-webmobile1-sub2/S11P12B205.git',
-                              credentialsId: 'gitlab-token']]  // credentialsId를 올바르게 설정
+                              credentialsId: 'dbstjr9898']]  // credentialsId를 올바르게 설정
                     ])
                 }
             }
