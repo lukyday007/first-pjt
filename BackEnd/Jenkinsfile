@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         TARGET_BRANCH = 'back-dev'  // 목표 브랜치 이름 설정
+        JENKINS_USER = 'boricori'
+        JENKINS_TOKEN = credentials('gitlab-token')
     }
 
     stages {
