@@ -1,8 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Onboarding from "./pages/Onboarding";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+
+import Onboarding from "./pages/user/Onboarding";
+import Login from "./pages/user/Login";
+import KakaoLogin from "./pages/user/KakaoLogin";
+import GoogleLogin from "./pages/user/GoogleLogin";
+import SetUsername from "./pages/user/SetUsername";
+import Signup from "./pages/user/Signup";
+
 import Home from "./pages/Home";
 import Room from "./pages/Room";
 import RoomNumber from "./pages/RoomNumber";
@@ -30,6 +35,9 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Onboarding />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/auth/kakao" element={<KakaoLogin />} />
+      <Route path="/auth/google" element={<GoogleLogin />} />
+      <Route path="/auth/setUsername" element={<SetUsername />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/home" element={<Home />} />
       <Route path="/room-number" element={<RoomNumber />} />

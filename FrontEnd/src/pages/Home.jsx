@@ -31,6 +31,15 @@ const Home = () => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+
+    // 카카오 로그아웃
+    window.Kakao.Auth.logout()
+      .then(function (response) {
+        console.log(Kakao.Auth.getAccessToken()); // null
+      })
+      .catch(function (error) {
+        console.log("카카오로 로그인한 사용자가 아닙니다.");
+      });
     navigate("/login");
   };
 
