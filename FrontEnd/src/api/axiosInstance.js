@@ -30,7 +30,7 @@ axiosInstance.interceptors.response.use(
       window.location.href = "/login";
       return Promise.reject(error);
     } else if (error.response.status === 7000) {
-      const newToken = error.response.headers["newtoken"];
+      const newToken = error.response.headers["newToken"];
       if (newToken) {
         localStorage.setItem("accessToken", newToken);
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
