@@ -31,7 +31,8 @@ public class FilterConfig {
   public CorsConfiguration corsConfiguration() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5080"));
-    configuration.setAllowedMethods(Collections.singletonList("*"));
+    // configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); // 임시
+     configuration.setAllowedMethods(Collections.singletonList("*"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(Collections.singletonList("*"));
     configuration.setExposedHeaders(Collections.singletonList("Authorization"));

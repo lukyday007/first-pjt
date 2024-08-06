@@ -33,7 +33,7 @@ public class MissionResponse {
         .missionId(mission.getId())
         .category(mission.getCategory())
         .target(mission.getTarget())
-        .targetEn(mission.getTargetEn())
+        .targetEn(mission.getAlt())
         .build();
   }
 }
