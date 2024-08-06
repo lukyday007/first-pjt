@@ -81,9 +81,7 @@ pipeline {
 
     post {
         always {
-            node {
-                archiveArtifacts artifacts: '**/BackEnd/build/libs/*.jar', fingerprint: true
-            }
+            archiveArtifacts artifacts: '**/BackEnd/build/libs/*.jar', fingerprint: true
         }
         success {
             echo 'Deployment successful!'
