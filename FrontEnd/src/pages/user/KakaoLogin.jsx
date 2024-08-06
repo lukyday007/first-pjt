@@ -18,10 +18,8 @@ const KakaoLogin = () => {
       return;
     }
 
-    const req = { code: code, state: state };
-
     axios
-      .post(`${BASE_URL}/auth/kakao/getToken`, req) // 카카오 서버에서 받은 인가코드를 백엔드 서버로 전송
+      .post(`${BASE_URL}/auth/kakao/getToken`, {code, state}) // 카카오 서버에서 받은 인가코드를 백엔드 서버로 전송
       .then(resp => {
         if (resp.status === 406) {
           alert("부적절한 요청입니다.");
