@@ -67,7 +67,7 @@ pipeline {
                 script {
                     // SSH 키를 사용하여 원격 서버에 연결하고 명령을 실행
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/jenkins_rsa ubuntu@i11b205.p.ssafy.io '
+                        ssh -o StrictHostKeyChecking=no -i /var/jenkins_home/.ssh/I11B205T.pem ubuntu@i11b205.p.ssafy.io '
                         cd /home/ubuntu/plog &&
                         docker-compose stop backend &&
                         docker-compose rm -f backend &&
@@ -81,9 +81,7 @@ pipeline {
 
     post {
         always {
-            node {
-                archiveArtifacts artifacts: '**/BackEnd/build/libs/*.jar', fingerprint: true
-            }
+            archiveArtifacts artifacts: '**/BackEnd/build/libs/*.jar', fingerprint: true
         }
         success {
             echo 'Deployment successful!'
