@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
 import CamChattingComponent from "@/components/CamChattingComponent";
+import { GameContext } from "@/context/GameContext";
 import { WebSocketContext } from "@/context/WebSocketContext";
 
 import useSendGPS from "@/hooks/Map/useSendGPS";
@@ -14,6 +15,7 @@ import CamChattingButton from "@/components/CamChattingButton";
 import GiveUpButton from "@/components/GiveUpGameButton";
 
 const GamePlay = () => {
+  const { gameStatus } = useContext(GameContext);
   const { disconnect } = useContext(WebSocketContext);
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
@@ -26,7 +28,9 @@ const GamePlay = () => {
 
   useEffect(() => {
     return () => {
-      disconnect();
+      if (!gameStatus) {
+        disconnect();
+      }
     };
   }, [disconnect]);
 
