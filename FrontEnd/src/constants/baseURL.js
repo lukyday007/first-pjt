@@ -1,2 +1,2 @@
-export const BASE_URL = "http://localhost:8080";
-export const WS_BASE_URL = "ws://localhost:8080";
+export const BASE_URL = "http://backend:8088";
+export const WS_BASE_URL = "ws://backend:8088";
