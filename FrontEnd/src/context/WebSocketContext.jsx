@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useContext,
   useCallback,
-  useLocation,
 } from "react";
 import Stomp from "stompjs";
 import axiosInstance from "@/api/axiosInstance.js";
