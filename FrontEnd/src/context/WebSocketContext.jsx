@@ -222,7 +222,9 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     return () => {
-      disconnect();
+      if (window.location.pathname !== `/game-play/${gameRoomId}`) {
+        disconnect();
+      }
     };
   }, [connect, disconnect, gameRoomId]);
 
