@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@components/ui/Button";
+import QrScanner from "react-qr-scanner";
+import axiosInstance from "@/api/axiosInstance";
 
+import { Button } from "@components/ui/Button";
 import GameSettingDialog from "@components/GameSettingDialog";
 
 import titleImage from "@assets/app-title.png";
@@ -26,6 +28,7 @@ const ActionButton = ({ onClick, icon, color, label }) => {
 
 const Home = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isQrReaderOpen, setIsQrReaderOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -41,6 +44,35 @@ const Home = () => {
         console.log("카카오로 로그인한 사용자가 아닙니다.");
       });
     navigate("/login");
+  };
+
+  const handleQrScan = async data => {
+    if (data) {
+      const gameCode = data.text;
+      console.log("QR Code Data:", gameCode);
+      setIsQrReaderOpen(false);
+
+      try {
+        const response = await axiosInstance.get(`/gameroom/${gameCode}`);
+
+        if (response.status == 200) {
+          const { gameId } = response.data;
+          navigate(`/room/${gameId}`);
+        } else if (response.status === 400) {
+          alert("인원이 다 차서 들어갈 수 없습니다");
+        } else {
+          alert("해당하는 방이 없습니다.");
+        }
+      } catch (err) {
+        alert(
+          "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
+        );
+      }
+    }
+  };
+
+  const handleQrError = err => {
+    console.error("QR Code Scan Error:", err);
   };
 
   return (
@@ -61,7 +93,7 @@ const Home = () => {
             label="방 만들기"
           />
           <ActionButton
-            onClick={() => navigate("/room-number")}
+            onClick={() => setIsQrReaderOpen(true)}
             icon={qrcodeIcon}
             color="bg-teal-300"
             label="방 코드 찍기"
@@ -83,6 +115,34 @@ const Home = () => {
           isOpen={isDialogOpen}
           onClose={() => setDialogOpen(false)}
         />
+        {isQrReaderOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+            <div className="flex flex-col items-center justify-center p-4">
+              <div className="mb-4 text-4xl font-bold text-white">
+                QR 코드 스캔
+              </div>
+              <div
+                onClick={() => navigate("/room-number")}
+                className="mb-16 font-bold text-white"
+              >
+                스캔이 안되시나요?{" "}
+                <span className="text-rose-400">방 코드 입력하기</span>
+              </div>
+              <QrScanner
+                className="mb-8 w-60 rounded-lg ring-4 ring-yellow-300"
+                delay={300}
+                onError={handleQrError}
+                onScan={handleQrScan}
+              />
+              <Button
+                onClick={() => setIsQrReaderOpen(false)}
+                className="mb-8 bg-rose-600 font-bold"
+              >
+                닫기
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
