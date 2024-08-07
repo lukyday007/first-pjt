@@ -28,7 +28,7 @@ const ActionButton = ({ onClick, icon, color, label }) => {
 
 const Home = () => {
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [isQrReaderOpen, setQrReaderOpen] = useState(false);
+  const [isQrReaderOpen, setIsQrReaderOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -50,7 +50,7 @@ const Home = () => {
     if (data) {
       const gameCode = data.text;
       console.log("QR Code Data:", gameCode);
-      setQrReaderOpen(false);
+      setIsQrReaderOpen(false);
 
       try {
         const response = await axiosInstance.get(`/gameroom/${gameCode}`);
@@ -93,7 +93,7 @@ const Home = () => {
             label="방 만들기"
           />
           <ActionButton
-            onClick={() => setQrReaderOpen(true)}
+            onClick={() => setIsQrReaderOpen(true)}
             icon={qrcodeIcon}
             color="bg-teal-300"
             label="방 코드 찍기"
@@ -135,7 +135,7 @@ const Home = () => {
                 onScan={handleQrScan}
               />
               <Button
-                onClick={() => setQrReaderOpen(false)}
+                onClick={() => setIsQrReaderOpen(false)}
                 className="mb-8 bg-rose-600 font-bold"
               >
                 닫기
