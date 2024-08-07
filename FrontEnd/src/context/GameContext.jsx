@@ -76,25 +76,24 @@ export const GameProvider = ({ children }) => {
         setMyLocation(newLocation);
 
         if (areaCenter) {
-          setDistance(
-            approximateDistance(
-              newLocation.lat,
-              newLocation.lng,
-              areaCenter.lat,
-              areaCenter.lng
-            )
+          const myDist = approximateDistance(
+            newLocation.lat,
+            newLocation.lng,
+            areaCenter.lat,
+            areaCenter.lng
           );
+
+          setDistance(myDist);
         }
 
         if (targetLocation) {
-          setDistToTarget(
-            approximateDistance(
-              newLocation.lat,
-              newLocation.lng,
-              targetLocation.lat,
-              targetLocation.lng
-            )
+          const targetDist = approximateDistance(
+            newLocation.lat,
+            newLocation.lng,
+            targetLocation.lat,
+            targetLocation.lng
           );
+          setDistToTarget(targetDist);
         }
       },
       error => console.log(error)

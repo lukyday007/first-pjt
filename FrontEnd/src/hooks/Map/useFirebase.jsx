@@ -43,10 +43,11 @@ const useFirebase = () => {
           typeof data.lat === "string" &&
           typeof data.lng === "string"
         ) {
-          setTargetLocation({
+          const newTargetLocation = {
             lat: parseFloat(data.lat),
             lng: parseFloat(data.lng),
-          });
+          };
+          setTargetLocation(newTargetLocation);
         } else {
           // 타겟 위치 수신에 문제 발생 시
           console.log("Invalid data format received:", data);
