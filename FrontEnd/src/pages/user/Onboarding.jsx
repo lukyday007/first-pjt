@@ -18,7 +18,7 @@ const Onboarding = () => {
       <p className="mb-8"> 꼬리 한 번 잡아볼까요?</p>
       <Button
         onClick={() => navigate("/login")}
-        className="mb-8 bg-theme-color-1 font-bold"
+        className="bg-theme-color-1 font-bold"
       >
         Get Started &gt;
       </Button>
