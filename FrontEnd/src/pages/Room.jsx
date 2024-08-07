@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { WebSocketContext } from "@/context/WebSocketContext";
 import { GameContext } from "@/context/GameContext";
-import PlotGameRoomUsers from "@/components/PlotGameRoomUsers";
+import GameRoomUsers from "@/components/GameRoomUsers";
 import useStartGame from "@/hooks/Map/useStartGame";
 import loadingSpinner from "@/assets/loading-spinner.gif";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 const Room = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
   const { gameStatus, gameRoomId, setGameRoomId } = useContext(GameContext);
-  const { connect, disconnect } = useContext(WebSocketContext);
+  const { connect } = useContext(WebSocketContext);
   const navigate = useNavigate();
 
   // GameSettingDialog 컴포넌트에서 보낸 state에서 QR과 방 코드를 추출
@@ -23,11 +23,7 @@ const Room = () => {
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
     connect();
-
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect, paramGameRoomId, setGameRoomId]);
+  }, [connect, paramGameRoomId]);
 
   useEffect(() => {
     // WebSocketContext.jsx에서 메시지 수신 여부에 따라 gameStatus true로 변경
@@ -57,7 +53,7 @@ const Room = () => {
         </>
       )}
       <div>3. 현재 참가자 목록</div>
-      <PlotGameRoomUsers />
+      <GameRoomUsers />
 
       <Button
         className="mb-8 bg-theme-color-1 font-bold"

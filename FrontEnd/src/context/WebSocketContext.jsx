@@ -11,6 +11,7 @@ import axiosInstance from "@/api/axiosInstance.js";
 import useEndGame from "@/hooks/Map/useEndGame";
 import { GameContext } from "@/context/GameContext";
 import { WS_BASE_URL } from "@/constants/baseURL";
+import { useLocation } from "react-router-dom";
 
 // WebSocket은 게임 방 접속시부터 실행되어야 함
 export const WebSocketContext = createContext();
@@ -31,6 +32,7 @@ export const WebSocketProvider = ({ children }) => {
     setMissionList,
   } = useContext(GameContext);
   const stompClient = useRef(null);
+  const location = useLocation();
 
   const MAX_RECONNECTION_ATTEMPTS = 5; // 최대 재연결 시도 횟수
   const RECONNECT_INTERVAL = 1000; // 재연결 간격 (1초)
@@ -222,7 +224,12 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     return () => {
-      disconnect();
+      if (
+        location.pathname !== `/room/${gameRoomId}` &&
+        location.pathname !== `/game-play/${gameRoomId}`
+      ) {
+        disconnect();
+      }
     };
   }, [connect, disconnect, gameRoomId]);
 

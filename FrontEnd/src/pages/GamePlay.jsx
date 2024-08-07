@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
 import CamChattingComponent from "@/components/CamChattingComponent";
+import { GameContext } from "@/context/GameContext";
+import { WebSocketContext } from "@/context/WebSocketContext";
 
 import useSendGPS from "@/hooks/Map/useSendGPS";
-import PlotGameTime from "@/components/PlotGameTime";
+import GameTime from "@/components/GameTime";
 import CatchTargetButton from "@/components/CatchTargetButton";
 import useCatchTarget from "@/hooks/Map/useCatchTarget";
 import CheckMyItemButton from "@/components/CheckMyItemButton";
@@ -13,6 +15,8 @@ import CamChattingButton from "@/components/CamChattingButton";
 import GiveUpButton from "@/components/GiveUpGameButton";
 
 const GamePlay = () => {
+  const { gameStatus } = useContext(GameContext);
+  const { disconnect } = useContext(WebSocketContext);
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
 
@@ -22,18 +26,26 @@ const GamePlay = () => {
 
   useSendGPS();
 
+  useEffect(() => {
+    return () => {
+      if (!gameStatus) {
+        disconnect();
+      }
+    };
+  }, [disconnect]);
+
   return (
     <>
       <GameHeader />
       {camChatting ? (
         <>
-          <PlotGameTime />
+          <GameTime />
           <CamChattingComponent />
         </>
       ) : (
         <>
           <MapComponent />
-          <PlotGameTime />
+          <GameTime />
           <div className="flex justify-between">
             <div />
             <div />
