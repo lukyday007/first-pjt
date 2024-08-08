@@ -122,7 +122,9 @@ export const GameProvider = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const isGamePlayPage = location.pathname.include(`/game-play/${gameRoomId}`);
+    const isGamePlayPage = location.pathname.includes(
+      `/game-play/${gameRoomId}`
+    );
     if (!isGamePlayPage || !navigator.geolocation) return;
 
     const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치 및 거리 계산 함수 실행
