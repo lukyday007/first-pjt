@@ -11,7 +11,9 @@ import com.boricori.entity.User;
 import com.boricori.game.GameManager;
 import com.boricori.service.GameService;
 import com.boricori.service.InGameService;
+import com.boricori.service.MessageService;
 import com.boricori.service.UserService;
+import com.boricori.util.Node;
 import com.boricori.util.ResponseEnum;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
@@ -36,6 +38,9 @@ public class InGameController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private MessageService messageService;
 
   @PostMapping("/assignMissions")
   public ResponseEntity<List<MissionResponse>> assignMissions(@RequestBody InGameRequest request){
@@ -91,9 +96,12 @@ public class InGameController {
   public void catchTarget(@RequestBody InGameRequest request){
     String username = request.getUsername();
     long gameId = request.getGameId();
-    User target = GameManager.catchableList.get(gameId).getByUsername(username).next.data;
+    Node<User> targetNode = GameManager.catchableList.get(gameId).killTarget(username);
+    Node<User> newTarget = targetNode.next;
+    messageService.changeTarget(username, newTarget.data.getUsername(), gameId);
+    messageService.notifyStatus(targetNode.data.getUsername(), gameId);
     User user = userService.findByUsername(username);
-    inGameService.catchTarget(user, target, gameId);
+    inGameService.catchTarget(user, targetNode.data, gameId);
   }
 
 }

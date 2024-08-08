@@ -42,4 +42,14 @@ public class MessageService {
   public void startGame(Long id) {
     messagingTemplate.convertAndSend(String.format("/topic/room/%d", id), "{\"msgType\":\"start\"}");
   }
+
+  public void changeTarget(String username, String newTarget, long gameId){
+    String jsonPayload = String.format("{\"msgType\":\"start\", \"hunter\":\"%s\", \"target\":\"%s\"}", username, newTarget);
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d", gameId), jsonPayload);
+  }
+
+  public void notifyStatus(String username, long gameId) {
+    String jsonPayload = String.format("{\"msgType\":\"caught\", \"user\":\"%s\"}", username);
+    messagingTemplate.convertAndSend(String.format("/topic/room/%d", gameId), jsonPayload);
+  }
 }
