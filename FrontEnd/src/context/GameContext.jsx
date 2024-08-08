@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useRef } from "react";
 
 const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371000; // 지구의 반지름 (m)
@@ -64,8 +64,17 @@ export const GameProvider = ({ children }) => {
   const [missionList, setMissionList] = useState([
     { id: 1, name: "미션 이름", description: "미션 내용" }, // 임시 데이터
   ]); // 미션 목록
+  const [itemList, setItemList] = useState([]);
   const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
   // 로그인 시 setItem 대상이 sessionStorage로 변경되면 이 부분도 같이 변경되어야 함
+
+  const targetLocationRef = useRef(targetLocation);
+  const areaCenterRef = useRef(areaCenter);
+
+  useEffect(() => {
+    targetLocationRef.current = targetLocation;
+    areaCenterRef.current = areaCenter;
+  }, [targetLocation, areaCenter]);
 
   // 내 위치를 잡고, 거리를 계산하는 함수
   const fetchLocation = () => {
@@ -75,23 +84,23 @@ export const GameProvider = ({ children }) => {
         const newLocation = coordToFixed(latitude, longitude);
         setMyLocation(newLocation);
 
-        if (areaCenter) {
+        if (areaCenterRef.current) {
           const myDist = approximateDistance(
             newLocation.lat,
             newLocation.lng,
-            areaCenter.lat,
-            areaCenter.lng
+            areaCenterRef.current.lat,
+            areaCenterRef.current.lng
           );
 
           setDistance(myDist);
         }
 
-        if (targetLocation) {
+        if (targetLocationRef.current) {
           const targetDist = approximateDistance(
             newLocation.lat,
             newLocation.lng,
-            targetLocation.lat,
-            targetLocation.lng
+            targetLocationRef.current.lat,
+            targetLocationRef.current.lng
           );
           setDistToTarget(targetDist);
         }
@@ -117,7 +126,7 @@ export const GameProvider = ({ children }) => {
     const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치 및 거리 계산 함수 실행
 
     return () => clearInterval(intervalId);
-  }, [gameStatus, areaCenter]);
+  }, [gameStatus]);
 
   return (
     <GameContext.Provider
@@ -146,6 +155,8 @@ export const GameProvider = ({ children }) => {
         setDistToTarget,
         missionList,
         setMissionList,
+        itemList,
+        setItemList,
         username,
       }}
     >
