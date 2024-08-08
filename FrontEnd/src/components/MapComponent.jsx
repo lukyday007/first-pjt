@@ -13,7 +13,7 @@ const MapComponent = () => {
   }, [myLocation]);
 
   const handleOnClickCenter = () => {
-    const { lat, lng } = myLocation.current;
+    const { lat, lng } = myLocationRef.current;
     goToLocation(lat, lng);
   };
 

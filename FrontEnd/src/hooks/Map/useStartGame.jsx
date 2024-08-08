@@ -38,12 +38,13 @@ const useStartGame = () => {
         sessionStorage.setItem("areaCenter", newAreaCenter); // 게임 종료 시까지 불변
         sessionStorage.setItem("targetId", newTargetId); // "target" msgType에서 관리
 
-        // 이하는 sessionStorage를 통해 PlotGameTime.jsx에서만 사용되는 부분
+        // 이하는 sessionStorage를 통해 GameTime.jsx에서 사용되는 부분
         const newGamePlayTime = parseInt(response.gameInfo.time, 10); // 분 단위
         const newStartTime = response.gameInfo.startTime;
         sessionStorage.setItem("gamePlayTime", newGamePlayTime.toString());
         sessionStorage.setItem("startTime", newStartTime);
 
+        // 미션, 아이템 목록
         const newMissionList = response.myMissions;
         const newItemList = response.myItems;
         setMissionList(newMissionList);
@@ -52,9 +53,10 @@ const useStartGame = () => {
         // 게임 시작 시간 처리
         const startTime = new Date(newStartTime).getTime();
         const currentTime = new Date().getTime();
-        const initialTimeUntilStart = startTime - currentTime; // 게임 시작까지 남은 시간
+        const initialTimeUntilStart = startTime - currentTime; // 게임 시작까지 남은 시간, ms 단위
         setTimeUntilStart(initialTimeUntilStart);
 
+        // 대기 시간 동안 1초마다 남은 시간 계산
         if (initialTimeUntilStart > 0) {
           // 1초마다 남은 시간 계산
           const intervalId = setInterval(() => {
@@ -71,6 +73,7 @@ const useStartGame = () => {
             }
           }, 1000);
 
+          // 컴포넌트 unmount 시 interval 정리
           return () => clearInterval(intervalId);
         } else {
           setGameStatus(true); // 이미 시작 시간이 지났다면 즉시 시작
