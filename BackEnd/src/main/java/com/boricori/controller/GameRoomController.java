@@ -154,4 +154,5 @@ public class GameRoomController {
 
     GameManager.catchableList.put(roomId, userCircularLinkedList);
   }
+
 }

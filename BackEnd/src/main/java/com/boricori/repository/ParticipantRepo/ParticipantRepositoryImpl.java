@@ -1,6 +1,7 @@
 package com.boricori.repository.ParticipantRepo;
 
 import com.boricori.entity.GameParticipants;
+import com.boricori.entity.GameRoom;
 import com.boricori.entity.QGameParticipants;
 import com.boricori.entity.QUser;
 import com.boricori.entity.User;
@@ -50,5 +51,13 @@ public class ParticipantRepositoryImpl {
         .set(participants.alive, false)
         .where(participants.user.userId.eq(target.getUserId()))
         .execute();
+  }
+
+  public GameRoom getPlaying(String username) {
+    return queryFactory
+        .select(participants.gameRoom)
+        .from(participants)
+        .where(participants.user.username.eq(username).and(participants.gameRoom.isActivated.eq(true)))
+        .fetchOne();
   }
 }

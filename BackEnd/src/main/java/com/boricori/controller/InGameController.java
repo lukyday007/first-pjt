@@ -95,15 +95,18 @@ public class InGameController {
   public void catchTarget(@RequestBody InGameRequest request){
     String username = request.getUsername();
     long gameId = request.getGameId();
-    Node<User> targetNode = GameManager.catchableList.get(gameId).killTarget(username);
+    Node<User> targetNode = gameManager.killTarget(gameId, username);
     Node<User> newTarget = targetNode.next;
     messageService.changeTarget(username, newTarget.data.getUsername(), gameId);
     messageService.notifyStatus(targetNode.data.getUsername(), gameId);
     User user = userService.findByUsername(username);
     inGameService.catchTarget(user, targetNode.data, gameId);
+    if (gameManager.isLastTwo(gameId)){
+      // 여기에 2명남았을 때 설정, 알림
+    }
   }
 
-  @GetMapping("/{gameId}/init")
+  @GetMapping("/init/{gameId}")
   @Operation(summary = "게임 초기 정보 요청", description = "게임에 접속하면 나의 정보, 게임 정보와 타겟을 받습니다.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "OK"),
@@ -118,7 +121,7 @@ public class InGameController {
         return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(data);
       }
       // 플레이어가 살아있는 상태. 게임 시작전일수도, 진행중일 수도 있음
-      User target = GameManager.catchableList.get(gameId).getByUsername(username).next.data;
+      User target = gameManager.getByUsername(gameId, username).next.data;
       List<Mission> playerMissions = inGameService.getMissions(player);
       List<ItemResponse> myItems = new ArrayList<>();
       List<MissionResponse> myMissions = new ArrayList<>();
@@ -148,16 +151,16 @@ public class InGameController {
   }
 
 
-  @PatchMapping("/end")
-  @Operation(summary = "게임 종료", description = "게임 종료")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "성공"),
-      @ApiResponse(responseCode = "404", description = "실패"),
-      @ApiResponse(responseCode = "500", description = "서버 오류")
-  })
-  public ResponseEntity<EndGameResponse> endGameRoom(
-      @RequestBody @Parameter(description = "게임 종료 후 데이터 전달", required = true) EndGameRoomRequest request) {
-
-    return null;
-  }
+//  @PatchMapping("/end")
+//  @Operation(summary = "게임 종료", description = "게임 종료")
+//  @ApiResponses({
+//      @ApiResponse(responseCode = "200", description = "성공"),
+//      @ApiResponse(responseCode = "404", description = "실패"),
+//      @ApiResponse(responseCode = "500", description = "서버 오류")
+//  })
+//  public ResponseEntity<EndGameResponse> endGameRoom(
+//      @RequestBody @Parameter(description = "게임 종료 후 데이터 전달", required = true) EndGameRoomRequest request) {
+//
+//    return null;
+//  }
 }

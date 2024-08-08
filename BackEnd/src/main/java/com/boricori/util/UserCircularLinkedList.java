@@ -31,7 +31,6 @@ public class UserCircularLinkedList extends CircularLinkedList {
 
   public Node<User> getByUsername(String username) {
     Node<User> currNode = tail.next; // 시작 노드
-
     do {
       if (currNode.data.getUsername().equals(username)) {
         return currNode;
