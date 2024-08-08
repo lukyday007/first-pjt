@@ -61,4 +61,19 @@ public class InGameRepositoryImpl {
         .fetch();
   }
 
+  public List<Mission> getMissions(GameParticipants player) {
+    return jpaQueryFactory
+        .select(ig_missions.missionId)
+        .from(ig_missions)
+        .where(ig_missions.user.id.eq(player.getId()))
+        .fetch();
+  }
+
+  public List<Item> getItems(GameParticipants player) {
+    return jpaQueryFactory
+        .select(ig_items.item)
+        .from(ig_items)
+        .where(ig_items.user.id.eq(player.getId()))
+        .fetch();
+  }
 }

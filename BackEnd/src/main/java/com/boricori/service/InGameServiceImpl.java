@@ -9,6 +9,7 @@ import com.boricori.entity.InGameMissions;
 import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.entity.User;
+import com.boricori.exception.NotAPlayerException;
 import com.boricori.repository.GameRoomRepo.GameRoomRepository;
 import com.boricori.repository.ParticipantRepo.ParticipantRepositoryImpl;
 import com.boricori.repository.inGameRepo.InGameItemsRepository;
@@ -96,5 +97,24 @@ public class InGameServiceImpl implements InGameService{
     List<InGameItems> igItems = new ArrayList<>();
     unusedItems.forEach(item -> igItems.add(new InGameItems(participant, item)));
     inGameItemsRepository.saveAll(igItems);
+  }
+
+  @Override
+  public GameParticipants checkIfPlayer(String username, long gameId) {
+    GameParticipants player = participantRepository.getByUsername(username, gameId);
+    if (player == null) {
+      throw new NotAPlayerException();
+    }
+    return player;
+  }
+
+  @Override
+  public List<Mission> getMissions(GameParticipants player) {
+    return inGameRepositoryImpl.getMissions(player);
+  }
+
+  @Override
+  public List<Item> getItems(GameParticipants player) {
+    return inGameRepositoryImpl.getItems(player);
   }
 }
