@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const R = 6371000; // 지구의 반지름 (m)
@@ -117,16 +118,17 @@ export const GameProvider = ({ children }) => {
     }
   }, [gameRoomId]);
 
-  // 게임 상태가 "started"일 때만 위치 정보를 가져오는 로직
-  // 내 위치를 실시간으로 변경
-  // - 한편 위치 전송은 useFirebase에서 수행하고 GamePlay에서 사용
+  // /game-play/:gameRoomId 페이지에 있을 때 내 위치를 실시간으로 변경
+  const location = useLocation();
+
   useEffect(() => {
-    if (!gameStatus || !navigator.geolocation) return;
+    const isGamePlayPage = location.pathname.include(`/game-play/${gameRoomId}`);
+    if (!isGamePlayPage || !navigator.geolocation) return;
 
     const intervalId = setInterval(fetchLocation, 1000); // 1초마다 내 위치 및 거리 계산 함수 실행
 
     return () => clearInterval(intervalId);
-  }, [gameStatus]);
+  }, [location.pathname, gameRoomId]);
 
   return (
     <GameContext.Provider
