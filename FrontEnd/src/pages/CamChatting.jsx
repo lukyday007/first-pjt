@@ -16,7 +16,7 @@ import {
 const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
 
 const CamChatting = () => {
-  const mySessionId = "mbm";
+  const mySessionId = "sdfsd";
   const [myUserName, setMyUserName] = useState('Participant' + Math.floor(Math.random() * 100));
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
@@ -209,13 +209,13 @@ const CamChatting = () => {
         <div id="session">            
           <h1 id="session-title">{mySessionId}</h1>
           <h1 id="participant-title">{myUserName}</h1>
-          {/* {mainStreamManager === undefined ? (
+          {mainStreamManager === undefined ? (
             <div id="main-video" className="col-md-6">
               <UserVideoComponent streamManager={mainStreamManager} />
             </div>
-          ) : null} */}
+          ) : null}
 
-          {/* <div>
+          <div>
             {publisher === undefined ? (
               <div 
                 onClick={() => handleMainVideoStream(publisher)}
@@ -223,12 +223,12 @@ const CamChatting = () => {
                 <UserVideoComponent streamManager={publisher} />
               </div>
             ) : null}
-          </div> */}
+          </div>
 
           <Carousel opts={{ align: "start" }}>
             <CarouselContent>
               {subscribers.map((sub, index) => (
-                <CarouselItem key={index} className="stream-container col-md-6 col-xs-6">
+                <CarouselItem key={index} className="stream-container">
                   <div class="temp" onClick={() => handleMainVideoStream(sub)}>
                     <span>{sub.id}</span>
                     <UserVideoComponent streamManager={sub} />

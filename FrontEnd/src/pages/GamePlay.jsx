@@ -11,14 +11,13 @@ import useStartGame from "@/hooks/Map/useStartGame";
 import useSendGPS from "@/hooks/Map/useSendGPS";
 import GameTime from "@/components/GameTime";
 import useCatchTarget from "@/hooks/Map/useCatchTarget";
-import CheckMyItemButton from "@/components/CheckMyItemButton";
-import CamChattingButton from "@/components/CamChattingButton";
+// import CheckMyItemButton from "@/components/CheckMyItemButton";
+// import CamChattingButton from "@/components/CamChattingButton";
 
 
 //====================================================================
 
 
-import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import UserVideoComponent from "@/hooks/WebRTC/UserVideoComponent";
@@ -29,8 +28,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from '@/components/ui/Carousel.jsx';
 
 const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
@@ -102,7 +99,7 @@ const GamePlay = () => {
 
 //===========================   OPENVIDU   ============================
 
-  const [session, setSession] = useState(undefined);
+  const [session, setSession] = useState(undefined);                        // 방 생성 관련 
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]);
