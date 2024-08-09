@@ -1,15 +1,20 @@
-import { useRef, useContext } from "react";
+import { useEffect, useRef, useContext } from "react";
 import { WS_BASE_URL } from "@/constants/baseURL";
 import Stomp from "stompjs";
 import useEndGame from "@/hooks/Map/useEndGame";
 import { GameContext } from "@/context/GameContext";
 
 const useGameWebSocket = () => {
-  const { setGameStatus, setTargetId } = useContext(GameContext);
+  const { areaRadius, setGameStatus, setTargetId } = useContext(GameContext);
   const { endGame } = useEndGame();
   const { gameRoomId, setAreaRadius } = useContext(GameContext);
   const stompClient = useRef(null);
+  const areaRadiusRef = useRef(areaRadius);
   const gameRoomIdRef = useRef(gameRoomId);
+
+  useEffect(() => {
+    areaRadiusRef.current = areaRadius;
+  }, [areaRadius]);
 
   const connect = () => {
     // WebSocket 연결 생성
