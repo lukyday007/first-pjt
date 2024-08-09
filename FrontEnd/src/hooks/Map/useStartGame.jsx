@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useCallback, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import axiosInstance from "@/api/axiosInstance";
 
@@ -16,7 +16,7 @@ const useStartGame = () => {
   } = useContext(GameContext);
   const [timeUntilStart, setTimeUntilStart] = useState(null);
 
-  const fetch = async () => {
+  const fetch = useCallback(async () => {
     try {
       const response = await axiosInstance.get(`/in-game/init/${gameRoomId}`);
 
@@ -84,7 +84,7 @@ const useStartGame = () => {
     } catch {
       alert("요청을 보내는 중 문제가 발생했습니다.");
     }
-  };
+  }, []);
 
   return { fetch, timeUntilStart };
 };
