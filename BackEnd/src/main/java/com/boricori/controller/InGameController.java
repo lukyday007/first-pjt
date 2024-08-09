@@ -6,6 +6,7 @@ import com.boricori.dto.request.inGame.MissionChangeRequest;
 import com.boricori.dto.request.inGame.UseItemRequest;
 import com.boricori.dto.response.gameroom.GameInfo;
 import com.boricori.dto.response.gameroom.end.EndGameResponse;
+import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.dto.response.inGame.InitResponse;
 import com.boricori.dto.response.inGame.ItemResponse;
 import com.boricori.dto.response.inGame.MissionResponse;
@@ -146,6 +147,17 @@ public class InGameController {
               .targetName(target.getUsername()).myMissions(myMissions).myItems(myItems).build());
 
     }catch (NotAPlayerException e){
+      return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);
+    }
+  }
+
+  @GetMapping("/endscore/{roomId}/{username}")
+  public ResponseEntity<?> EndGameWinner(@PathVariable long roomId, HttpServletRequest req){
+    String username = (String) req.getAttribute("username");
+    try {
+      GameParticipants player = inGameService.checkIfPlayer(username, roomId);
+      return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(EndGameUserInfoResponse.of(player));
+    }catch (Exception e){
       return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);
     }
   }
