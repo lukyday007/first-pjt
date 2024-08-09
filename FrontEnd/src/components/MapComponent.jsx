@@ -1,13 +1,21 @@
-import React from "react";
+import React, { useEffect, useRef, useContext } from "react";
 import useKakaoMap from "@/hooks/Map/useKakaoMap";
 
+import { GameContext } from "@/context/GameContext";
 import crosshair from "@/assets/material-icon/profile-icon.svg";
 
 const MapComponent = () => {
-  const { mapRef, panToMyLocation } = useKakaoMap();
+  const { myLocation } = useContext(GameContext);
+  const { mapRef, goToLocation } = useKakaoMap();
+  const myLocationRef = useRef(myLocation);
+
+  useEffect(() => {
+    myLocationRef.current = myLocation;
+  }, [myLocation]);
 
   const handleOnClickCenter = () => {
-    panToMyLocation(myLocation.lat, myLocation.lng);
+    const { lat, lng } = myLocationRef.current;
+    goToLocation(lat, lng);
   };
 
   return (
