@@ -2,6 +2,7 @@ package com.boricori.config;
 
 import com.boricori.util.JwtAuthenticationFilter;
 import com.boricori.util.JwtUtil;
+import java.util.Arrays;
 import java.util.Collections;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +34,12 @@ public class FilterConfig {
   public CorsConfiguration corsConfiguration() {
     CorsConfiguration configuration = new CorsConfiguration();
 //    configuration.setAllowedOrigins(Collections.singletonList("https://i11b205.p.ssafy.io"));
-    configuration.setAllowedOrigins(Collections.singletonList("*"));
+//    configuration.setAllowedOrigins(Collections.singletonList("*"));
     // configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); // 임시
-    configuration.setAllowedMethods(Collections.singletonList("*"));
+//    configuration.setAllowedMethods(Collections.singletonList("*"));
+    configuration.setAllowedOrigins(Arrays.asList("https://i11b205.p.ssafy.io"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(Collections.singletonList("*"));
     configuration.setExposedHeaders(Collections.singletonList("Authorization"));
