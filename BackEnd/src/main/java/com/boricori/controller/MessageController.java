@@ -1,13 +1,14 @@
 package com.boricori.controller;
 
 import com.boricori.dto.RoomMessage;
+import com.boricori.dto.request.inGame.EndGameWinnerRequest;
 import com.boricori.dto.response.gameroom.EnterMessageResponse;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
@@ -92,5 +93,12 @@ public class MessageController {
     List<String> users = gameRoomService.leaveRoom(roomId, sessionId);
     EnterMessageResponse message = new EnterMessageResponse("users", users);
     messagingTemplate.convertAndSend("/topic/room/"+roomId, message);
+  }
+
+  @MessageMapping("/room/{roomId}/message")
+  public void handleWinnerMessage(@DestinationVariable String roomId, EndGameWinnerRequest message) {
+    if ("end".equals(message.getType())) {
+      messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
+    }
   }
 }
