@@ -38,8 +38,9 @@ public class FilterConfig {
     // configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); // 임시
 //    configuration.setAllowedMethods(Collections.singletonList("*"));
     configuration.setAllowedOrigins(
-        Arrays.asList("https://i11b205.p.ssafy.io", "http://i11b205.p.ssafy.io"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        Arrays.asList("https://i11b205.p.ssafy.io", "http://i11b205.p.ssafy.io",
+            "https://i11b205.p.ssafy.io/"));
+    configuration.addAllowedMethod("*");
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(Collections.singletonList("*"));
