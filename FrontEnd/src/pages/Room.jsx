@@ -1,61 +1,39 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { WebSocketContext } from "@/context/WebSocketContext";
+import React, { useContext, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import { GameContext } from "@/context/GameContext";
-import axiosInstance from "@/api/axiosInstance.js";
-
+import GameRoomUsers from "@/components/GameRoomUsers";
+import useReadyGame from "@/hooks/Map/useReadyGame";
 import loadingSpinner from "@/assets/loading-spinner.gif";
-import { Button } from "@components/ui/Button";
+import { Button } from "@/components/ui/Button";
+import useRoomWebSocket from "@/hooks/WebSocket/useRoomWebSocket";
 
 const Room = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
-  const { gameStatus, myLocation, gameRoomId, setGameRoomId, gameRoomUsers } =
-    useContext(GameContext);
-  const { connect, disconnect } = useContext(WebSocketContext);
-  const navigate = useNavigate();
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { setGameRoomId } = useContext(GameContext);
+  const { connect, disconnect } = useRoomWebSocket();
 
   // GameSettingDialog 컴포넌트에서 보낸 state에서 QR과 방 코드를 추출
   const location = useLocation();
   const { qrCode, gameCode } = location.state || {};
 
-  const handleStartGame = async () => {
-    try {
-      await axiosInstance.post(`/gameroom/${gameRoomId}/start`, {
-        centerLat: myLocation.lat,
-        centerLng: myLocation.lng,
-      });
-
-      // 요청에서 에러가 없었다면 로딩 상태로 변경
-      setIsLoading(true);
-    } catch (err) {
-      setError(
-        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
-      );
-    }
-  };
+  const { handleStartGame, isLoading, error } = useReadyGame();
 
   // 방에 접속 시 username, gameRoomId 설정 및 WebSocket 연결
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
+  }, [paramGameRoomId]);
+
+  useEffect(() => {
     connect();
 
     return () => {
       disconnect();
     };
-  }, [connect, disconnect, paramGameRoomId, setGameRoomId]);
+  }, []);
 
-  useEffect(() => {
-    // WebSocketContext.jsx에서 메시지 수신 여부에 따라 gameStatus true로 변경
-    // gameStatus 변동 시 /game-play로 이동하도록 함
-    if (gameStatus && gameRoomId) {
-      navigate(`/game-play/${gameRoomId}`);
-    }
-  }, [navigate, gameStatus, gameRoomId]);
-
+  // isLoading은 useRoomWebSocket.jsx에서 변경
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-white">
+    <div className="flex h-screen flex-col items-center justify-center">
       {isLoading ? (
         <>
           {/* 서버에서 start 웹소켓 메시지가 오기 전까지 로딩 스피너 표시 */}
@@ -74,11 +52,7 @@ const Room = () => {
         </>
       )}
       <div>3. 현재 참가자 목록</div>
-      <ul className="mb-8">
-        {gameRoomUsers.map((user, index) => {
-          <li key={index}>{user.username}</li>;
-        })}
-      </ul>
+      <GameRoomUsers />
 
       <Button
         className="mb-8 bg-theme-color-1 font-bold"
