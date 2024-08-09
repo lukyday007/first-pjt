@@ -15,16 +15,18 @@ import CheckMyItemButton from "@/components/CheckMyItemButton";
 import CamChattingButton from "@/components/CamChattingButton";
 import GiveUpButton from "@/components/GiveUpGameButton";
 
+
 const GamePlay = () => {
   const { gameRoomId: paramGameRoomId } = useParams();
   const {
-    setGameRoomId,
+    setGameRoomId,  // 게임 룸 아이디
     gameStatus,
     myLocation,
     areaRadius,
     distance,
-    username,
+    username,       // 유저 이름 
   } = useContext(GameContext);
+  
   const { sendGPS } = useFirebase();
   const { decreaseTime } = useTimer();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
@@ -56,6 +58,8 @@ const GamePlay = () => {
     decreaseTime,
   ]);
 
+
+
   const toggleCamChatting = () => {
     setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
   };
@@ -66,7 +70,10 @@ const GamePlay = () => {
       {camChatting ? (
         <>
           <PlotGameTime />
-          <CamChattingComponent />
+          <CamChattingComponent 
+            gameRoomId={paramGameRoomId}   // gameRoomId를 prop으로 전달
+            username={username}            // username을 prop으로 전달
+          />
         </>
       ) : (
         <>
