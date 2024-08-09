@@ -16,8 +16,8 @@ import {
 const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
 
 const CamChattingComponent = ({gameRoomId, username}) => {
-  const [mySessionId, setMySessionId] = useState(gameRoomId);
-  const [myUserName, setMyUserName] = useState(username);
+  const mySessionId = gameRoomId;
+  const myUserName = username;
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
@@ -75,6 +75,9 @@ const CamChattingComponent = ({gameRoomId, username}) => {
     newSession.on('streamCreated', (event) => {
         const subscriber = newSession.subscribe(event.stream, undefined);
         setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+        console.log("09090-0-0-0-")
+        console.log(subscribers)
+
     });
 
     newSession.on('streamDestroyed', (event) => {
@@ -121,7 +124,7 @@ const CamChattingComponent = ({gameRoomId, username}) => {
   useEffect(() => {
     // 컴포넌트가 마운트 될 때 joinSession을 자동으로 호출 
     joinSession();
-  }, [joinSession]);
+  }, []); // 빈 배열로 해야 마운트 될 때 딱 한 번만 실행됨 
 
 
   const leaveSession = useCallback(() => {
@@ -202,7 +205,7 @@ const CamChattingComponent = ({gameRoomId, username}) => {
             </div>
           ) : null}
 
-          <div>
+          {/* <div>
             {publisher === undefined ? (
               <div 
                 onClick={() => handleMainVideoStream(publisher)}
@@ -210,7 +213,7 @@ const CamChattingComponent = ({gameRoomId, username}) => {
                 <UserVideoComponent streamManager={publisher} />
               </div>
             ) : null}
-          </div>
+          </div> */}
 
           <Carousel opts={{ align: "start" }}>
             <CarouselContent>

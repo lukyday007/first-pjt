@@ -16,8 +16,8 @@ import {
 const APPLICATION_SERVER_URL = process.env.NODE_ENV === 'production' ? '' : 'https://demos.openvidu.io/';
 
 const CamChatting = () => {
-  const [mySessionId, setMySessionId] = useState('Session098');
-  const [myUserName, setMyUserName] = useState('Participant' + Math.floor(Math.random() * 100));
+  const mySessionId = "abced";
+  const myUserName = "hihihih";
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
@@ -36,6 +36,7 @@ const CamChatting = () => {
       };
   }, [session]);
 
+
   // const handleChangeSessionId = (e) => {
   //     setMySessionId(e.target.value);
   // };
@@ -45,6 +46,8 @@ const CamChatting = () => {
   // };
 
   const handleMainVideoStream = (stream) => {
+      console.log("0000000------------")
+      console.log(subscribers)
       if (mainStreamManager !== stream) {
           setMainStreamManager(stream);
       }
@@ -54,9 +57,7 @@ const CamChatting = () => {
       setSubscribers((prevSubscribers) => prevSubscribers.filter(sub => sub !== streamManager));
   };
 
-  const joinSession = useCallback(async (event) => {
-    // event.preventDefault();
-
+  const joinSession = useCallback(async () => {
     const OV = new OpenVidu();
 
     // 브라우저 감지 우회
@@ -70,59 +71,62 @@ const CamChatting = () => {
 
     const newSession = OV.initSession();
 
-    setSession(newSession);
+    // 이벤트 리스너 중복 등록 방지를 위한 확인
+    if (!session) {
+        newSession.on('streamCreated', (event) => {
+            const subscriber = newSession.subscribe(event.stream, undefined);
+            setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
+            console.log("Updated subscribers: ", subscribers);
+        });
 
-    newSession.on('streamCreated', (event) => {
-        const subscriber = newSession.subscribe(event.stream, undefined);
-        setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
-    });
+        newSession.on('streamDestroyed', (event) => {
+            deleteSubscriber(event.stream.streamManager);
+        });
 
-    newSession.on('streamDestroyed', (event) => {
-        deleteSubscriber(event.stream.streamManager);
-    });
+        newSession.on('exception', (exception) => {
+            console.warn(exception);
+        });
 
-    newSession.on('exception', (exception) => {
-        console.warn(exception);
-    });
+        setSession(newSession); // session 상태를 업데이트
+    }
 
     const token = await getToken();
 
-    newSession.connect(token, { clientData: myUserName })
+    try {
+        await newSession.connect(token, { clientData: myUserName });
 
-    .then(async () => {
-      const newPublisher = await OV.initPublisherAsync(undefined, {
-        audioSource: undefined,
-        videoSource: undefined,
-        publishAudio: true,
-        publishVideo: true,
-        resolution: '640x480',
-        frameRate: 30,
-        insertMode: 'APPEND',
-        mirror: false,
-      });
+        const newPublisher = await OV.initPublisherAsync(undefined, {
+            audioSource: undefined,
+            videoSource: undefined,
+            publishAudio: true,
+            publishVideo: true,
+            resolution: '640x480',
+            frameRate: 30,
+            insertMode: 'APPEND',
+            mirror: false,
+        });
 
-      newSession.publish(newPublisher);
+        await newSession.publish(newPublisher);
 
-      const devices = await OV.getDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      const currentVideoDeviceId = newPublisher.stream.getMediaStream().getVideoTracks()[0].getSettings().deviceId;
-      const currentVideoDevice = videoDevices.find(device => device.deviceId === currentVideoDeviceId);
+        const devices = await OV.getDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        const currentVideoDeviceId = newPublisher.stream.getMediaStream().getVideoTracks()[0].getSettings().deviceId;
+        const currentVideoDevice = videoDevices.find(device => device.deviceId === currentVideoDeviceId);
 
-      setCurrentVideoDevice(currentVideoDevice);
-      setMainStreamManager(newPublisher);
-      setPublisher(newPublisher);
-    })
-    .catch((error) => {
-      console.log('There was an error connecting to the session:', error.code, error.message);
-    });
-  }, [myUserName]);
-  
+        setCurrentVideoDevice(currentVideoDevice);
+        setMainStreamManager(newPublisher);
+        setPublisher(newPublisher);
 
-  // 추가한 부분 -> 자동 입장
+    } catch (error) {
+        console.log('There was an error connecting to the session:', error.code, error.message);
+    }
+  }, [myUserName, session, subscribers]);
+
   useEffect(() => {
-    // 컴포넌트가 마운트 될 때 joinSession을 자동으로 호출 
-    joinSession();
-  }, [joinSession]);
+    if(!session){
+      joinSession();
+    }
+  }, []);
 
 
   const leaveSession = useCallback(() => {
@@ -197,13 +201,13 @@ const CamChatting = () => {
         <div id="session">            
           <h1 id="session-title">{mySessionId}</h1>
 
-          {mainStreamManager === undefined ? (
+          {/* {mainStreamManager === undefined ? (
             <div id="main-video" className="col-md-6">
               <UserVideoComponent streamManager={mainStreamManager} />
             </div>
-          ) : null}
+          ) : null} */}
 
-          <div>
+          {/* <div>
             {publisher === undefined ? (
               <div 
                 onClick={() => handleMainVideoStream(publisher)}
@@ -211,13 +215,13 @@ const CamChatting = () => {
                 <UserVideoComponent streamManager={publisher} />
               </div>
             ) : null}
-          </div>
+          </div> */}
 
           <Carousel opts={{ align: "start" }}>
             <CarouselContent>
               {subscribers.map((sub, index) => (
-                <CarouselItem key={sub.id} className="stream-container col-md-6 col-xs-6">
-                  <div onClick={() => handleMainVideoStream(sub)}>
+                <CarouselItem key={index} className="stream-container col-md-6 col-xs-6">
+                  <div class="temp" onClick={() => handleMainVideoStream(sub)}>
                     <span>{sub.id}</span>
                     <UserVideoComponent streamManager={sub} />
                   </div>
