@@ -12,6 +12,7 @@ import GameTime from "@/components/GameTime";
 import useCatchTarget from "@/hooks/Map/useCatchTarget";
 import GiveUpButton from "@/components/GiveUpGameButton";
 import { Button } from "@/components/ui/Button";
+import GameRuleDialog from "@/components/GameRuleDialog";
 
 import catchButton from "@/assets/gameplay-icon/catch-button.png";
 
@@ -22,6 +23,7 @@ const GamePlay = () => {
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const toggleCamChatting = () => {
     setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
@@ -54,16 +56,26 @@ const GamePlay = () => {
       )}
 
       <GameHeader />
-
+      <div className="flex items-center justify-center">
+        <div id="game-rule-dialog" className="m-4">
+          <Button
+            onClick={() => setIsDialogOpen(true)}
+            className="shadow-3d h-14 w-32 bg-gradient-to-r from-teal-400 to-blue-700 font-bold"
+          >
+            게임 규칙 요약
+          </Button>
+          <GameRuleDialog
+            isOpen={isDialogOpen}
+            onClose={() => setIsDialogOpen(false)}
+          />
+        </div>
+        <GameTime />
+      </div>
       {camChatting ? (
-        <>
-          <GameTime />
-          <CamChattingComponent />
-        </>
+        <CamChattingComponent />
       ) : (
         <>
           <MapComponent />
-          <GameTime />
           <div className="flex justify-between">
             <div />
             <div />
