@@ -22,7 +22,9 @@ import com.boricori.repository.inGameRepo.MissionRepository;
 import com.boricori.repository.inGameRepo.MissionRepositoryImpl;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,7 +46,10 @@ public class InGameServiceImpl implements InGameService{
   private InGameMissionsRepository inGameMissionsRepository;
   @Autowired
   private InGameItemsRepository inGameItemsRepository;
-
+  @Autowired
+  private GameRoomRepository gameRoomRepository;
+  @Autowired
+  private RedisTemplate<String, String> redisTemplate;
 
   @Override
   public List<Mission> assignMissions(String username, Long gameId) {
@@ -90,7 +95,7 @@ public class InGameServiceImpl implements InGameService{
 
   @Override
   public void catchTarget(User user, User target, long gameId) {
-    participantRepository.changeStatus(target);
+    participantRepository.changeStatus(target, gameId);
     participantRepository.addKills(user);
     GameParticipants participant = participantRepository.getByUsername(user.getUsername(), gameId);
     List<Item> unusedItems = inGameRepositoryImpl.getUserItems(target);
@@ -131,5 +136,19 @@ public class InGameServiceImpl implements InGameService{
   @Override
   public List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long gameId, String usernameA) {
     return participantRepository.getWinEndGameUsersInfo(gameId, usernameA);
+
+  @Override
+  public void stopPlaying(String username, String roomId) {
+    redisTemplate.opsForValue().set((username + "-" + roomId + "-left"), "leave", 60, TimeUnit.SECONDS);
+  }
+
+  @Override
+  public void rejoin(String username, String roomId) {
+    redisTemplate.opsForValue().getAndDelete((username + "-" + roomId + "-left"));
+  }
+
+  @Override
+  public void killUser(String username, long roomId) {
+    participantRepository.changeStatusByName(username, roomId);
   }
 }
