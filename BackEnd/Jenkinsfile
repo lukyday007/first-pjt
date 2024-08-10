@@ -71,7 +71,8 @@ pipeline {
                         cd /home/ubuntu/plog &&
                         docker-compose stop backend && 
                         docker-compose rm -f backend &&
-                        docker-compose up -d backend
+                        docker-compose up -d backend &&
+                        docker image prune -f
                         '
                     '''
                 }
