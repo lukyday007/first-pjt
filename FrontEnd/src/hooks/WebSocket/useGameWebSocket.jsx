@@ -10,7 +10,6 @@ const useGameWebSocket = () => {
   const { gameRoomId, setAreaRadius } = useContext(GameContext);
   const stompClient = useRef(null);
   const areaRadiusRef = useRef(areaRadius);
-  const gameRoomIdRef = useRef(gameRoomId);
 
   useEffect(() => {
     areaRadiusRef.current = areaRadius;
@@ -18,19 +17,18 @@ const useGameWebSocket = () => {
 
   const connect = () => {
     // WebSocket 연결 생성
-    const socket = new WebSocket(
-      `${WS_BASE_URL}/gameRoom/${gameRoomIdRef.current}`
-    );
+    console.log(`GamePlay: ${WS_BASE_URL}/gameRoom/${gameRoomId}`)
+    const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
 
     // STOMP 연결 설정
-    stompClient.current.connect(
+    stompClient.current.connect({}, 
       frame => {
         console.log("Connected:" + frame);
 
         // 메시지 구독 설정
         stompClient.current.subscribe(
-          `/topic/play/${gameRoomIdRef.current}`,
+          `/topic/play/${gameRoomId}`,
           serverMsg => {
             const msg = JSON.parse(serverMsg.body);
             handleAlertMessage(msg);
