@@ -15,14 +15,15 @@ import GameRuleDialog from "@/components/GameRuleDialog";
 const Room = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { gameRoomId: paramGameRoomId } = useParams();
-  const { gameRoomId, setGameRoomId } = useContext(GameContext);
+  const { gameRoomId, setGameRoomId, isGameRoomLoading } =
+    useContext(GameContext);
   const { connect, disconnect } = useRoomWebSocket();
 
   // GameSettingDialog 컴포넌트에서 보낸 state에서 QR과 방 코드를 추출
   const location = useLocation();
   const { qrCode, gameCode } = location.state || {};
 
-  const { handleStartGame, isLoading, error } = useReadyGame();
+  const { handleStartGame, error } = useReadyGame();
 
   const isChief = sessionStorage.getItem("isChief") === "true"; // 방장여부 판단
 
@@ -54,7 +55,7 @@ const Room = () => {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      {!isLoading ? (
+      {!isGameRoomLoading ? (
         <>
           {isChief && (
             // 방장에게만 게임시작 버튼 보여주기

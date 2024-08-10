@@ -31,6 +31,7 @@ export const GameProvider = ({ children }) => {
     return sessionStorage.getItem("gameRoomId") || "";
   }); // 게임 방 번호
   const [gameRoomUsers, setGameRoomUsers] = useState([]); // 참여자 목록
+  const [isGameRoomLoading, setIsGameRoomLoading] = useState(false); // Room.jsx에서 로딩 스피너 사용
   const [gameStatus, setGameStatus] = useState(() => {
     const savedGameStatus = sessionStorage.getItem("gameStatus");
     return savedGameStatus === "true";
@@ -193,6 +194,8 @@ export const GameProvider = ({ children }) => {
         setTargetId,
         gameStatus,
         setGameStatus,
+        isGameRoomLoading,
+        setIsGameRoomLoading,
         isAlive,
         setIsAlive,
         myLocation,

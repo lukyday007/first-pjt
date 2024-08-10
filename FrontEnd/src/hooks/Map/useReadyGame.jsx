@@ -5,7 +5,6 @@ import axiosInstance from "@/api/axiosInstance.js";
 // Room.jsx에서 시작 프로세스 관리
 const useReadyGame = () => {
   const { gameRoomId } = useContext(GameContext);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleStartGame = async () => {
@@ -35,7 +34,7 @@ const useReadyGame = () => {
   };
 
   // setIsLoading은 useRoomWebSocket.jsx에서 사용
-  return { handleStartGame, isLoading, setIsLoading, error };
+  return { handleStartGame, error };
 };
 
 export default useReadyGame;
