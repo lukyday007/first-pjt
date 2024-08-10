@@ -94,11 +94,4 @@ public class MessageController {
     EnterMessageResponse message = new EnterMessageResponse("users", users);
     messagingTemplate.convertAndSend("/topic/room/"+roomId, message);
   }
-
-  @MessageMapping("/room/{roomId}/message")
-  public void handleWinnerMessage(@DestinationVariable String roomId, EndGameWinnerRequest message) {
-    if ("end".equals(message.getType())) {
-      messagingTemplate.convertAndSend("/topic/room/" + roomId, message);
-    }
-  }
 }
