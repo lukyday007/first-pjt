@@ -32,12 +32,14 @@ const Room = () => {
   }, [paramGameRoomId]);
 
   useEffect(() => {
-    connect();
+    if (gameRoomId) {
+      connect();
+    }
 
     return () => {
       disconnect();
     };
-  }, []);
+  }, [gameRoomId]);
 
   // isLoading은 useRoomWebSocket.jsx에서 변경
   return (
