@@ -150,4 +150,9 @@ public class InGameServiceImpl implements InGameService{
   public void killUser(String username, long roomId) {
     participantRepository.changeStatusByName(username, roomId);
   }
+
+  @Override
+  public Mission getMissionById(long missionId) {
+    return missionRepository.findById(missionId).orElse(null);
+  }
 }
