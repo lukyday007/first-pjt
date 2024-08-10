@@ -34,11 +34,11 @@ const Room = () => {
   useEffect(() => {
     if (gameRoomId) {
       connect();
-
-      return () => {
-        disconnect();
-      };
     }
+
+    return () => {
+      disconnect();
+    };
   }, [gameRoomId]);
 
   // isLoading은 useRoomWebSocket.jsx에서 변경
@@ -46,7 +46,7 @@ const Room = () => {
     <div className="relative flex h-screen flex-col items-center justify-center">
       <Button
         onClick={() => setIsDialogOpen(true)}
-        className="shadow-3d absolute left-12 top-12 mb-8 h-12 w-32 bg-gradient-to-r from-teal-400 to-blue-700 font-bold"
+        className="absolute left-12 top-12 mb-8 h-12 w-32 bg-gradient-to-r from-teal-400 to-blue-700 font-bold shadow-3d"
       >
         게임 규칙 요약
       </Button>
@@ -59,7 +59,7 @@ const Room = () => {
           {isChief && (
             // 방장에게만 게임시작 버튼 보여주기
             <Button
-              className="shadow-3d bg-gradient-rainbow animate-gradient-move absolute right-12 top-12 mb-8 h-12 w-32 bg-[length:200%_200%] font-bold"
+              className="absolute right-12 top-12 mb-8 h-12 w-32 animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] font-bold shadow-3d"
               onClick={handleStartGame}
             >
               게임 시작
