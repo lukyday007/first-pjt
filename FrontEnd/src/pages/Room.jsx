@@ -2,11 +2,11 @@ import React, { useState, useContext, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { ClockLoader } from "react-spinners";
 
-import { WebSocketContext } from "@/context/WebSocketContext";
 import { GameContext } from "@/context/GameContext";
 
 import GameRoomUsers from "@/components/GameRoomUsers";
 import { Button } from "@/components/ui/Button";
+import useRoomWebSocket from "@/hooks/WebSocket/useRoomWebSocket";
 
 import useReadyGame from "@/hooks/Map/useReadyGame";
 
@@ -16,7 +16,7 @@ const Room = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { gameRoomId: paramGameRoomId } = useParams();
   const { setGameRoomId } = useContext(GameContext);
-  const { connect } = useContext(WebSocketContext);
+  const { connect, disconnect } = useRoomWebSocket();
 
   // GameSettingDialog 컴포넌트에서 보낸 state에서 QR과 방 코드를 추출
   const location = useLocation();
@@ -29,10 +29,17 @@ const Room = () => {
   // 방에 접속 시 username, gameRoomId 설정 및 WebSocket 연결
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
-    connect();
-  }, [paramGameRoomId, connect]);
+  }, [paramGameRoomId]);
 
-  // isLoading은 WebSocketContext.jsx에서 변경
+  useEffect(() => {
+    connect();
+
+    return () => {
+      disconnect();
+    };
+  }, []);
+
+  // isLoading은 useRoomWebSocket.jsx에서 변경
   return (
     <div className="relative flex h-screen flex-col items-center justify-center">
       <Button
