@@ -17,13 +17,6 @@ const approximateDistance = (lat1, lng1, lat2, lng2) => {
   return distance.toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
 };
 
-const coordToFixed = (getLat, getLng) => {
-  return {
-    lat: getLat.toFixed(5), // 거리 연산에 위/경도의 소수점 5자리까지 사용
-    lng: getLng.toFixed(5), // 거리 연산에 위/경도의 소수점 5자리까지 사용
-  };
-};
-
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
@@ -35,7 +28,7 @@ export const GameProvider = ({ children }) => {
   const [gameStatus, setGameStatus] = useState(() => {
     const savedGameStatus = sessionStorage.getItem("gameStatus");
     return savedGameStatus === "true";
-  }); // 게임방 플레이 상태 (웹소켓 메시지에 따라 true로 전환되고, 이후 게임 종료 조건에 따라 false로 전환)
+  }); // 게임방 플레이 상태
   const [isAlive, setIsAlive] = useState(() => {
     const savedIsAlive = sessionStorage.getItem("isAlive");
     return savedIsAlive === "true";
