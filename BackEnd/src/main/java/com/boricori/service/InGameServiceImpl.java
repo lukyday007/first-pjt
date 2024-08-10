@@ -2,6 +2,7 @@ package com.boricori.service;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
 import com.boricori.dto.request.inGame.UseItemRequest;
+import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.GameRoom;
 import com.boricori.entity.InGameItems;
@@ -43,8 +44,7 @@ public class InGameServiceImpl implements InGameService{
   private InGameMissionsRepository inGameMissionsRepository;
   @Autowired
   private InGameItemsRepository inGameItemsRepository;
-  @Autowired
-  private GameRoomRepository gameRoomRepository;
+
 
   @Override
   public List<Mission> assignMissions(String username, Long gameId) {
@@ -116,5 +116,20 @@ public class InGameServiceImpl implements InGameService{
   @Override
   public List<Item> getItems(GameParticipants player) {
     return inGameRepositoryImpl.getItems(player);
+  }
+
+  @Override
+  public GameParticipants getUserInfo(Long gameId, String username){
+      return participantRepository.getByUsername(username, gameId);
+  }
+
+  @Override
+  public List<EndGameUserInfoResponse> getDrawEndGameUsersInfo(Long gameId, String usernameA, String usernameB) {
+    return participantRepository.getDrawEndGameUsersInfo(gameId, usernameA, usernameB);
+  }
+
+  @Override
+  public List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long gameId, String usernameA) {
+    return participantRepository.getWinEndGameUsersInfo(gameId, usernameA);
   }
 }
