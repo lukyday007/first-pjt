@@ -51,8 +51,8 @@ pipeline {
                         cd /home/ubuntu/plog &&
                         docker-compose stop frontend && 
                         docker-compose rm -f frontend &&
-                        docker image rm -f frontend &&
-                        docker-compose up -d frontend
+                        docker-compose up -d frontend &&
+                        docker image prune -f
                         '
                     '''
                 }
