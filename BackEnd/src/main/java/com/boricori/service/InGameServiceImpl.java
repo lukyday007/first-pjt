@@ -1,10 +1,8 @@
 package com.boricori.service;
 
-import com.boricori.dto.request.inGame.MissionChangeRequest;
-import com.boricori.dto.request.inGame.UseItemRequest;
+
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
-import com.boricori.entity.GameRoom;
 import com.boricori.entity.InGameItems;
 import com.boricori.entity.InGameMissions;
 import com.boricori.entity.Item;
@@ -136,6 +134,7 @@ public class InGameServiceImpl implements InGameService{
   @Override
   public List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long gameId, String usernameA) {
     return participantRepository.getWinEndGameUsersInfo(gameId, usernameA);
+  }
 
   @Override
   public void stopPlaying(String username, String roomId) {

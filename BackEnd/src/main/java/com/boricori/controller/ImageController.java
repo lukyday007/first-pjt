@@ -5,10 +5,7 @@ import com.boricori.util.ResponseEnum;
 import com.google.cloud.vision.v1.ColorInfo;
 import com.google.cloud.vision.v1.EntityAnnotation;
 import com.google.cloud.vision.v1.LocalizedObjectAnnotation;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,31 +17,30 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class ImageController {
 
-  private static final String UPLOAD_DIR = "C:/ssafyTempImg/uploads/";
-
-
-  @PostMapping("/upload")
-  public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-    if (file.isEmpty()) {
-      return new ResponseEntity<>("Please select a file to upload", HttpStatus.BAD_REQUEST);
-    }
-    try {
-      // Ensure the directory exists
-      File uploadDir = new File(UPLOAD_DIR);
-      if (!uploadDir.exists()) {
-        uploadDir.mkdirs();
-      }
-      // Construct the full path to the file
-      String fileName = file.getOriginalFilename();
-      File dest = new File(UPLOAD_DIR + fileName);
-      // Save the file
-      file.transferTo(dest);
-      return new ResponseEntity<>("Successfully uploaded: " + fileName, HttpStatus.OK);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
+//  private static final String UPLOAD_DIR = "C:/ssafyTempImg/uploads/";
+//
+//  @PostMapping("/upload")
+//  public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+//    if (file.isEmpty()) {
+//      return new ResponseEntity<>("Please select a file to upload", HttpStatus.BAD_REQUEST);
+//    }
+//    try {
+//      // Ensure the directory exists
+//      File uploadDir = new File(UPLOAD_DIR);
+//      if (!uploadDir.exists()) {
+//        uploadDir.mkdirs();
+//      }
+//      // Construct the full path to the file
+//      String fileName = file.getOriginalFilename();
+//      File dest = new File(UPLOAD_DIR + fileName);
+//      // Save the file
+//      file.transferTo(dest);
+//      return new ResponseEntity<>("Successfully uploaded: " + fileName, HttpStatus.OK);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//      return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//  }
 
 
   @PostMapping("/ocr")
