@@ -15,12 +15,9 @@ const useKakaoMap = () => {
   // 내 위치로 이동하는 버튼 함수
   const goToLocation = (lat, lng) => {
     if (mapInstanceRef.current && lat !== undefined && lng !== undefined) {
-      mapInstanceRef.current.setLevel(1, {
-        anchor: new kakao.maps.LatLng(lat, lng),
-        animate: {
-          duration: 500,
-        },
-      });
+      const newLocation = new kakao.maps.LatLng(lat, lng);
+      mapInstanceRef.current.setLevel(1, { animate: true });
+      mapInstanceRef.current.panTo(newLocation);
     }
   };
 

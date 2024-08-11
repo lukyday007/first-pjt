@@ -73,7 +73,9 @@ const useGameWebSocket = () => {
         break;
       case "end": // 게임 종료 조건(인원수)
         setGameStatus(false);
-        endGame();
+        const winner = msg.winner;
+        const rankList = msg.rank;
+        endGame(winner, rankList);
         break;
       default:
         break;
@@ -91,7 +93,9 @@ const useGameWebSocket = () => {
         break;
       case "4": // 게임 시간 소진으로 종료
         setGameStatus(false);
-        endGame();
+        const winner = msg.winner;
+        const rankList = msg.rank;
+        endGame(winner, rankList);
         break;
       default:
         break;
