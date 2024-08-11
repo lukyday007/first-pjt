@@ -17,12 +17,15 @@ const useGameWebSocket = () => {
 
   const connect = () => {
     // WebSocket 연결 생성
-    console.log(`GamePlay: ${WS_BASE_URL}/gameRoom/${gameRoomId}`)
     const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
 
+    // 사용자 이름 가져오기
+    const username = localStorage.getItem("username");
+
     // STOMP 연결 설정
-    stompClient.current.connect({}, 
+    stompClient.current.connect(
+      { username: username }, // 헤더에 username 추가
       frame => {
         console.log("Connected:" + frame);
 
@@ -68,7 +71,7 @@ const useGameWebSocket = () => {
       case "alert":
         handleAlertDegree(msg.alertDegree);
         break;
-      case "end":
+      case "end": // 게임 종료 조건(인원수)
         setGameStatus(false);
         endGame();
         break;
@@ -86,7 +89,7 @@ const useGameWebSocket = () => {
         setAreaRadius(newAreaRadius);
         sessionStorage.setItem("areaRadius", newAreaRadius);
         break;
-      case "4":
+      case "4": // 게임 시간 소진으로 종료
         setGameStatus(false);
         endGame();
         break;
