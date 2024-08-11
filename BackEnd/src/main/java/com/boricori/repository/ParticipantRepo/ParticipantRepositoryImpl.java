@@ -91,11 +91,12 @@ public class ParticipantRepositoryImpl {
   public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId){
     return queryFactory
             .select(new QUpdatePlayerScoreRequest(
-                    user.userId,
+                    participants.user.userId,
                     participants.missionComplete,
                     participants.kills))
             .from(participants)
             .where(participants.gameRoom.id.eq(roomId))
+            .orderBy(participants.kills.desc(), participants.missionComplete.desc())
             .fetch();
   }
 
