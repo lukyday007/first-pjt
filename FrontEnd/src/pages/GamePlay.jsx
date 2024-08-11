@@ -54,14 +54,14 @@ const GamePlay = () => {
     setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
   };
 
-  // useEffect(() => {
-  //   connect();
-  //   fetch();
+  useEffect(() => {
+    connect();
+    fetch();
 
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
+    return () => {
+      disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (gameStatus) {
