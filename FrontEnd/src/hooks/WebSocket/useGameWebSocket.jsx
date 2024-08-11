@@ -10,7 +10,7 @@ const useGameWebSocket = () => {
     setGameStatus,
     setTargetId,
     setIsAlive,
-    setCountPlayer,
+    setPlayerCount,
     username,
   } = useContext(GameContext);
   const { endGame } = useEndGame();
@@ -91,7 +91,7 @@ const useGameWebSocket = () => {
         break;
       case "playerCount":
         const count = parseInt(msg.count, 10);
-        setCountPlayer(count);
+        setPlayerCount(count);
         break;
       default:
         break;
