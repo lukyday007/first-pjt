@@ -42,7 +42,7 @@ const GamePlay = () => {
   const { gameStatus } = useContext(GameContext);
   const { fetch, timeUntilStart } = useStartGame();
   const { startSendingGPS } = useSendGPS();
-  const { isAbleToCatchTarget, handleCatchTarget } = useCatchTarget();
+  const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
   const { bullet, isCooldown, shootBullet } = useBullet();
 
@@ -352,7 +352,7 @@ const GamePlay = () => {
               alt="catch-button"
               onClick={() => {
                 shootBullet();
-                handleCatchTarget();
+                handleOnClickCatchTarget();
               }}
               className={`mr-4 h-[28vh] w-[28vh] ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-40"}`}
             />
