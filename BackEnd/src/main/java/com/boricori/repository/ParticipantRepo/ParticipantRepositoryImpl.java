@@ -73,7 +73,7 @@ public class ParticipantRepositoryImpl {
         .fetchOne();
   }
 
-  public List<EndGameUserInfoResponse> getDrawEndGameUsersInfo(Long roomId, String userA, String userB) {
+  public List<EndGameUserInfoResponse> getEndGamePlayersInfo(Long roomId) {
     return queryFactory
             .select(new QEndGameUserInfoResponse(
                     user.username,
@@ -82,25 +82,7 @@ public class ParticipantRepositoryImpl {
             ))
             .from(participants)
             .join(participants.user, user)
-            .where(participants.gameRoom.id.eq(roomId)
-                    .and(user.username.ne(userA))
-                    .and(user.username.ne(userB))) // userA와 userB가 아닌 경우만 포함
-            .orderBy(participants.kills.desc(), participants.missionComplete.desc())
-            .fetch();
-  }
-
-
-  public List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long roomId, String username) {
-    return queryFactory
-            .select(new QEndGameUserInfoResponse(
-                    user.username,
-                    participants.missionComplete,
-                    participants.kills
-            ))
-            .from(participants)
-            .join(participants.user, user)
-            .where(participants.gameRoom.id.eq(roomId)
-                    .and(user.username.ne(username))) // username이 같지 않은 경우만 포함
+            .where(participants.gameRoom.id.eq(roomId))
             .orderBy(participants.kills.desc(), participants.missionComplete.desc())
             .fetch();
   }

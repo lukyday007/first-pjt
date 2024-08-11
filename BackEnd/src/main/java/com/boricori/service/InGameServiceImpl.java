@@ -129,12 +129,7 @@ public class InGameServiceImpl implements InGameService{
 
   @Override
   public List<EndGameUserInfoResponse> getDrawEndGameUsersInfo(Long gameId, String usernameA, String usernameB) {
-    return participantRepository.getDrawEndGameUsersInfo(gameId, usernameA, usernameB);
-  }
-
-  @Override
-  public List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long gameId, String usernameA) {
-    return participantRepository.getWinEndGameUsersInfo(gameId, usernameA);
+    return participantRepository.getEndGamePlayersInfo(gameId);
   }
 
   @Override

@@ -32,9 +32,7 @@ public interface InGameService {
 
   GameParticipants getUserInfo(Long gameId, String username);
 
-  List<EndGameUserInfoResponse> getDrawEndGameUsersInfo(Long gameIf, String usernameA, String usernameB);
-
-  List<EndGameUserInfoResponse> getWinEndGameUsersInfo(Long gameIf, String usernameA);
+  List<EndGameUserInfoResponse> getEndGamePlayersInfo(Long gameId);
 
   void stopPlaying(String username, String roomId);
 

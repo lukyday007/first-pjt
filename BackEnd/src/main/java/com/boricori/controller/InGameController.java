@@ -165,13 +165,7 @@ public class InGameController {
     GameParticipants userB = inGameService.getUserInfo(gameId, users.get(1));
     String winner = determineWinner(userA, userB);
 
-    List<EndGameUserInfoResponse> usersInfo = new ArrayList<>();
-    if (userA.getKills() == userB.getKills() && userA.getMissionComplete() == userB.getMissionComplete()) {
-      usersInfo = inGameService.getDrawEndGameUsersInfo(gameId, userA.getUser().getUsername(), userB.getUser().getUsername());
-    } else {
-      usersInfo = inGameService.getWinEndGameUsersInfo(gameId, winner);
-    }
-
+    List<EndGameUserInfoResponse> usersInfo = inGameService.getEndGamePlayersInfo(gameId);
     messageService.endGameScore(gameId, winner, usersInfo);
   }
 
