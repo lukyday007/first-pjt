@@ -25,16 +25,16 @@ public class FilterConfig {
     FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil));
     registrationBean.addUrlPatterns("/gameroom/**", "/in-game/init/*", "/participants/**",
-        "/user/ranks/*", "/user/myProfile", "/user/updateProfile",
-        "/user/profile/*"); // 필터를 적용할 URL 패턴 설정
+            "/user/ranks/*", "/user/myProfile", "/user/updateProfile", "/api/sessions/**",
+            "/user/profile/*"); // 필터를 적용할 URL 패턴 설정
     return registrationBean;
   }
 
   @Bean
   public CorsConfiguration corsConfiguration() {
     CorsConfiguration configuration = new CorsConfiguration();
-//    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5080/")); // 임시
-    configuration.setAllowedOrigins(Arrays.asList("https://i11b205.p.ssafy.io"));
+    configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5080/")); // 임시
+//    configuration.setAllowedOrigins(Arrays.asList("https://i11b205.p.ssafy.io"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
     configuration.setAllowCredentials(true);
