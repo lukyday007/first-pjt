@@ -66,7 +66,22 @@ const Room = () => {
 
       {/* 나머지 요소들은 flex로 배치 */}
       <div className="mt-12 flex flex-col items-center justify-center">
-        {!isGameRoomLoading ? (
+        {isGameRoomLoading ? (
+          // 게임이 시작된 경우: 방장과 플레이어 모두에게 동일한 메시지와 로딩 스피너 표시
+          <>
+            <ClockLoader
+              color="#fff900"
+              size={70}
+              speedMultiplier={2}
+              className="mb-8"
+            />
+            <div className="mb-12 text-center text-xl leading-loose">
+              잠시 후 게임이 시작됩니다. <br />
+              원하는 위치로 이동해주세요!
+            </div>
+          </>
+        ) : isChief ? (
+          // 방장이면서 게임이 시작되지 않은 경우: QR 코드와 방 코드 표시
           <>
             {qrCode && (
               <img
@@ -75,17 +90,11 @@ const Room = () => {
                 className="mb-8 h-40 w-40"
               />
             )}
-
-            {/* 예시 QR */}
-            {/* <img
-              className="mb-4 h-60 w-60"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQAAAACFI5MzAAABIUlEQVR4Xu2WQXbDIAxExYpjcFMbbsoxWNmdGeK4L6/d9ZVZWM+Ow3wWEwkpjvO3iE/hHQ95COPvSQ1Ewec+yjm4SDak4YZ2dvDGL1JMyIg0ypH7FnAN+8WNIJdb7smVzIx6EdxXRkFeigepbAxqurhINmRGzdyyv9cepOoAHpmJhPHzW0aXEz6lHXTdY3r3IBRQZLruCUT2XUjmxdCA2e6TuJ6g2nQdpX1Wez1pNMsBgy2b8rrbkCoZfqGFItmQpqSG+vjaYkNUah1DDr807t5eTmYgr1W92+5qrydwStcSkM7JTQifGskYLWkufYjenqrqzMh2pF3tO71bkZnRgDzu6bKenKx25f8tuRWBhi5pTCp+wes1yoT8HA95COO/yBdlU+Neyv9lBAAAAABJRU5ErkJggg=="
-            /> */}
             <div className="mb-4 text-2xl font-bold">방 코드 : {gameCode}</div>
           </>
         ) : (
+          // 플레이어면서 게임이 시작되지 않은 경우: 대기 메시지와 로딩 스피너 표시
           <>
-            {/* 서버에서 start 웹소켓 메시지가 오기 전까지 로딩 스피너 표시 */}
             <ClockLoader
               color="#fff900"
               size={70}
@@ -93,8 +102,8 @@ const Room = () => {
               className="mb-8"
             />
             <div className="mb-12 text-center text-xl leading-loose">
-              1분 후 게임이 시작됩니다. <br />
-              원하는 위치로 이동해주세요 !
+              방장이 게임을 시작할 때까지
+              <br /> 기다려주세요!
             </div>
           </>
         )}
