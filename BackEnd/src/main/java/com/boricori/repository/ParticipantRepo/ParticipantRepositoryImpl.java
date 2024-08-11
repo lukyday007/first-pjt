@@ -88,19 +88,19 @@ public class ParticipantRepositoryImpl {
             .fetch();
   }
 
-  public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId, Long userA, Long userB){
-    return queryFactory
-            .select(new QUpdatePlayerScoreRequest(
-                    participants.user.userId,
-                    participants.missionComplete,
-                    participants.kills))
-            .from(participants)
-            .where(participants.gameRoom.id.eq(roomId)
-                    .and(participants.user.userId.ne(userA))
-                    .and(participants.user.userId.ne(userB)))
-            .orderBy(participants.kills.desc(), participants.missionComplete.desc())
-            .fetch();
-  }
+//  public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId, Long userA, Long userB){
+//    return queryFactory
+//            .select(new QUpdatePlayerScoreRequest(
+//                    participants.user.userId,
+//                    participants.missionComplete,
+//                    participants.kills))
+//            .from(participants)
+//            .where(participants.gameRoom.id.eq(roomId)
+//                    .and(participants.user.userId.ne(userA))
+//                    .and(participants.user.userId.ne(userB)))
+//            .orderBy(participants.kills.desc(), participants.missionComplete.desc())
+//            .fetch();
+//  }
 
   public UpdatePlayerScoreRequest getTwoUserInfo(String username, Long roomId){
     return queryFactory
@@ -116,8 +116,15 @@ public class ParticipantRepositoryImpl {
 
   public void updateUserScore(Long userId, int score) {
     queryFactory.update(participants)
-            .set(participants.score, score)
+            .set(participants.score, participants.score.add(score))
             .where(participants.user.userId.eq(userId))
             .execute();
+  }
+
+  public List<GameParticipants> getPlayersInfo(Long roomId){
+    return queryFactory
+            .selectFrom(participants)
+            .where(participants.gameRoom.id.eq(roomId))
+            .fetch();
   }
 }

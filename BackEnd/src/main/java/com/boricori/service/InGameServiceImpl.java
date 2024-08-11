@@ -152,52 +152,33 @@ public class InGameServiceImpl implements InGameService{
     UpdatePlayerScoreRequest userA = participantRepository.getTwoUserInfo(users.get(0), gameId);
     UpdatePlayerScoreRequest userB = participantRepository.getTwoUserInfo(users.get(1), gameId);
 
-    List<UpdatePlayerScoreRequest> gamePlayersInfo = participantRepository.getByPlayersInfo(gameId,userA.getUserId(),userB.getUserId());
-    if(calculateTwoPlayer(userA, userB)){
-      gamePlayersInfo.add(0, userA);
-      gamePlayersInfo.add(1, userB);
-    }else{
-      gamePlayersInfo.add(0, userB);
-      gamePlayersInfo.add(1, userA);
-    }
+    int scoreA = 2000;
+    int scoreB = 1000;
 
-    updatePlayersScore(gamePlayersInfo);
-  }
-
-  private boolean calculateTwoPlayer(UpdatePlayerScoreRequest userA, UpdatePlayerScoreRequest userB) {
-    int sumA = userA.getKills()*100 + userA.getMissionComplete()*50;
-    int sumB = userB.getKills()*100 + userB.getMissionComplete()*50;
-    return sumA >= sumB;
-  }
-
-  private void updatePlayersScore(List<UpdatePlayerScoreRequest> gamePlayersInfo) {
-    // 첫 번째 플레이어의 정보 (최고 득점자)
-    UpdatePlayerScoreRequest firstPlayer = gamePlayersInfo.get(0);
-
-    for (int i = 0; i < gamePlayersInfo.size(); i++) {
-      UpdatePlayerScoreRequest player = gamePlayersInfo.get(i);
-      int score = calculatePlayerScore(player);
-
-      // 1등 보너스 또는 무승부 처리
-      if (i == 0 || (i ==1 && isCompareDraw(player, firstPlayer)) ) {
-        score += 2000;
-      } else if (i == 1) { // 2등 보너스
-        score += 1000;
+    if (userA.getKills() == userB.getKills()) {
+      if (userA.getMissionComplete() == userB.getMissionComplete()) {
+        scoreB = 2000; // 두 사용자 모두 2000점
+      } else if (userA.getMissionComplete() < userB.getMissionComplete()) {
+        scoreA = 1000;
+        scoreB = 2000;
       }
-      userRepository.addUserScore(player.getUserId(), score);
-      participantRepository.updateUserScore(player.getUserId(), score);
+    } else if (userA.getKills() < userB.getKills()) {
+      scoreA = 1000;
+      scoreB = 2000;
     }
+
+    participantRepository.updateUserScore(userA.getUserId(), scoreA);
+    participantRepository.updateUserScore(userB.getUserId(), scoreB);
+
+    updatePlayersScore(gameId);
   }
 
-  private int calculatePlayerScore(UpdatePlayerScoreRequest player) {
-    //킬 : 100점, 미션 : 50
-    return player.getKills() * 100 + player.getMissionComplete() * 50;
-  }
 
-  private boolean isCompareDraw(UpdatePlayerScoreRequest player, UpdatePlayerScoreRequest firstPlayer) {
-      // 2번째 플레이어가 1등과 동점인지 확인
-      return player.getKills() == firstPlayer.getKills() &&
-              player.getMissionComplete() == firstPlayer.getMissionComplete();
+  private void updatePlayersScore(long gameId) {
+    List<GameParticipants> playersInfo = participantRepository.getPlayersInfo(gameId);
+    for (GameParticipants player : playersInfo) {
+      userRepository.addUserScore(player.getUser().getUserId(), player.getScore());
+    }
   }
 
   @Override
@@ -219,17 +200,10 @@ public class InGameServiceImpl implements InGameService{
 
 
   private String determineWinner(GameParticipants userA, GameParticipants userB) {
-    if (userA.getKills() == userB.getKills()) {
-      if (userA.getMissionComplete() > userB.getMissionComplete()) {
-        return userA.getUser().getUsername();
-      } else if (userA.getMissionComplete() < userB.getMissionComplete()) {
-        return userB.getUser().getUsername();
-      } else {
-        return null; // 무승부
-      }
-    } else {
-      return userA.getKills() > userB.getKills() ? userA.getUser().getUsername() : userB.getUser().getUsername();
+    if (userA.getScore() == userB.getScore()) {
+      return null;
     }
+    return userA.getScore() > userB.getScore() ? userA.getUser().getUsername() : userB.getUser().getUsername();
   }
 
   // redis expired = 4 일 때, 타임아웃 종료
