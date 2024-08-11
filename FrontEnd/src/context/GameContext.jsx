@@ -69,10 +69,6 @@ export const GameProvider = ({ children }) => {
   const areaCenterRef = useRef(areaCenter);
 
   useEffect(() => {
-    myLocationRef.current = myLocation;
-  }, [myLocation]);
-
-  useEffect(() => {
     targetLocationRef.current = targetLocation;
   }, [targetLocation]);
 
