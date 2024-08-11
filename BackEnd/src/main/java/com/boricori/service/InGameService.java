@@ -1,6 +1,7 @@
 package com.boricori.service;
 
 import com.boricori.dto.request.inGame.MissionChangeRequest;
+import com.boricori.dto.request.inGame.UpdatePlayerScoreRequest;
 import com.boricori.dto.request.inGame.UseItemRequest;
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
@@ -42,4 +43,8 @@ public interface InGameService {
   void killUser(String username, long roomId);
 
   Mission getMissionById(long missionId);
+
+  List<UpdatePlayerScoreRequest> getGamePlayerInfo(long gameId);
+
+  void addPlayerScore(Long userId, int score);
 }

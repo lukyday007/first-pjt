@@ -1,6 +1,7 @@
 package com.boricori.service;
 
 
+import com.boricori.dto.request.inGame.UpdatePlayerScoreRequest;
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.InGameItems;
@@ -154,5 +155,15 @@ public class InGameServiceImpl implements InGameService{
   @Override
   public Mission getMissionById(long missionId) {
     return missionRepository.findById(missionId).orElse(null);
+  }
+
+  @Override
+  public List<UpdatePlayerScoreRequest> getGamePlayerInfo(long gameId){
+    return participantRepository.getByPlayersInfo(gameId);
+  }
+
+  @Override
+  public void addPlayerScore(Long userId, int score){
+    participantRepository.addUserScoreByUsername(userId, score);
   }
 }

@@ -1,5 +1,7 @@
 package com.boricori.repository.ParticipantRepo;
 
+import com.boricori.dto.request.inGame.QUpdatePlayerScoreRequest;
+import com.boricori.dto.request.inGame.UpdatePlayerScoreRequest;
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.dto.response.inGame.QEndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
@@ -101,5 +103,24 @@ public class ParticipantRepositoryImpl {
                     .and(user.username.ne(username))) // username이 같지 않은 경우만 포함
             .orderBy(participants.kills.desc(), participants.missionComplete.desc())
             .fetch();
+  }
+
+  public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId){
+    return queryFactory
+            .select(new QUpdatePlayerScoreRequest(
+                    user.userId,
+                    participants.missionComplete,
+                    participants.kills))
+            .from(participants)
+            .where(participants.gameRoom.id.eq(roomId))
+            .fetch();
+  }
+
+  public void addUserScoreByUsername(Long userId, int scoreToAdd) {
+    queryFactory
+          .update(user)
+          .set(user.scores, user.scores.add(scoreToAdd))  // 현재 점수에 새로운 점수를 더함
+          .where(user.userId.eq(userId))
+          .execute();
   }
 }

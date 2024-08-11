@@ -1,11 +1,10 @@
 package com.boricori.controller;
 
-import com.boricori.dto.request.gameroom.EndGameRoomRequest;
 import com.boricori.dto.request.inGame.InGameRequest;
 import com.boricori.dto.request.inGame.MissionChangeRequest;
+import com.boricori.dto.request.inGame.UpdatePlayerScoreRequest;
 import com.boricori.dto.request.inGame.UseItemRequest;
 import com.boricori.dto.response.gameroom.GameInfo;
-import com.boricori.dto.response.gameroom.end.EndGameResponse;
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.dto.response.inGame.InitResponse;
 import com.boricori.dto.response.inGame.ItemResponse;
@@ -17,7 +16,6 @@ import com.boricori.entity.Mission;
 import com.boricori.entity.User;
 import com.boricori.exception.NotAPlayerException;
 import com.boricori.game.GameManager;
-import com.boricori.repository.inGameRepo.MissionRepositoryImpl;
 import com.boricori.service.GameRoomService;
 import com.boricori.service.ImageService;
 import com.boricori.service.InGameService;
@@ -27,7 +25,6 @@ import com.boricori.util.Node;
 import com.boricori.util.ResponseEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,7 +37,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -146,10 +142,20 @@ public class InGameController {
       inGameService.catchTarget(user, targetNode.data, gameId);
 
       if (gameManager.isLastTwo(gameId)) {
+        addGamePlayerScore(gameId);
         handleLastTwoPlayers(gameId);
       }
     } catch (JsonProcessingException e) {
       e.printStackTrace(); // 예외 처리 (필요한 경우 로그로 대체 가능)
+    }
+  }
+
+  private void addGamePlayerScore(long gameId) {
+    List<UpdatePlayerScoreRequest> gamePlayersInfo = inGameService.getGamePlayerInfo(gameId);
+    //킬 : 100점, 미션 : 50
+    for (UpdatePlayerScoreRequest player : gamePlayersInfo) {
+      int score = player.getKills() * 100 + player.getMissionComplete()*50;
+      inGameService.addPlayerScore(player.getUserId(), score);
     }
   }
 
