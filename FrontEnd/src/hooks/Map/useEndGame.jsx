@@ -16,6 +16,7 @@ const useEndGame = () => {
     "gamePlayTime",
     "gameStatus",
     "isAlive",
+    "bullet",
   ];
 
   const endGame = data => {
