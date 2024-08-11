@@ -18,6 +18,10 @@ const useCatchTarget = () => {
       });
       if (response.status === 200) {
         alert("Target caught successfully!");
+
+        (async () => {
+          await axiosInstance.get(`/in-game/init/${gameRoomId}`);
+        })();
       }
     } catch (error) {
       console.log(error);
