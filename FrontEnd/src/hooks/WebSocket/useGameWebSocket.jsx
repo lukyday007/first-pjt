@@ -5,8 +5,14 @@ import useEndGame from "@/hooks/Map/useEndGame";
 import { GameContext } from "@/context/GameContext";
 
 const useGameWebSocket = () => {
-  const { areaRadius, setGameStatus, setTargetId, setIsAlive, username } =
-    useContext(GameContext);
+  const {
+    areaRadius,
+    setGameStatus,
+    setTargetId,
+    setIsAlive,
+    setCountPlayer,
+    username,
+  } = useContext(GameContext);
   const { endGame } = useEndGame();
   const { gameRoomId, setAreaRadius } = useContext(GameContext);
   const stompClient = useRef(null);
@@ -83,7 +89,9 @@ const useGameWebSocket = () => {
         const data = msg.data;
         endGame(data);
         break;
-      case "player":
+      case "playerCount":
+        const count = parseInt(msg.count, 10);
+        setCountPlayer(count);
         break;
       default:
         break;
