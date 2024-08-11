@@ -60,10 +60,13 @@ const useStartGame = () => {
   };
 
   const fetch = async () => {
+    console.log("fetch 함수 호출됨");
     try {
       const response = await axiosInstance.get(`/in-game/init/${gameRoomId}`);
+      console.log(`response.status: ${response.status}`);
 
       if (response.status == 200) {
+        console.log("데이터 정상 수신");
         const metadata = response.data;
         console.log(`metadata: ${metadata}`);
 
@@ -95,8 +98,9 @@ const useStartGame = () => {
       } else {
         alert(`요청 수신 중 문제가 발생했습니다: ${response.status}`);
       }
-    } catch {
+    } catch (error) {
       alert("요청을 보내는 중 문제가 발생했습니다.");
+      console.log(error);
     }
   };
 
