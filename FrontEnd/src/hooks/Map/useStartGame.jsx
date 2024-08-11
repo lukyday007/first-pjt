@@ -70,6 +70,8 @@ const useStartGame = () => {
               setTimeUntilStart(0);
               setGameStatus(true); // 대기 시간이 끝나면 게임 상태 변경
               setIsAlive(true);
+              sessionStorage.setItem("gameStatus", true);
+              sessionStorage.setItem("isAlive", true);
             } else {
               setTimeUntilStart(updatedTimeUntilStart);
             }

@@ -19,15 +19,17 @@ const useTimer = () => {
 
   useEffect(() => {
     if (remainingTime == 0) {
-      // 주어진 시간을 모두 소진 시 사망 처리 및 axios
+      // 타이머 종료로 인한 사망 처리
+      setIsAlive(false);
+      sessionStorage.setItem("isAlive", false);
+
+      // axios
       (async () => {
         try {
           await axiosInstance.patch(
             `/participants/${gameRoomId}/${username}/die`
           );
-          // 타이머 종료로 인한 사망 후 처리 부분 입력
-          setIsAlive(false);
-          sessionStorage.setItem("isAlive", false);
+          console.log(`Timeout: Play ${username}`);
         } catch {
           // axios 요청 실패 시 부분 입력
           console.error("Failed to send death status");
