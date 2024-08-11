@@ -17,7 +17,6 @@ import {
   CarouselItem,
 } from "@/components/ui/Carousel.jsx";
 import { Button } from "@/components/ui/Button";
-import GiveUpButton from "@/components/GiveUpGameButton";
 import GameRuleDialog from "@/components/GameRuleDialog";
 
 import catchButton from "@/assets/gameplay-icon/catch-button.png";
@@ -53,7 +52,6 @@ const GamePlay = () => {
   };
 
   useEffect(() => {
-    console.log(1234)
     connect();
     fetch();
 
