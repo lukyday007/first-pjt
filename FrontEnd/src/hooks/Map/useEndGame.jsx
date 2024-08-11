@@ -16,6 +16,7 @@ const useEndGame = () => {
     "gamePlayTime",
     "gameStatus",
     "isAlive",
+    "countPlayer",
     "bullet",
   ];
 
