@@ -14,7 +14,7 @@ const approximateDistance = (lat1, lng1, lat2, lng2) => {
   const x = dLng * Math.cos(avgLatRad);
   const distance = Math.sqrt(dLat * dLat + x * x) * R;
 
-  return distance.toFixed(1); // 거리의 소수점 이하 1자리까지, 미터 단위
+  return parseFloat(distance.toFixed(1)); // 거리의 소수점 이하 1자리까지, 미터 단위
 };
 
 export const GameContext = createContext();
@@ -67,10 +67,6 @@ export const GameProvider = ({ children }) => {
   const myLocationRef = useRef(myLocation);
   const targetLocationRef = useRef(targetLocation);
   const areaCenterRef = useRef(areaCenter);
-
-  useEffect(() => {
-    myLocationRef.current = myLocation;
-  }, [myLocation]);
 
   useEffect(() => {
     targetLocationRef.current = targetLocation;

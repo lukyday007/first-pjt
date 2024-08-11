@@ -26,14 +26,20 @@ const useKakaoMap = () => {
 
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
+      // 지도 초기화
       const options = {
         center: new kakao.maps.LatLng(areaCenter.lat, areaCenter.lng),
         level: 1,
       };
       const mapInstance = new kakao.maps.Map(mapRef.current, options);
       mapInstanceRef.current = mapInstance;
+    } else if (mapInstanceRef.current) {
+      // 지도 중심 업데이트
+      mapInstanceRef.current.setCenter(
+        new kakao.maps.LatLng(areaCenter.lat, areaCenter.lng)
+      );
     }
-  }, [gameStatus, areaCenter]);
+  }, [areaCenter]);
 
   useCircleWithOverlay(mapInstanceRef.current); // 플레이 영역을 표시
   useMarker(mapInstanceRef.current); // 내 위치를 실시간으로 마커 표시
