@@ -76,14 +76,15 @@ public class ParticipantRepositoryImpl {
   public List<EndGameUserInfoResponse> getEndGamePlayersInfo(Long roomId) {
     return queryFactory
             .select(new QEndGameUserInfoResponse(
-                    user.username,
+                    participants.user.username,
                     participants.missionComplete,
-                    participants.kills
+                    participants.kills,
+                    participants.score
             ))
             .from(participants)
             .join(participants.user, user)
             .where(participants.gameRoom.id.eq(roomId))
-            .orderBy(participants.kills.desc(), participants.missionComplete.desc())
+            .orderBy(participants.score.desc())
             .fetch();
   }
 
@@ -98,11 +99,10 @@ public class ParticipantRepositoryImpl {
             .fetch();
   }
 
-  public void addUserScoreByUsername(Long userId, int scoreToAdd) {
-    queryFactory
-          .update(user)
-          .set(user.scores, user.scores.add(scoreToAdd))  // 현재 점수에 새로운 점수를 더함
-          .where(user.userId.eq(userId))
-          .execute();
+  public void updateUserScore(Long userId, int score) {
+    queryFactory.update(participants)
+            .set(participants.score, score)
+            .where(participants.user.userId.eq(userId))
+            .execute();
   }
 }

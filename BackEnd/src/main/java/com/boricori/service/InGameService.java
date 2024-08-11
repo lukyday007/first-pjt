@@ -1,13 +1,11 @@
 package com.boricori.service;
 
-import com.boricori.dto.request.inGame.MissionChangeRequest;
-import com.boricori.dto.request.inGame.UpdatePlayerScoreRequest;
-import com.boricori.dto.request.inGame.UseItemRequest;
-import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
+import com.boricori.dto.GameResult;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.entity.User;
+
 import java.util.List;
 
 public interface InGameService {
@@ -30,10 +28,6 @@ public interface InGameService {
 
   List<Item> getItems(GameParticipants player);
 
-  GameParticipants getUserInfo(Long gameId, String username);
-
-  List<EndGameUserInfoResponse> getEndGamePlayersInfo(Long gameId);
-
   void stopPlaying(String username, String roomId);
 
   void rejoin(String username, String roomId);
@@ -42,7 +36,12 @@ public interface InGameService {
 
   Mission getMissionById(long missionId);
 
-  List<UpdatePlayerScoreRequest> getGamePlayerInfo(long gameId);
+  void addGamePlayerScore(long gameId);
 
-  void addPlayerScore(Long userId, int score);
+  GameResult finishGameAndHandleLastTwoPlayers(long gameId);
+
+  void finishGame(long gameId);
+
+  // redis expired = 4 일 때, 타임아웃 종료
+  GameResult gameTimeout(long gameId);
 }
