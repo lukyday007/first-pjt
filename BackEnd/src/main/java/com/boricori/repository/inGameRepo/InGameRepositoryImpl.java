@@ -4,13 +4,10 @@ import com.boricori.dto.ItemCount;
 import com.boricori.dto.QItemCount;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.InGameItems;
-import com.boricori.entity.InGameMissions;
-import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.entity.QInGameItems;
 import com.boricori.entity.QInGameMissions;
 import com.boricori.entity.QMission;
-import com.boricori.entity.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -58,15 +55,14 @@ public class InGameRepositoryImpl {
   }
 
   public List<ItemCount> getPlayersItems(GameParticipants user) {
-//    return jpaQueryFactory
-//        .select(new QItemCount(
-//            ig_items.item.id,
-//            ig_items.count
-//        ))
-//        .from(ig_items)
-//        .where(ig_items.user.id.eq(user.getId()))
-//        .fetch();
-    return null;
+    return jpaQueryFactory
+        .select(new QItemCount(
+            ig_items.item.id,
+            ig_items.count
+        ))
+        .from(ig_items)
+        .where(ig_items.user.id.eq(user.getId()))
+        .fetch();
   }
 
   public List<Mission> getMissions(GameParticipants player) {
@@ -78,6 +74,6 @@ public class InGameRepositoryImpl {
   }
 
   public void addItems(GameParticipants participant, InGameItems igItem) {
-//    jpaQueryFactory.update(ig_items).set(ig_items.count, ig_items.count + igItem.getCount()).where(ig_items.user.id.eq(participant.getId())).execute();
+    jpaQueryFactory.update(ig_items).set(ig_items.count, ig_items.count.add(igItem.getCount())).where(ig_items.user.id.eq(participant.getId())).execute();
   }
 }

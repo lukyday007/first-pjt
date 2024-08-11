@@ -8,10 +8,10 @@ public class ItemCount {
 
   Long itemId;
 
-  long count;
+  int count;
 
   @QueryProjection
-  public ItemCount(Long itemId, long count) {
+  public ItemCount(Long itemId, int count) {
     this.itemId = itemId;
     this.count = count;
   }
