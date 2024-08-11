@@ -148,20 +148,42 @@ public class InGameServiceImpl implements InGameService{
 
   @Override
   public void addGamePlayerScore(long gameId) {
-    List<UpdatePlayerScoreRequest> gamePlayersInfo = participantRepository.getByPlayersInfo(gameId);
+    List<String> users = gameManager.EndGameUserInfo(gameId);
+    UpdatePlayerScoreRequest userA = participantRepository.getTwoUserInfo(users.get(0), gameId);
+    UpdatePlayerScoreRequest userB = participantRepository.getTwoUserInfo(users.get(1), gameId);
 
+    List<UpdatePlayerScoreRequest> gamePlayersInfo = participantRepository.getByPlayersInfo(gameId,userA.getUserId(),userB.getUserId());
+    if(calculateTwoPlayer(userA, userB)){
+      gamePlayersInfo.add(0, userA);
+      gamePlayersInfo.add(1, userB);
+    }else{
+      gamePlayersInfo.add(0, userB);
+      gamePlayersInfo.add(1, userA);
+    }
+
+    updatePlayersScore(gamePlayersInfo);
+  }
+
+  private boolean calculateTwoPlayer(UpdatePlayerScoreRequest userA, UpdatePlayerScoreRequest userB) {
+    int sumA = userA.getKills()*100 + userA.getMissionComplete()*50;
+    int sumB = userB.getKills()*100 + userB.getMissionComplete()*50;
+    return sumA >= sumB;
+  }
+
+  private void updatePlayersScore(List<UpdatePlayerScoreRequest> gamePlayersInfo) {
     // 첫 번째 플레이어의 정보 (최고 득점자)
     UpdatePlayerScoreRequest firstPlayer = gamePlayersInfo.get(0);
 
-    for (UpdatePlayerScoreRequest player : gamePlayersInfo) {
+    for (int i = 0; i < gamePlayersInfo.size(); i++) {
+      UpdatePlayerScoreRequest player = gamePlayersInfo.get(i);
       int score = calculatePlayerScore(player);
 
-      // 1등 보너스 추가, 무승부
-      if (isFirstPlace(player, firstPlayer, gamePlayersInfo.indexOf(player))) {
+      // 1등 보너스 또는 무승부 처리
+      if (i == 0 || (i ==1 && isCompareDraw(player, firstPlayer)) ) {
         score += 2000;
+      } else if (i == 1) { // 2등 보너스
+        score += 1000;
       }
-
-      // 점수 업데이트
       userRepository.addUserScore(player.getUserId(), score);
       participantRepository.updateUserScore(player.getUserId(), score);
     }
@@ -172,15 +194,10 @@ public class InGameServiceImpl implements InGameService{
     return player.getKills() * 100 + player.getMissionComplete() * 50;
   }
 
-  private boolean isFirstPlace(UpdatePlayerScoreRequest player, UpdatePlayerScoreRequest firstPlayer, int index) {
-    if (index == 0 && firstPlayer != null) {
-      return true; // 첫 번째 플레이어
-    } else if (index == 1) {
+  private boolean isCompareDraw(UpdatePlayerScoreRequest player, UpdatePlayerScoreRequest firstPlayer) {
       // 2번째 플레이어가 1등과 동점인지 확인
       return player.getKills() == firstPlayer.getKills() &&
               player.getMissionComplete() == firstPlayer.getMissionComplete();
-    }
-    return false;
   }
 
   @Override

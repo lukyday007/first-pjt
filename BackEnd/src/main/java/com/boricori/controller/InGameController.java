@@ -128,6 +128,7 @@ public class InGameController {
     inGameService.catchTarget(user, targetNode.data, gameId);
 
     if (gameManager.isLastTwo(gameId)) {
+      inGameService.addGamePlayerScore(gameId);
       GameResult res = inGameService.finishGameAndHandleLastTwoPlayers(gameId);
       messageService.endGameScore(res);
     }

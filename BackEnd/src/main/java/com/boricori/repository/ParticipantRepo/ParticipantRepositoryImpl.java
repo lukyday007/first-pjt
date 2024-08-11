@@ -88,16 +88,30 @@ public class ParticipantRepositoryImpl {
             .fetch();
   }
 
-  public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId){
+  public List<UpdatePlayerScoreRequest> getByPlayersInfo(Long roomId, Long userA, Long userB){
     return queryFactory
             .select(new QUpdatePlayerScoreRequest(
                     participants.user.userId,
                     participants.missionComplete,
                     participants.kills))
             .from(participants)
-            .where(participants.gameRoom.id.eq(roomId))
+            .where(participants.gameRoom.id.eq(roomId)
+                    .and(participants.user.userId.ne(userA))
+                    .and(participants.user.userId.ne(userB)))
             .orderBy(participants.kills.desc(), participants.missionComplete.desc())
             .fetch();
+  }
+
+  public UpdatePlayerScoreRequest getTwoUserInfo(String username, Long roomId){
+    return queryFactory
+            .select(new QUpdatePlayerScoreRequest(
+                    participants.user.userId,
+                    participants.missionComplete,
+                    participants.kills))
+            .from(participants)
+            .where(participants.user.username.eq(username)
+                    .and(participants.gameRoom.id.eq(roomId)))
+            .fetchOne();
   }
 
   public void updateUserScore(Long userId, int score) {
