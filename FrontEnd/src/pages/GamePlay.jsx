@@ -23,6 +23,7 @@ import catchButton from "@/assets/gameplay-icon/catch-button.png";
 import camchattingIcon from "@assets/material-icon/camchatting-icon.svg";
 import itemIcon from "@assets/material-icon/item-icon.svg";
 import giveUpIcon from "@/assets/material-icon/giveup-icon.svg";
+import bulletImage from "@/assets/bullet.png";
 
 //====================================================================
 
@@ -51,14 +52,14 @@ const GamePlay = () => {
     setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
   };
 
-  useEffect(() => {
-    connect();
-    fetch();
+  // useEffect(() => {
+  //   connect();
+  //   fetch();
 
-    return () => {
-      disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (gameStatus) {
@@ -345,12 +346,26 @@ const GamePlay = () => {
         <>
           <MapComponent />
           <div className="item-center flex justify-center">
-            <img
-              src={catchButton}
-              alt="catch-button"
-              onClick={handleCatchTarget}
-              className={`mr-4 h-[28vh] w-[28vh] ${isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-40"}`}
-            />
+            <div
+              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-30"}`}
+            >
+              <img
+                src={catchButton}
+                alt="catch-button"
+                onClick={handleCatchTarget}
+                className="absolute z-20 mr-4 h-[28vh] w-[28vh]"
+              />
+              <div className="absolute bottom-4 left-4 z-30 flex h-12 w-20 items-center justify-center rounded-xl bg-indigo-100">
+                <img src={bulletImage} alt="bullet" className="mr-2 h-8 w-8" />
+                <span className="text-3xl font-bold text-black"> 8</span>
+              </div>
+              {isAbleToCatchTarget && (
+                <div
+                  id="catch-pulse"
+                  className="absolute bottom-[3vh] left-[3vh] z-10 h-[21vh] w-[21vh] animate-ping rounded-full bg-amber-200"
+                />
+              )}
+            </div>
             <div id="mini-buttons" className="flex flex-col">
               <Button className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black">
                 <img src={itemIcon} alt="item" />
