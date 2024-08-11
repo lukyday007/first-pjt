@@ -5,7 +5,6 @@ import axiosInstance from "@/api/axiosInstance.js";
 // Room.jsx에서 시작 프로세스 관리
 const useReadyGame = () => {
   const { gameRoomId } = useContext(GameContext);
-  const [error, setError] = useState("");
 
   const handleStartGame = async () => {
     if (!navigator.geolocation) {
@@ -24,7 +23,7 @@ const useReadyGame = () => {
         try {
           await axiosInstance.post(`/gameroom/${gameRoomId}/start`, posToStart);
         } catch (err) {
-          setError(
+          alert(
             "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
           );
         }
@@ -34,7 +33,7 @@ const useReadyGame = () => {
   };
 
   // setIsLoading은 useRoomWebSocket.jsx에서 사용
-  return { handleStartGame, error };
+  return { handleStartGame };
 };
 
 export default useReadyGame;
