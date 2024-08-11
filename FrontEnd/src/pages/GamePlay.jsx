@@ -10,6 +10,7 @@ import useStartGame from "@/hooks/Map/useStartGame";
 import useSendGPS from "@/hooks/Map/useSendGPS";
 import GameTime from "@/components/GameTime";
 import useCatchTarget from "@/hooks/Map/useCatchTarget";
+import useBullet from "@/hooks/Map/useBullet";
 
 import {
   Carousel,
@@ -42,8 +43,9 @@ const GamePlay = () => {
   const { gameStatus } = useContext(GameContext);
   const { fetch, timeUntilStart } = useStartGame();
   const { startSendingGPS } = useSendGPS();
-  const { isAbleToCatchTarget, handleCatchTarget } = useCatchTarget();
+  const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
+  const { bullet, isCooldown, shootBullet } = useBullet();
 
   const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -347,19 +349,22 @@ const GamePlay = () => {
           <MapComponent />
           <div className="item-center flex justify-center">
             <div
-              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-30"}`}
+              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-30"}`}
             >
               <img
                 src={catchButton}
                 alt="catch-button"
-                onClick={handleCatchTarget}
+                onClick={() => {
+                  shootBullet();
+                  handleOnClickCatchTarget();
+                }}
                 className="absolute z-20 mr-4 h-[28vh] w-[28vh]"
               />
-              <div className="absolute bottom-4 left-4 z-30 flex h-12 w-20 items-center justify-center rounded-xl bg-indigo-100">
+              <div className="absolute bottom-4 left-4 z-30 flex h-12 w-20 items-center justify-center rounded-xl bg-sky-100">
                 <img src={bulletImage} alt="bullet" className="mr-2 h-8 w-8" />
-                <span className="text-3xl font-bold text-black"> 8</span>
+                <span className="text-3xl font-bold text-black">{bullet}</span>
               </div>
-              {isAbleToCatchTarget && (
+              {bullet > 0 && !isCooldown && isAbleToCatchTarget && (
                 <div
                   id="catch-pulse"
                   className="absolute bottom-[3vh] left-[3vh] z-10 h-[21vh] w-[21vh] animate-ping rounded-full bg-amber-200"
