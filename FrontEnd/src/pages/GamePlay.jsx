@@ -33,6 +33,7 @@ import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production" ? "" : "http://localhost:8080/";
 
+let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
   const { gameStatus } = useContext(GameContext);
@@ -100,6 +101,14 @@ const GamePlay = () => {
       console.log("====> subscribers : ", subscribers)
     }
   };
+
+  const handleButtonClick = async () => {
+    
+    console.log("you clicked ", count, " times!" )
+
+    count ++;
+  }
+
 
   const leaveSession = () => {
     if (session) {
@@ -309,7 +318,12 @@ const GamePlay = () => {
         </div>
       )}
 
-      <GameHeader />
+      {/* publisher 의 카메라 인자 전달 */}
+      <GameHeader 
+        publisher={publisher}
+        handleMainVideoStream={handleMainVideoStream}
+      />
+      
       <div className="flex items-center justify-center">
         <div id="game-rule-dialog" className="m-4">
           <Button
@@ -365,7 +379,19 @@ const GamePlay = () => {
                     }
                   </CarouselContent>
                 </Carousel>
-                
+                <div>
+                  {subscribers.map((subscriber, idx) => {
+                    const clientData = JSON.parse(subscriber.stream.connection.data).clientData;
+                    return (
+                      <Button 
+                        key={idx}
+                        onClick={handleButtonClick}
+                      >
+                        {clientData}
+                      </Button>
+                    );
+                  })}        
+                  </div>
               </div>
             ) : null}
           </div>
