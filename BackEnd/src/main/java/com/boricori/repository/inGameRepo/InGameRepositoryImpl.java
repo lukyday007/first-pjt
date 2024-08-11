@@ -1,5 +1,7 @@
 package com.boricori.repository.inGameRepo;
 
+import com.boricori.dto.ItemCount;
+import com.boricori.dto.QItemCount;
 import com.boricori.entity.GameParticipants;
 import com.boricori.entity.InGameItems;
 import com.boricori.entity.InGameMissions;
@@ -31,34 +33,40 @@ public class InGameRepositoryImpl {
   public void updateMission(Long missionId, GameParticipants player) {
     jpaQueryFactory
         .update(ig_missions)
-        .where(ig_missions.user.eq(player).and(ig_missions.missionId.id.eq(missionId)))
         .set(ig_missions.done, true)
+        .where(ig_missions.user.id.eq(player.getId()).and(ig_missions.missionId.id.eq(missionId)))
         .execute();
   }
 
 
-  public void useItem(GameParticipants player, Long itemId) {
-    jpaQueryFactory
-        .update(ig_items)
-        .set(ig_items.used, true)
-        .where(ig_items.user.id.eq(player.getId()).and(ig_items.item.id.eq(itemId)))
-        .execute();
-  }
-
-  public List<Mission> getUserMissions(User user){
+  public InGameItems getActivatedItem(GameParticipants player, Long itemId) {
     return jpaQueryFactory
-        .select(ig_missions.missionId)
-        .from(ig_missions)
-        .where(ig_missions.user.id.eq(user.getUserId()).and(ig_missions.done.eq(false)))
-        .fetch();
-  }
-
-  public List<Item> getUserItems(User user){
-    return jpaQueryFactory
-        .select(ig_items.item)
+        .select(ig_items)
         .from(ig_items)
-        .where(ig_items.user.id.eq(user.getUserId()).and(ig_items.used.eq(false)))
+        .where(ig_items.user.id.eq(player.getId())
+            .and(ig_items.item.id.eq(itemId)))
+        .fetchOne();
+  }
+
+
+  public List<InGameItems> targetItemsCount(GameParticipants target){
+    return jpaQueryFactory
+        .select(ig_items)
+        .from(ig_items)
+        .where(ig_items.user.id.eq(target.getId()))
         .fetch();
+  }
+
+  public List<ItemCount> getPlayersItems(GameParticipants user) {
+//    return jpaQueryFactory
+//        .select(new QItemCount(
+//            ig_items.item.id,
+//            ig_items.count
+//        ))
+//        .from(ig_items)
+//        .where(ig_items.user.id.eq(user.getId()))
+//        .fetch();
+    return null;
   }
 
   public List<Mission> getMissions(GameParticipants player) {
@@ -69,11 +77,7 @@ public class InGameRepositoryImpl {
         .fetch();
   }
 
-  public List<Item> getItems(GameParticipants player) {
-    return jpaQueryFactory
-        .select(ig_items.item)
-        .from(ig_items)
-        .where(ig_items.user.id.eq(player.getId()))
-        .fetch();
+  public void addItems(GameParticipants participant, InGameItems igItem) {
+//    jpaQueryFactory.update(ig_items).set(ig_items.count, ig_items.count + igItem.getCount()).where(ig_items.user.id.eq(participant.getId())).execute();
   }
 }

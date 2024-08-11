@@ -1,5 +1,6 @@
 package com.boricori.controller;
 
+import com.boricori.dto.ItemCount;
 import com.boricori.dto.request.gameroom.EndGameRoomRequest;
 import com.boricori.dto.request.inGame.InGameRequest;
 import com.boricori.dto.request.inGame.MissionChangeRequest;
@@ -71,7 +72,6 @@ public class InGameController {
   @Autowired
   private ImageService imageService;
 
-  @Transactional
   @PostMapping("/changeMission")
   public ResponseEntity<MissionResponse> changeMission(@RequestBody MissionChangeRequest request){
     String username = request.getUsername();
@@ -113,8 +113,8 @@ public class InGameController {
         success = imageService.checkColours(file, mission);
       }
       if (success){
-        inGameService.completeMission(gameId, username, missionId);
-        Item item = inGameService.getItem(gameId, username);
+        GameParticipants player = inGameService.completeMission(gameId, username, missionId);
+        Item item = inGameService.getItem(player);
         return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(ItemResponse.of(item));
       }
       return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
@@ -123,18 +123,26 @@ public class InGameController {
     }
   }
 
-  @Transactional
   @PostMapping("/useItem")
+  // item_id = 1이면 추격자한테 메시지 (blockGPS)
+  // item_id = 2이면 추격자한테 ws메시지 보내기 (blockScreen)
+  // item_id = 3이면 전부 프론트에서 처리
+  // 모든 경우 백에서 사용 DB 저장
   public void useItem(@RequestBody UseItemRequest request){
     String username = request.getUsername();
     long gameId = request.getGameId();
     long itemId = request.getItemId();
     inGameService.useItem(gameId, username, itemId);
+    if (itemId == 1 || itemId == 2){
+      Node<User> hunter = gameManager.getHunter(gameId, username);
+      String effect = itemId == 1 ? "blockGPS" : "blockScreen";
+      messageService.useItem(gameId, hunter.data.getUsername(), effect);
+    }
   }
 
   @Transactional
   @PostMapping("/catchTarget")
-  public void catchTarget(@RequestBody InGameRequest request) {
+  public ResponseEntity<String> catchTarget(@RequestBody InGameRequest request) {
     try {
       String username = request.getUsername();
       long gameId = request.getGameId();
@@ -147,9 +155,12 @@ public class InGameController {
 
       if (gameManager.isLastTwo(gameId)) {
         handleLastTwoPlayers(gameId);
+        return ResponseEntity.status(ResponseEnum.REDIRECT.getCode()).body("게임 종료");
+      }else {
+        return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("잡았습니다.");
       }
-    } catch (JsonProcessingException e) {
-      e.printStackTrace(); // 예외 처리 (필요한 경우 로그로 대체 가능)
+    } catch (Exception e) {
+      return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body("알 수 없는 오류");
     }
   }
 
@@ -198,21 +209,17 @@ public class InGameController {
         return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(data);
       }
       // 플레이어가 살아있는 상태. 게임 시작전일수도, 진행중일 수도 있음
-      User target = gameManager.getByUsername(gameId, username).next.data;
+      User target = gameManager.getTarget(gameId, username).data;
       List<Mission> playerMissions = inGameService.getMissions(player);
-      List<ItemResponse> myItems = new ArrayList<>();
       List<MissionResponse> myMissions = new ArrayList<>();
+      List<ItemCount> myItems = null;
 
       if (playerMissions == null || playerMissions.isEmpty()){
         // 게임 시작 전 초기 설정 단계
         playerMissions = inGameService.assignMissions(username, gameId);
       }else {
         // 게임 진행 중이고, 플레이어가 재접속한 상황
-        List<Item> playerItems = inGameService.getItems(player);
-        for (Item i : playerItems) {
-          ItemResponse newI = ItemResponse.of(i);
-          myItems.add(newI);
-        }
+        myItems = inGameService.getPlayerItems(player);
       }
       for (Mission m : playerMissions){
         MissionResponse newM = MissionResponse.of(m);
@@ -220,7 +227,8 @@ public class InGameController {
       }
       return ResponseEntity.status(ResponseEnum.SUCCESS.getCode())
           .body(InitResponse.builder().status("alive").gameInfo(GameInfo.of(game))
-              .targetName(target.getUsername()).myMissions(myMissions).myItems(myItems).build());
+              .targetName(target.getUsername()).myMissions(myMissions).myItems(myItems).bullets(
+                  player.getBullets()).build());
 
     }catch (NotAPlayerException e){
       return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);

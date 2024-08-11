@@ -1,9 +1,9 @@
 package com.boricori.service;
 
-import com.boricori.dto.request.inGame.MissionChangeRequest;
-import com.boricori.dto.request.inGame.UseItemRequest;
+import com.boricori.dto.ItemCount;
 import com.boricori.dto.response.inGame.EndGameUserInfoResponse;
 import com.boricori.entity.GameParticipants;
+import com.boricori.entity.InGameItems;
 import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.entity.User;
@@ -15,9 +15,9 @@ public interface InGameService {
 
   Mission changeMission(Long gameId, String username, long missionId);
 
-  void completeMission(Long roomId, String username, long missionId);
+  GameParticipants completeMission(Long roomId, String username, long missionId);
 
-  Item getItem(Long gameId, String username);
+  Item getItem(GameParticipants player);
 
   void useItem(Long roomId, String username, long itemId);
 
@@ -27,7 +27,7 @@ public interface InGameService {
 
   List<Mission> getMissions(GameParticipants player);
 
-  List<Item> getItems(GameParticipants player);
+  List<ItemCount> getPlayerItems(GameParticipants player);
 
   GameParticipants getUserInfo(Long gameId, String username);
 

@@ -19,25 +19,22 @@ public class MessageService {
 
   private final GameManager gameManager = GameManager.getGameManager();
 
-  private final ObjectMapper mapper = new ObjectMapper();
-
-
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   public MessageService(SimpMessagingTemplate messagingTemplate) {
     this.messagingTemplate = messagingTemplate;
   }
 
-
   public void readyGame(Long gameRoomId, GameRoom gameRoom){
     messagingTemplate.convertAndSend(String.format("/topic/waiting/%d", gameRoomId),"{\"msgType\":\"ready\"}");
   }
 
-  public void processAlertMessage(String gameId, String alertJSON) {
-    messagingTemplate.convertAndSend(String.format("/topic/play/%s", gameId), alertJSON);
-  }
-
   public void startGame(Long id) {
     messagingTemplate.convertAndSend(String.format("/topic/waiting/%d", id), "{\"msgType\":\"start\"}");
+  }
+
+  public void processAlertMessage(String gameId, String alertJSON) {
+    messagingTemplate.convertAndSend(String.format("/topic/play/%s", gameId), alertJSON);
   }
 
   public void changeTarget(String username, String newTarget, long gameId){
@@ -53,6 +50,11 @@ public class MessageService {
   public void endGameScore(long gameId, String winner, List<EndGameUserInfoResponse> usersInfo) throws JsonProcessingException {
     String rankJson = mapper.writeValueAsString(usersInfo);
     String jsonPayload = String.format("{\"msgType\":\"end\", \"winner\":\"%s\", \"rank\":\"%s\"}", winner);
-    messagingTemplate.convertAndSend(String.format("/topic/room/%d", gameId), jsonPayload);
+    messagingTemplate.convertAndSend(String.format("/topic/play/%d", gameId), jsonPayload);
+  }
+
+  public void useItem(long gameId, String username, String effect) {
+    String jsonPayload = String.format("{\"msgType\":\"useItem\", \"username\":\"%s\", \"effect\":\"%s\"}", username, effect);
+    messagingTemplate.convertAndSend(String.format("/topic/play/%d", gameId), jsonPayload);
   }
 }
