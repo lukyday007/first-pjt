@@ -2,7 +2,6 @@ import { useState, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
 import useBullet from "@/hooks/Map/useBullet";
 import axiosInstance from "@/api/axiosInstance";
-import { meta } from "eslint-plugin-prettier";
 
 // GamePlay.jsx에서 시작 프로세스 관리
 const useStartGame = () => {
