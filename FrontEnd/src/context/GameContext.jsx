@@ -57,6 +57,7 @@ export const GameProvider = ({ children }) => {
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
   const [missionList, setMissionList] = useState([
     { id: 1, name: "미션 이름", description: "미션 내용" }, // 임시 데이터
+    { id: 2, name: "ddd", description: "hahaha"},
   ]); // 미션 목록
   const [itemList, setItemList] = useState([]);
   const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
@@ -86,7 +87,7 @@ export const GameProvider = ({ children }) => {
     };
 
     setMyLocation(newLocation);
-    myLocationRef.current = newLocation;
+    // myLocationRef.current = newLocation;
 
     if (areaCenterRef.current) {
       const myDist = approximateDistance(
