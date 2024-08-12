@@ -5,6 +5,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+application-jwt.properties
+application-db.properties
+application-api.properties
+application-kafka.properties
+
 ### STS ###
 .apt_generated
 .classpath
