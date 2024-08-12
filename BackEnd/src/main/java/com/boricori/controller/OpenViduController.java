@@ -23,7 +23,7 @@ import io.openvidu.java.client.Session;
 import io.openvidu.java.client.SessionProperties;
 
 
-@RequestMapping("vidu")
+@RequestMapping("/vidu")
 @RestController
 public class OpenViduController {
 
