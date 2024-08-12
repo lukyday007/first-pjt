@@ -57,7 +57,7 @@ const GameHeader = ({ publisher, handleMainVideoStream }) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-80">
-          {missions.map((mission) => (
+          {missionList.map((mission) => (
             <Popover.Root
               key={mission.id}
               open={openCamera === mission.id}
