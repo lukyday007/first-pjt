@@ -270,9 +270,31 @@ const GamePlay = () => {
     return await createToken(sessionId);
   };
 
+  // const createSession = async sessionId => {
+  //   const response = await axios.post(
+  //     APPLICATION_SERVER_URL + "/sessions",
+  //     { customSessionId: sessionId },
+  //     {
+  //       headers: { "Content-Type": "application/json" },
+  //     }
+  //   );
+  //   return response.data; // The sessionId
+  // };
+
+  // const createToken = async sessionId => {
+  //   const response = await axios.post(
+  //     APPLICATION_SERVER_URL + "/sessions/" + sessionId + "/connections",
+  //     {},
+  //     {
+  //       headers: { "Content-Type": "application/json" },
+  //     }
+  //   );
+  //   return response.data; // The token
+  // };
+
   const createSession = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/sessions",
+      APPLICATION_SERVER_URL + "api/sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -283,7 +305,7 @@ const GamePlay = () => {
 
   const createToken = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },
@@ -291,6 +313,7 @@ const GamePlay = () => {
     );
     return response.data; // The token
   };
+
 
   return (
     <>
