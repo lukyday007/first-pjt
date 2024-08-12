@@ -27,6 +27,8 @@ const useGameWebSocket = () => {
 
   const connect = () => {
     // WebSocket 연결 생성
+    console.log("test")
+    console.log(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
 
