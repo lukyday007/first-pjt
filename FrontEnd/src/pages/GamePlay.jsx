@@ -33,17 +33,16 @@ import { OpenVidu } from "openvidu-browser";
 import UserVideoComponent from "@/hooks/WebRTC/UserVideoComponent";
 import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
+import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://i11b205.p.ssafy.io/api"
-    : "http://localhost:8080/";
+  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/";
 
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
   const { gameStatus } = useContext(GameContext);
-  const { fetch, timeUntilStart } = useStartGame();
+  const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
@@ -59,6 +58,8 @@ const GamePlay = () => {
   useEffect(() => {
     connect();
     fetch();
+    checkItemEffect();
+
 
     return () => {
       disconnect();
@@ -140,25 +141,6 @@ const GamePlay = () => {
     OV.checkSystemRequirements = function () {
       return true;
     };
-
-    // const newSession = OV.initSession(paramGameRoomId);
-
-    // let newSession;
-
-    // const OVSessionIdStored = localStorage.getItem("OVSessionID");
-    // console.log("OVID:", OVSessionIdStored);
-
-    // if (OVSessionIdStored && OVSessionIdStored != "undefined") {
-    //   // OVSessionIdStored가 null 또는 빈 문자열이 아닌 경우 기존 세션을 사용
-    //   console.log("기존 세션을 사용합니다.");
-    //   newSession = OV.initSession(OVSessionIdStored);
-    // } else {
-    //   // OVSessionIdStored가 null 또는 빈 문자열일 때 새로운 세션을 생성
-    //   console.log("OV Session 재생성");
-    //   newSession = OV.initSession();
-    //   console.log("newSession", newSession.options);
-    //   localStorage.setItem("OVSessionID", newSession.sessionId);
-    // }
 
     const newSession = OV.initSession();
 
@@ -293,7 +275,7 @@ const GamePlay = () => {
 
   const createSession = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions",
+      APPLICATION_SERVER_URL + "/cam/sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -304,7 +286,7 @@ const GamePlay = () => {
 
   const createToken = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "/cam/sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },

@@ -14,6 +14,8 @@ const useStartGame = () => {
     setIsAlive,
     setMissionList,
     setItemList,
+    setBlockScreen,
+    setBlockGPS
   } = useContext(GameContext);
   const { getBullet } = useBullet();
   const [timeUntilStart, setTimeUntilStart] = useState(null);
@@ -26,10 +28,13 @@ const useStartGame = () => {
 
   // 게임 시작 시간 처리 함수 별도 분리
   const handleStartGameTime = newStartTime => {
-    const startTime = new Date(newStartTime).getTime();
-    const currentTime = new Date().getTime() - (9 * 60 * 60 * 1000);
-    const initialTimeUntilStart = startTime - currentTime; // 게임 시작까지 남은 시간, ms 단위
-    console.log(`startTime: ${startTime}`);
+    const startTimeValue =
+      new Date(newStartTime).getTime() + 9 * 60 * 60 * 1000;
+    sessionStorage.setItem("startTime", startTimeValue);
+
+    const currentTime = new Date().getTime();
+    const initialTimeUntilStart = startTimeValue - currentTime; // 게임 시작까지 남은 시간, ms 단위
+    console.log(`startTime: ${startTimeValue}`);
     console.log(`currentTime: ${currentTime}`);
     console.log(`initialTimeUntilStart: ${initialTimeUntilStart}`);
     setTimeUntilStart(initialTimeUntilStart);
@@ -37,7 +42,7 @@ const useStartGame = () => {
     // 대기 시간 동안 1초마다 남은 시간 계산
     if (initialTimeUntilStart > 0) {
       const intervalId = setInterval(() => {
-        const updatedTimeUntilStart = startTime - new Date().getTime();
+        const updatedTimeUntilStart = startTimeValue - new Date().getTime();
 
         // 대기 시간이 끝났다면
         if (updatedTimeUntilStart <= 0) {
@@ -77,7 +82,11 @@ const useStartGame = () => {
           lng: parseFloat(metadata.gameInfo.centerLng).toFixed(5),
         };
         const newTargetId = metadata.targetName;
+        const newGamePlayTime = parseInt(metadata.gameInfo.time, 10) * 60; // 초 단위
         const newBullet = parseInt(metadata.bullets, 10);
+
+        console.log(`newGamePlayTime: ${newGamePlayTime}`);
+        console.log(`newBullet: ${newBullet}`);
 
         // 상태 업데이트
         setAreaRadius(newAreaRadius);
@@ -88,7 +97,8 @@ const useStartGame = () => {
         sessionStorage.setItem("areaRadius", newAreaRadius);
         sessionStorage.setItem("areaCenter", newAreaCenter);
         sessionStorage.setItem("targetId", newTargetId);
-        sessionStorage.setItem("bullet", newBullet);
+        sessionStorage.setItem("gamePlayTime", newGamePlayTime);
+        sessionStorage.setItem("bullets", newBullet);
 
         // 미션 및 아이템 업데이트
         updateMissionAndItems(metadata.myMissions, metadata.myItems);
@@ -104,7 +114,34 @@ const useStartGame = () => {
     }
   };
 
-  return { fetch, timeUntilStart };
+  const checkItemEffect = () => {
+    const expirationTime = parseInt(sessionStorage.getItem('effectExpirationTime'), 10);
+    const currentTime = Date.now();
+  if (expirationTime) {
+    if (currentTime < expirationTime) {
+      const effect = sessionStorage.getItem("itemInEffect");
+      // Effect is still active
+      const remainingTime = expirationTime - currentTime;
+      if (effect === "blockScreen"){
+        setBlockScreen(true);
+      }else if (effect === "blockGPS"){
+        setBlockGPS(true);
+      }
+      // Set a timer to clear the effect when it expires
+      setTimeout(clearEffect, remainingTime);
+    } else {
+      // Effect has expired
+      clearEffect(); // Clear the effect immediately if expired
+    }
+  }
+  }
+
+  const clearEffect = () => {
+    setBlockScreen(false);
+    setBlockGPS(false);
+  }
+
+  return { fetch, timeUntilStart, checkItemEffect };
 };
 
 export default useStartGame;
