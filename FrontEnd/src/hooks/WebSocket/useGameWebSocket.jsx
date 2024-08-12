@@ -86,7 +86,7 @@ const useGameWebSocket = () => {
         break;
       case "end": // 게임 종료 조건(인원수)
         setGameStatus(false);
-        const data = msg.data;
+        const data = JSON.parse(msg.data);
         endGame(data);
         break;
       case "playerCount":
