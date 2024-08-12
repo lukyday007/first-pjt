@@ -39,17 +39,13 @@ const RankPageTable = ({ rankingList }) => {
         id="rank"
         className="flex h-screen flex-col items-center justify-center"
       >
+        <GoBackButton to="/home" />
         <div className="flex w-full flex-col items-center">
-          <div id="header" className="mb-8 flex items-center justify-center">
-            <span className="mr-8">
-              <GoBackButton to="/home" />
+          <div className="m-8 flex items-center justify-center text-4xl font-bold">
+            <span className="mr-4 bg-gradient-to-r from-rose-700 to-rose-200 bg-clip-text text-transparent">
+              HITMAN
             </span>
-            <span className="text-4xl font-bold">
-              <span className="bg-gradient-to-r from-rose-700 to-rose-200 bg-clip-text text-transparent">
-                HITMAN
-              </span>{" "}
-              순위
-            </span>
+            순위
           </div>
           <input
             type="text"
@@ -58,7 +54,7 @@ const RankPageTable = ({ rankingList }) => {
             onChange={e => setSearchTerm(e.target.value)}
             className="mb-4 w-[85%] rounded-lg p-3 text-black"
           />
-          <ScrollArea className="h-[75vh] w-[85%] flex-col items-center rounded-lg border-2 bg-white font-medium">
+          <ScrollArea className="h-[70vh] w-[85%] flex-col items-center rounded-lg border-2 bg-white font-medium">
             {filteredList.map((user, idx) => (
               <>
                 <div

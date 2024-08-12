@@ -12,7 +12,7 @@ const GoBackButton = ({ to }) => {
   return (
     <Button
       onClick={handleGoBack}
-      className="flex items-center justify-center rounded-full bg-white font-black text-black"
+      className="absolute left-8 top-8 flex items-center justify-center rounded-full bg-white font-black text-black"
     >
       &lt;
     </Button>
