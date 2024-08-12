@@ -41,8 +41,8 @@ const APPLICATION_SERVER_URL =
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
-  const { gameStatus, toOffChatting } = useContext(GameContext);
-  const { fetch, timeUntilStart } = useStartGame();
+  const { gameStatus, blockScreen, toOffChatting } = useContext(GameContext);
+  const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
@@ -58,6 +58,7 @@ const GamePlay = () => {
   useEffect(() => {
     connect();
     fetch();
+    checkItemEffect();
 
     return () => {
       disconnect();
@@ -297,10 +298,19 @@ const GamePlay = () => {
     <>
       {timeUntilStart > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white">
-          게임 시작까지 {Math.max(0, Math.ceil(timeUntilStart / 1000))}초
+          게임 시작까지
+          <br /> {Math.max(0, Math.ceil(timeUntilStart / 1000))}초<br />
           남았습니다.
         </div>
       )}
+
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white ${blockScreen ? "visible" : "hidden"}`}
+      >
+        방해 폭탄을
+        <br />
+        맞았습니다!
+      </div>
 
       {/* publisher 의 카메라 인자 전달 */}
       <GameHeader
