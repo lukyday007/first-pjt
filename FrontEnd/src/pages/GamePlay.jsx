@@ -75,15 +75,15 @@ const GamePlay = () => {
     setIsItemClicked(prevState => !prevState);
   };
 
-  useEffect(() => {
-    connect();
-    fetch();
-    checkItemEffect();
+  // useEffect(() => {
+  //   connect();
+  //   fetch();
+  //   checkItemEffect();
 
-    return () => {
-      disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (gameStatus) {
@@ -91,6 +91,10 @@ const GamePlay = () => {
       return () => stopSendingGPS(); // 컴포넌트 unmount 시 GPS 전송 중지
     }
   }, [gameStatus]);
+
+  //===========================   ITEM   ============================
+
+  // const handle
 
   //===========================   OPENVIDU   ============================
 
@@ -348,6 +352,8 @@ const GamePlay = () => {
     return response.data; // The token
   };
 
+  // ===== JSX 시작 ===========================================================================================================================================
+
   return (
     <>
       {timeUntilStart > 0 && (
@@ -433,27 +439,33 @@ const GamePlay = () => {
                 {isItemClicked && (
                   <DropdownMenuContent
                     side="left"
-                    className="mr-1 mt-12 h-32 w-60 rounded-md bg-gradient-to-r from-teal-100 to-lime-100"
+                    className="mr-1 mt-12 h-28 w-60 rounded-md bg-lime-100"
                   >
                     <div className="flex flex-row">
-                      <DropdownMenuItem className="flex flex-col">
+                      <DropdownMenuItem className="relative flex flex-col">
+                        <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
+                          1
+                        </div>
                         <img
                           src={stealthCloakImage}
-                          className="m-1 h-16 w-16 rounded-full"
+                          className="m-1 h-14 w-14"
                         />
                         <div className="text-xs font-bold">스텔스 망토</div>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="flex flex-col">
-                        <img
-                          src={jammingBombImage}
-                          className="m-1 h-16 w-16 rounded-full"
-                        />
+                        <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
+                          2
+                        </div>
+                        <img src={jammingBombImage} className="m-1 h-14 w-14" />
                         <div className="text-xs font-bold">방해 폭탄</div>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="flex flex-col">
+                        <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
+                          3
+                        </div>
                         <img
                           src={reinforcedBulletImage}
-                          className="m-1 h-16 w-16 rounded-full"
+                          className="m-1 h-14 w-14"
                         />
                         <div className="text-xs font-bold">강화 총알</div>
                       </DropdownMenuItem>
