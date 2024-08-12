@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { Separator } from "@/components/ui/Separator";
+import GoBackButton from "./GoBackButton";
 
 const RankPageTable = ({ rankingList }) => {
   const rankList = JSON.stringify(rankingList);
@@ -11,6 +12,27 @@ const RankPageTable = ({ rankingList }) => {
     user.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const winnerClass = idx =>
+    searchTerm === "" && idx + 1 === 1
+      ? "animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] bg-clip-text text-transparent"
+      : "";
+
+  const top3Class = idx => {
+    // 검색결과가 순위처럼 나오는 것 방지
+    if (searchTerm !== "") return "text-lg text-black";
+
+    switch (idx + 1) {
+      case 1: // 금메달
+        return "h-[16vh] bg-gradient-to-br from-yellow-200 to-yellow-500 text-4xl font-black";
+      case 2: // 은메달
+        return "bg-gradient-to-br from-gray-200 to-gray-500 text-xl";
+      case 3: // 동메달
+        return "bg-gradient-to-br from-yellow-500 to-yellow-800 text-xl";
+      default:
+        return "text-lg text-black";
+    }
+  };
+
   return (
     <>
       <div
@@ -18,12 +40,17 @@ const RankPageTable = ({ rankingList }) => {
         className="flex h-screen flex-col items-center justify-center"
       >
         <div className="flex w-full flex-col items-center">
-          <h1 className="mb-8 text-4xl font-bold">
-            <span className="bg-gradient-to-r from-rose-700 to-rose-200 bg-clip-text text-transparent">
-              HITMAN
-            </span>{" "}
-            순위
-          </h1>
+          <div id="header" className="mb-8 flex items-center justify-center">
+            <span className="mr-8">
+              <GoBackButton to="/home" />
+            </span>
+            <span className="text-4xl font-bold">
+              <span className="bg-gradient-to-r from-rose-700 to-rose-200 bg-clip-text text-transparent">
+                HITMAN
+              </span>{" "}
+              순위
+            </span>
+          </div>
           <input
             type="text"
             placeholder="닉네임 검색"
@@ -37,25 +64,17 @@ const RankPageTable = ({ rankingList }) => {
                 <div
                   key={idx}
                   id="rank-row"
-                  className={`flex h-full w-full flex-row p-2 ${
-                    idx + 1 === 1
-                      ? "h-[16vh] bg-gradient-to-br from-yellow-200 to-yellow-500 text-4xl font-black" // 금메달
-                      : idx + 1 === 2
-                        ? "bg-gradient-to-br from-gray-200 to-gray-500 text-xl" // 은메달
-                        : idx + 1 === 3
-                          ? "bg-gradient-to-br from-yellow-500 to-yellow-800 text-xl" // 동메달
-                          : "text-lg text-black"
-                  }`}
+                  className={`flex h-full w-full flex-row p-2 ${top3Class(idx)}`}
                 >
                   <span
                     id="rank-number"
-                    className={`m-2 flex w-[15%] items-center justify-center ${idx + 1 === 1 && "animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] bg-clip-text text-transparent"}`}
+                    className={`m-2 flex w-[15%] items-center justify-center ${winnerClass(idx)}`}
                   >
                     {idx + 1}
                   </span>
                   <span
                     id="nickname"
-                    className={`flex w-[60%] items-center justify-center ${idx + 1 === 1 && "animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] bg-clip-text text-transparent"}`}
+                    className={`flex w-[60%] items-center justify-center ${winnerClass(idx)}`}
                   >
                     {user.id}
                   </span>
