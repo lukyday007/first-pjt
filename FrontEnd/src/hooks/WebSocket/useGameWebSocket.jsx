@@ -27,7 +27,7 @@ const useGameWebSocket = () => {
 
   const connect = () => {
     // WebSocket 연결 생성
-    console.log("test")
+    console.log("test");
     console.log(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
     stompClient.current = Stomp.over(socket);
@@ -105,6 +105,7 @@ const useGameWebSocket = () => {
         if (username === affected) {
           handleItemEffect(effect);
         }
+        break;
       default:
         break;
     }
@@ -130,11 +131,11 @@ const useGameWebSocket = () => {
     if (effect === "blockScreen") {
       sessionStorage.setItem("itemInEffect", "blockScreen");
       alert("방해 폭탄 공격");
-      setBlockScreen(true); // 렌더링 해줘야함
+      setBlockScreen(true); // GamePlay.jsx
     } else if (effect === "blockGPS") {
       sessionStorage.setItem("itemInEffect", "blockGPS");
       alert("스텔스 망토 작동");
-      setBlockGPS(true); // 렌더링 해줘야함
+      setBlockGPS(true); // useTargetMarker.jsx
     }
   };
 
