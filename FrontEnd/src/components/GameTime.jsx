@@ -31,10 +31,14 @@ const GameTime = () => {
 
   // 타이머 업데이트 함수
   const updateTimer = startTime => {
+    if (!startTime) return;
+
     const start = new Date(startTime).getTime();
     const now = Date.now();
     const elapsedTime = Math.floor((now - start) / 1000); // 경과 시간
     const newRemainingPlayTime = gamePlayTime - elapsedTime; // 남은 시간
+
+    console.log(`start: ${start}, ${typeof start}`);
     console.log(`GameTime.jsx - updateTimer - start: ${start}`);
     console.log(`GameTime.jsx - updateTimer - now: ${now}`);
 
