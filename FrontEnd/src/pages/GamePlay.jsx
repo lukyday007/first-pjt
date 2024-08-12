@@ -17,6 +17,12 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/Carousel";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/DropdownMenu";
 import { Button } from "@/components/ui/Button";
 import GameRuleDialog from "@/components/GameRuleDialog";
 
@@ -25,6 +31,9 @@ import camchattingIcon from "@assets/material-icon/camchatting-icon.svg";
 import itemIcon from "@assets/material-icon/item-icon.svg";
 import giveUpIcon from "@/assets/material-icon/giveup-icon.svg";
 import bulletImage from "@/assets/bullet.png";
+import stealthCloakImage from "@/assets/gameplay-icon/stealth-cloak.png";
+import jammingBombImage from "@/assets/gameplay-icon/jamming-bomb.png";
+import reinforcedBulletImage from "@/assets/gameplay-icon/reinforced-bullet.png";
 
 //====================================================================
 
@@ -48,23 +57,27 @@ const GamePlay = () => {
   const { connect, disconnect } = useGameWebSocket();
   const { bullet, isCooldown, shootBullet } = useBullet();
 
-  const [camChatting, setCamChatting] = useState(false); // camChatting 상태 초기화
+  const [camChatting, setCamChatting] = useState(false);
+  const [isItemClicked, setIsItemClicked] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const toggleCamChatting = () => {
-    setCamChatting(prevState => !prevState); // camChatting 상태 토글 함수
+    setCamChatting(prevState => !prevState);
   };
 
-  useEffect(() => {
-    connect();
-    fetch();
-    checkItemEffect();
+  const toggleItemList = () => {
+    setIsItemClicked(prevState => !prevState);
+  };
 
+  // useEffect(() => {
+  //   connect();
+  //   fetch();
+  //   checkItemEffect();
 
-    return () => {
-      disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (gameStatus) {
@@ -355,11 +368,49 @@ const GamePlay = () => {
                 />
               )}
             </div>
+
             <div id="mini-buttons" className="flex flex-col">
-              <Button className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black">
-                <img src={itemIcon} alt="item" />
-                <div className="text-xs">아이템</div>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    onClick={toggleItemList}
+                    className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black"
+                  >
+                    <img src={itemIcon} alt="item" />
+                    <div className="text-xs">아이템</div>
+                  </Button>
+                </DropdownMenuTrigger>
+                {isItemClicked && (
+                  <DropdownMenuContent
+                    side="left"
+                    className="mr-1 mt-12 h-32 w-60 rounded-md bg-gradient-to-r from-teal-100 to-lime-100"
+                  >
+                    <div className="flex flex-row">
+                      <DropdownMenuItem className="flex flex-col">
+                        <img
+                          src={stealthCloakImage}
+                          className="m-1 h-16 w-16 rounded-full"
+                        />
+                        <div className="text-xs font-bold">스텔스 망토</div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex flex-col">
+                        <img
+                          src={jammingBombImage}
+                          className="m-1 h-16 w-16 rounded-full"
+                        />
+                        <div className="text-xs font-bold">방해 폭탄</div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="flex flex-col">
+                        <img
+                          src={reinforcedBulletImage}
+                          className="m-1 h-16 w-16 rounded-full"
+                        />
+                        <div className="text-xs font-bold">강화 총알</div>
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                )}
+              </DropdownMenu>
               <Button
                 onClick={toggleCamChatting}
                 className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-cyan-200 to-indigo-400 text-black"
@@ -367,11 +418,11 @@ const GamePlay = () => {
                 <img src={camchattingIcon} alt="chat" />
                 <div className="text-xs">화상채팅</div>
               </Button>
-              <button
+              <Button
                 className={`m-2 flex h-[7vh] w-[7vh] items-center justify-center rounded-full bg-rose-500 transition-colors duration-300`}
               >
                 <img src={giveUpIcon} alt="Give Up" className="w-12" />
-              </button>
+              </Button>
             </div>
           </div>
         </>
