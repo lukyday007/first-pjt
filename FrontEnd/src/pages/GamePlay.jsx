@@ -33,15 +33,16 @@ import { OpenVidu } from "openvidu-browser";
 import UserVideoComponent from "@/hooks/WebRTC/UserVideoComponent";
 import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
+import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? "https://i11b205.p.ssafy.io/vidu" : "http://localhost:8080/";
+  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/";
 
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
   const { gameStatus } = useContext(GameContext);
-  const { fetch, timeUntilStart } = useStartGame();
+  const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
@@ -57,6 +58,8 @@ const GamePlay = () => {
   useEffect(() => {
     connect();
     fetch();
+    checkItemEffect();
+
 
     return () => {
       disconnect();
@@ -413,7 +416,7 @@ const GamePlay = () => {
           <div className="relative h-[45vh] w-full rounded-lg bg-white">
             <Button
               onClick={() => setCamChatting(false)}
-              className="border-1 absolute left-[3%] top-[3%] z-20 h-12 w-20 rounded-lg border-black bg-gradient-to-r from-emerald-300 to-emerald-500 font-bold text-white shadow-3d"
+              className="border-1 absolute right-[3%] top-[3%] z-20 h-12 w-20 rounded-lg border-black bg-gradient-to-r from-emerald-300 to-emerald-500 font-bold text-white shadow-3d"
             >
               ← 지도
             </Button>
