@@ -12,6 +12,7 @@ const useGameWebSocket = () => {
     setIsAlive,
     setPlayerCount,
     username,
+    setToOffChatting,
   } = useContext(GameContext);
   const { endGame } = useEndGame();
   const { gameRoomId, setAreaRadius } = useContext(GameContext);
@@ -86,6 +87,7 @@ const useGameWebSocket = () => {
         break;
       case "end": // 게임 종료 조건(인원수)
         setGameStatus(false);
+        setToOffChatting(true); // 종료 시 true로 변환
         const data = JSON.parse(msg.data);
         endGame(data);
         break;

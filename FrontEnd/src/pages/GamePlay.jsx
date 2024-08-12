@@ -41,7 +41,7 @@ const APPLICATION_SERVER_URL =
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
-  const { gameStatus } = useContext(GameContext);
+  const { gameStatus, toOffChatting } = useContext(GameContext);
   const { fetch, timeUntilStart } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
