@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useCallback } from "react";
+import React, { useEffect, useContext, useState, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 import GameHeader from "@/components/GameHeader";
@@ -81,6 +81,7 @@ const GamePlay = () => {
   const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
   const audioEnabled = false;
 
+  const ws = useRef(null)
   const username = localStorage.getItem("username"); // 추가
   const { gameRoomId: paramGameRoomId } = useParams(); // 추가
 
@@ -105,10 +106,28 @@ const GamePlay = () => {
     }
   };
 
-  const handleButtonClick = async () => {
-    console.log("you clicked ", count, " times!");
+  const handleButtonClick = async (receiver) => {
+    console.log(receiver);
+    console.log(ws.current);  
 
-    count++;
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      try {
+
+        const message = {
+          type: 'offer',
+          fromUser: participantName,
+          toUser: receiver,
+          curRoom: roomName,
+          privateRoom: 'Room' + Math.floor(Math.random() * 100)
+        };
+        ws.current.send(`click:${JSON.stringify(message)}`);
+        console.log('Sent offer:', message);
+      } catch (error) {
+        console.error('Error creating or sending offer:', error);
+      }
+    } else {
+      console.error('WebSocket is not open.');
+    }
   };
 
   const leaveSession = () => {
@@ -207,6 +226,23 @@ const GamePlay = () => {
         setCurrentVideoDevice(currentVideoDevice);
         setMainStreamManager(newPublisher);
         setPublisher(newPublisher);
+
+        // WebSocket 연결 설정
+        ws.current = new WebSocket('ws://localhost:8080/ChattingServer');
+        ws.current.onopen = () => {
+            console.log('WebSocket connection established');
+        };
+        ws.current.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log('Received message:', message);
+        };
+        ws.current.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+        ws.current.onerror = (error) => {
+            console.log('WebSocket error:', error);
+        };
+
       } catch (permissionError) {
         console.error("Permission denied:", permissionError);
         alert(
@@ -274,7 +310,7 @@ const GamePlay = () => {
 
   const createSession = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/cam/sessions",
+      APPLICATION_SERVER_URL + "sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -285,7 +321,7 @@ const GamePlay = () => {
 
   const createToken = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/cam/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },
@@ -429,15 +465,23 @@ const GamePlay = () => {
                       ))}
                   </CarouselContent>
                 </Carousel>
-                <div>
+                <div className="m-4">
                   {subscribers.map((subscriber, idx) => {
                     const clientData = JSON.parse(
                       subscriber.stream.connection.data
                     ).clientData;
                     return (
-                      <Button key={idx} onClick={handleButtonClick}>
-                        {clientData}
-                      </Button>
+                      // <Button key={idx} onClick={handleButtonClick}>
+                      //   {clientData}
+                      // </Button>
+                      <div className="flex justify-center">
+                        <Button 
+                          key={idx}
+                          onClick={handleButtonClick} 
+                        >
+                          {clientData}
+                        </Button>
+                      </div>
                     );
                   })}
                 </div>
