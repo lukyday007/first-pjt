@@ -2,7 +2,7 @@ import { GameContext } from "@/context/GameContext";
 import React, { useState, useEffect, useContext, useRef } from "react";
 
 const GameTime = () => {
-  const { setGameStatus, setIsAlive } = useContext(GameContext);
+  const { gameStatus, setGameStatus, setIsAlive } = useContext(GameContext);
 
   // startTime과 gamePlayTime을 state로 관리
   const [startTime, setStartTime] = useState(null);
@@ -86,20 +86,26 @@ const GameTime = () => {
     const interval = setInterval(checkSessionStorage, 1000);
 
     // startTime과 gamePlayTime이 설정되면 타이머를 시작
-    if (startTime && gamePlayTime) {
-      clearInterval(interval); // interval 제거
-      updateTimer(startTime); // 초기 타이머 업데이트
+    if (!gameStatus) {
+      if (startTime && gamePlayTime) {
+        clearInterval(interval); // interval 제거
+        updateTimer(startTime); // 초기 타이머 업데이트
 
-      intervalIdRef.current = setInterval(() => {
-        updateTimer(startTime);
-      }, 1000); // 매초 타이머 업데이트
+        intervalIdRef.current = setInterval(() => {
+          updateTimer(startTime);
+        }, 1000); // 매초 타이머 업데이트
+      }
+    } else {
+      console.log("clearInterval: GameTime.jsx");
+      clearInterval(interval);
+      clearInterval(intervalIdRef.current);
     }
 
     return () => {
       clearInterval(interval); // 컴포넌트 unmount 시 interval 정리
       clearInterval(intervalIdRef.current); // 기존 타이머 정리
     };
-  }, [startTime, gamePlayTime]);
+  }, [gameStatus, startTime, gamePlayTime]);
 
   return (
     <div className="m-4 flex h-16 w-48 items-center justify-center rounded-lg border-2 border-black bg-white text-4xl font-bold text-black">
