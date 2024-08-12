@@ -139,25 +139,6 @@ const GamePlay = () => {
       return true;
     };
 
-    // const newSession = OV.initSession(paramGameRoomId);
-
-    // let newSession;
-
-    // const OVSessionIdStored = localStorage.getItem("OVSessionID");
-    // console.log("OVID:", OVSessionIdStored);
-
-    // if (OVSessionIdStored && OVSessionIdStored != "undefined") {
-    //   // OVSessionIdStored가 null 또는 빈 문자열이 아닌 경우 기존 세션을 사용
-    //   console.log("기존 세션을 사용합니다.");
-    //   newSession = OV.initSession(OVSessionIdStored);
-    // } else {
-    //   // OVSessionIdStored가 null 또는 빈 문자열일 때 새로운 세션을 생성
-    //   console.log("OV Session 재생성");
-    //   newSession = OV.initSession();
-    //   console.log("newSession", newSession.options);
-    //   localStorage.setItem("OVSessionID", newSession.sessionId);
-    // }
-
     const newSession = OV.initSession();
 
     if (!session) {
