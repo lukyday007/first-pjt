@@ -35,7 +35,7 @@ import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? "https://i11b205.p.ssafy.io/api/" : "http://localhost:8080/";
+  process.env.NODE_ENV === "production" ? "https://i11b205.p.ssafy.io/vidu" : "http://localhost:8080/";
 
 let count = 1;
 const GamePlay = () => {
@@ -291,7 +291,7 @@ const GamePlay = () => {
 
   const createSession = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions",
+      APPLICATION_SERVER_URL + "sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -302,7 +302,7 @@ const GamePlay = () => {
 
   const createToken = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "api/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },
