@@ -33,15 +33,16 @@ import { OpenVidu } from "openvidu-browser";
 import UserVideoComponent from "@/hooks/WebRTC/UserVideoComponent";
 import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
+import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? "https://i11b205.p.ssafy.io/vidu" : "http://localhost:8080/";
+  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/";
 
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
   const { gameStatus } = useContext(GameContext);
-  const { fetch, timeUntilStart } = useStartGame();
+  const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
@@ -57,6 +58,8 @@ const GamePlay = () => {
   useEffect(() => {
     connect();
     fetch();
+    checkItemEffect();
+
 
     return () => {
       disconnect();
@@ -272,7 +275,7 @@ const GamePlay = () => {
 
   const createSession = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/sessions",
+      APPLICATION_SERVER_URL + "/cam/sessions",
       { customSessionId: sessionId },
       {
         headers: { "Content-Type": "application/json" },
@@ -283,7 +286,7 @@ const GamePlay = () => {
 
   const createToken = async sessionId => {
     const response = await axios.post(
-      APPLICATION_SERVER_URL + "/sessions/" + sessionId + "/connections",
+      APPLICATION_SERVER_URL + "/cam/sessions/" + sessionId + "/connections",
       {},
       {
         headers: { "Content-Type": "application/json" },
