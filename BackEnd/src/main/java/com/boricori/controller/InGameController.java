@@ -149,7 +149,7 @@ public class InGameController {
       Node<User> targetNode = gameManager.killTarget(gameId, username);
       Node<User> newTarget = targetNode.next;
       messageService.changeTarget(username, newTarget.data.getUsername(), gameId);
-      messageService.notifyStatus(targetNode.data.getUsername(), gameId);
+      messageService.eliminateUser(targetNode.data.getUsername(), gameId);
       User user = userService.findByUsername(username);
       inGameService.catchTarget(user, targetNode.data, gameId);
 

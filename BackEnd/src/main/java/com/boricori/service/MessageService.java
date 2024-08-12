@@ -42,8 +42,8 @@ public class MessageService {
     messagingTemplate.convertAndSend(String.format("/topic/play/%d", gameId), jsonPayload);
   }
 
-  public void notifyStatus(String username, long gameId) {
-    String jsonPayload = String.format("{\"msgType\":\"caught\", \"user\":\"%s\"}", username);
+  public void eliminateUser(String username, long gameId) {
+    String jsonPayload = String.format("{\"msgType\":\"eliminated\", \"user\":\"%s\"}", username);
     messagingTemplate.convertAndSend(String.format("/topic/play/%d", gameId), jsonPayload);
   }
 
