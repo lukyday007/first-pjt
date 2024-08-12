@@ -71,7 +71,7 @@ const GameHeader = ({ publisher, handleMainVideoStream }) => {
                     e.preventDefault();
                     setOpenCamera(mission.missionId);
                   }}
-                  style={{ margin: "8px 0" }}
+                  className={`m-1 ${mission.done ? "inset-0 z-40 bg-black bg-opacity-75 text-white line-through" : ""}`}
                 >
                   <div>
                     {

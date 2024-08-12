@@ -56,9 +56,15 @@ export const GameProvider = ({ children }) => {
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
   const [missionList, setMissionList] = useState([
-    { missionId: 1, category: "1", target: "A", alt: "a" },
-    { missionId: 2, category: "2", target: "의자", alt: "chair" }, // 임시 데이터
-    { missionId: 3, category: "3", target: "#e35e4b", alt: "227-94-75" },
+    { missionId: 1, category: "1", target: "A", alt: "a", done: true },
+    { missionId: 2, category: "2", target: "의자", alt: "chair", done: false }, // 임시 데이터
+    {
+      missionId: 3,
+      category: "3",
+      target: "#e35e4b",
+      alt: "227-94-75",
+      done: true,
+    },
   ]); // 미션 목록
   const [itemList, setItemList] = useState([]);
   const [playerCount, setPlayerCount] = useState(() => {
@@ -70,8 +76,8 @@ export const GameProvider = ({ children }) => {
   // 로그인 시 setItem 대상이 sessionStorage로 변경되면 이 부분도 같이 변경되어야 함
 
   // item 적용 여부 부분
-  const [blockGPS, setBlockGPS] = useState(false);
-  const [blockScreen, setBlockScreen] = useState(false);
+  const [blockGPS, setBlockGPS] = useState(false); // 스텔스 망토
+  const [blockScreen, setBlockScreen] = useState(false); // 방해 폭탄
 
   const DISTANCE_TO_CATCH = 5; // 잡기 버튼이 활성화되기 위한 타겟과의 거리
   const DISTANCE_ENHANCED_BULLET = 10; // 강화 총알 거리
