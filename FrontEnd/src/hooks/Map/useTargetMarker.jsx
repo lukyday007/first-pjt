@@ -9,7 +9,7 @@ const useTargetMarker = mapInstance => {
 
   // 타겟 위치 변동에 따라 마커를 새로 set
   useEffect(() => {
-    if (gameStatus && markerRef.current && targetLocation && blockGPS) {
+    if (gameStatus && markerRef.current && targetLocation && !blockGPS) {
       // blockGPS 아이템 조건
       const newPosition = new kakao.maps.LatLng(
         targetLocation.lat,

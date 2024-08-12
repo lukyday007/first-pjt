@@ -304,6 +304,7 @@ const GamePlay = () => {
         </div>
       )}
 
+      {/* blockScreen 아이템 화면 오버레이 부분 */}
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white ${blockScreen ? "visible" : "hidden"}`}
       >
