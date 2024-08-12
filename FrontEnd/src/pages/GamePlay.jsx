@@ -39,7 +39,11 @@ import giveUpIcon from "@/assets/material-icon/giveup-icon.svg";
 import bulletImage from "@/assets/bullet.png";
 import stealthCloakImage from "@/assets/gameplay-icon/stealth-cloak.png";
 import jammingBombImage from "@/assets/gameplay-icon/jamming-bomb.png";
-import reinforcedBulletImage from "@/assets/gameplay-icon/reinforced-bullet.png";
+import enhancedBulletImage from "@/assets/gameplay-icon/enhanced-bullet.png";
+
+// ===================================================================
+
+import useItemCount from "@/hooks/Map/useItemCount";
 
 //====================================================================
 
@@ -51,7 +55,9 @@ import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/cam/";
+  process.env.NODE_ENV === "production"
+    ? BASE_URL
+    : "http://localhost:8080/cam/";
 
 let count = 1;
 const GamePlay = () => {
@@ -94,7 +100,8 @@ const GamePlay = () => {
 
   //===========================   ITEM   ============================
 
-  // const handle
+  const { blockGPSCount, blockScreenCount, enhancedBulletCount } =
+    useItemCount();
 
   //===========================   OPENVIDU   ============================
 
@@ -439,12 +446,15 @@ const GamePlay = () => {
                 {isItemClicked && (
                   <DropdownMenuContent
                     side="left"
-                    className="mr-1 mt-12 h-28 w-60 rounded-md bg-lime-100"
+                    className="mr-1 mt-12 h-28 w-60 rounded-2xl bg-lime-100"
                   >
                     <div className="flex flex-row">
-                      <DropdownMenuItem className="relative flex flex-col">
+                      <DropdownMenuItem
+                        onClick=""
+                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                      >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
-                          1
+                          {blockGPSCount}
                         </div>
                         <img
                           src={stealthCloakImage}
@@ -452,19 +462,25 @@ const GamePlay = () => {
                         />
                         <div className="text-xs font-bold">스텔스 망토</div>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="flex flex-col">
+                      <DropdownMenuItem
+                        onClick=""
+                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                      >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
-                          2
+                          {blockScreenCount}
                         </div>
                         <img src={jammingBombImage} className="m-1 h-14 w-14" />
                         <div className="text-xs font-bold">방해 폭탄</div>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="flex flex-col">
+                      <DropdownMenuItem
+                        onClick=""
+                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                      >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
-                          3
+                          {enhancedBulletCount}
                         </div>
                         <img
-                          src={reinforcedBulletImage}
+                          src={enhancedBulletImage}
                           className="m-1 h-14 w-14"
                         />
                         <div className="text-xs font-bold">강화 총알</div>
