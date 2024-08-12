@@ -341,7 +341,7 @@ const GamePlay = () => {
           <MapComponent />
           <div className="item-center flex justify-center">
             <div
-              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-30"}`}
+              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
             >
               <img
                 src={catchButton}

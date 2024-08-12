@@ -4,6 +4,7 @@ import axiosInstance from "@/api/axiosInstance";
 
 const useCatchTarget = () => {
   const DISTANCE_TO_CATCH = 5; // 잡기 버튼이 활성화되기 위한 타겟과의 거리
+
   const { gameRoomId, isAlive, distToTarget, username } =
     useContext(GameContext);
   const [isAbleToCatchTarget, setIsAbleToCatchTarget] = useState(false);
