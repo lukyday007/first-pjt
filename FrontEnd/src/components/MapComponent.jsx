@@ -23,11 +23,10 @@ const MapComponent = () => {
     return (
       distance > areaRadius && (
         <div
-          className="pointer-events-none absolute z-20 h-full w-full -translate-x-1/2 -translate-y-1/2 animate-ping bg-red-700 opacity-30"
+          className="pointer-events-none absolute z-20 h-full w-full -translate-x-1/2 -translate-y-1/2 animate-ping overflow-hidden bg-red-700 opacity-30"
           style={{
             top: "50%",
             left: "50%",
-            overflow: "hidden",
           }}
         />
       )
@@ -36,13 +35,15 @@ const MapComponent = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="w-full p-2">
+      <div className="h-full w-full p-2">
         <div id="map-wrap" className="relative">
           <div
             id="map"
             ref={mapRef}
             className="z-10 h-[45vh] w-full rounded-lg"
-          />
+          >
+            <MapOverlay />
+          </div>
           <img
             id="map-center-button"
             src={crosshair}
@@ -51,7 +52,6 @@ const MapComponent = () => {
             className="border-1 absolute right-[3%] top-[3%] z-20 h-12 w-12 rounded-lg border-black bg-gradient-to-r from-amber-300 to-amber-500 shadow-3d"
           />
         </div>
-        <MapOverlay />
       </div>
     </div>
   );
