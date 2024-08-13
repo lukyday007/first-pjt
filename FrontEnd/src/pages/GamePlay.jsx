@@ -33,15 +33,16 @@ import { OpenVidu } from "openvidu-browser";
 import UserVideoComponent from "@/hooks/WebRTC/UserVideoComponent";
 import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
+import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? "https://i11b205.p.ssafy.io/vidu" : "http://localhost:8080/";
+  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/";
 
 let count = 1;
 const GamePlay = () => {
   //===========================   GPS   ============================
-  const { gameStatus } = useContext(GameContext);
-  const { fetch, timeUntilStart } = useStartGame();
+  const { gameStatus, blockScreen, toOffChatting } = useContext(GameContext);
+  const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
   const { isAbleToCatchTarget, handleOnClickCatchTarget } = useCatchTarget();
   const { connect, disconnect } = useGameWebSocket();
@@ -57,6 +58,7 @@ const GamePlay = () => {
   useEffect(() => {
     connect();
     fetch();
+    checkItemEffect();
 
     return () => {
       disconnect();
@@ -332,10 +334,20 @@ const GamePlay = () => {
     <>
       {timeUntilStart > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white">
-          게임 시작까지 {Math.max(0, Math.ceil(timeUntilStart / 1000))}초
+          게임 시작까지
+          <br /> {Math.max(0, Math.ceil(timeUntilStart / 1000))}초<br />
           남았습니다.
         </div>
       )}
+
+      {/* blockScreen 아이템 화면 오버레이 부분 */}
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white ${blockScreen ? "visible" : "hidden"}`}
+      >
+        방해 폭탄을
+        <br />
+        맞았습니다!
+      </div>
 
       {/* publisher 의 카메라 인자 전달 */}
       <GameHeader
@@ -366,7 +378,7 @@ const GamePlay = () => {
           <MapComponent />
           <div className="item-center flex justify-center">
             <div
-              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "cursor-not-allowed opacity-30"}`}
+              className={`relative mr-4 h-[28vh] w-[28vh] overflow-hidden ${bullet && !isCooldown && isAbleToCatchTarget ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
             >
               <img
                 src={catchButton}
@@ -413,7 +425,7 @@ const GamePlay = () => {
           <div className="relative h-[45vh] w-full rounded-lg bg-white">
             <Button
               onClick={() => setCamChatting(false)}
-              className="border-1 absolute left-[3%] top-[3%] z-20 h-12 w-20 rounded-lg border-black bg-gradient-to-r from-emerald-300 to-emerald-500 font-bold text-white shadow-3d"
+              className="border-1 absolute right-[3%] top-[3%] z-20 h-12 w-20 rounded-lg border-black bg-gradient-to-r from-emerald-300 to-emerald-500 font-bold text-white shadow-3d"
             >
               ← 지도
             </Button>
