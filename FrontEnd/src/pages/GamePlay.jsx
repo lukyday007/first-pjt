@@ -64,7 +64,7 @@ const GamePlay = () => {
   //===========================   ITEM   ============================
 
   const username = localStorage.getItem("username");
-  const { gameRoomId: gameId } = useContext(GameContext);
+  const { gameRoomId: gameId, isAlive } = useContext(GameContext);
   const { blockGPSCount, blockScreenCount, enhancedBulletCount, useItem } =
     useItemCount();
 
@@ -115,15 +115,15 @@ const GamePlay = () => {
     setIsItemClicked(prevState => !prevState);
   };
 
-  useEffect(() => {
-    connect();
-    fetch();
-    checkItemEffect();
+  // useEffect(() => {
+  //   connect();
+  //   fetch();
+  //   checkItemEffect();
 
-    return () => {
-      disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (gameStatus) {
@@ -415,8 +415,8 @@ const GamePlay = () => {
         handleMainVideoStream={handleMainVideoStream}
       />
 
-      <div className="flex items-center justify-center">
-        <div id="game-rule-dialog" className="m-4">
+      <div className="m-2 flex items-center justify-around">
+        <div id="game-rule-dialog">
           <Button
             onClick={() => setIsDialogOpen(true)}
             className="h-[6vh] w-32 bg-gradient-to-r from-teal-400 to-blue-700 font-bold shadow-3d"
@@ -466,7 +466,7 @@ const GamePlay = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     onClick={toggleItemList}
-                    className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black"
+                    className={`m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black ${isAlive ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                   >
                     <img src={itemIcon} alt="item" />
                     <div className="text-xs">아이템</div>
@@ -493,7 +493,7 @@ const GamePlay = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleUseItem(2)}
-                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                        className={`relative flex flex-col ${blockScreenCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                       >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
                           {blockScreenCount}
@@ -503,7 +503,7 @@ const GamePlay = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleUseItem(3)}
-                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                        className={`relative flex flex-col ${enhancedBulletCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                       >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
                           {enhancedBulletCount}
