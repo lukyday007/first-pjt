@@ -26,6 +26,10 @@ const Room = () => {
 
   const isChief = sessionStorage.getItem("isChief") === "true"; // 방장여부 판단
 
+  if (!isChief) {
+    sessionStorage.setItem("isChief", false);
+  }
+
   // 방에 접속 시 username, gameRoomId 설정 및 WebSocket 연결
   useEffect(() => {
     setGameRoomId(paramGameRoomId);
