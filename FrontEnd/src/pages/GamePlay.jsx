@@ -55,7 +55,9 @@ import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/cam/";
+  process.env.NODE_ENV === "production"
+    ? BASE_URL
+    : "http://localhost:8080/cam/";
 
 let count = 1;
 const GamePlay = () => {
@@ -63,16 +65,16 @@ const GamePlay = () => {
 
   const username = localStorage.getItem("username");
   const { gameRoomId: gameId } = useContext(GameContext);
-  // const { blockGPSCount, blockScreenCount, enhancedBulletCount, useItem } =
-  //   useItemCount();
+  const { blockGPSCount, blockScreenCount, enhancedBulletCount, useItem } =
+    useItemCount();
 
-  // 테스트 데이터
-  const blockGPSCount = 1;
-  const blockScreenCount = 2;
-  const enhancedBulletCount = 3;
+  // // 테스트 데이터
+  // const blockGPSCount = 1;
+  // const blockScreenCount = 2;
+  // const enhancedBulletCount = 3;
 
   const handleUseItem = async itemId => {
-    alert(`${itemId}번 아이템 사용`); // 테스트
+    // alert(`${itemId}번 아이템 사용`); // 테스트
     try {
       const response = await axiosInstance.post("/in-game/useItem", {
         username,
