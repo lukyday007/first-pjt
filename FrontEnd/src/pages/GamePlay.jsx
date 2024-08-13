@@ -116,15 +116,15 @@ const GamePlay = () => {
     setIsItemClicked(prevState => !prevState);
   };
 
-  // useEffect(() => {
-  //   connect();
-  //   fetch();
-  //   checkItemEffect();
+  useEffect(() => {
+    connect();
+    fetch();
+    checkItemEffect();
 
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
+    return () => {
+      disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (gameStatus) {

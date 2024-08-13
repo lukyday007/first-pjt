@@ -61,10 +61,10 @@ const Room = () => {
       {/* 게임시작 버튼은 방장만 보여주기 */}
       {isChief && !isGameRoomLoading && (
         <Button
-          className="absolute right-12 top-8 h-12 w-32 animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] font-bold shadow-3d"
+          className={`absolute right-12 top-8 h-12 w-32 animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] font-bold shadow-3d ${gameRoomUsers.length >= 3 ? "" : "pointer-events-none cursor-not-allowed text-xs opacity-70"}`}
           onClick={handleStartGame}
         >
-          게임 시작
+          {gameRoomUsers.length >= 3 ? "게임 시작" : "참가자 부족 (최소 3명)"}
         </Button>
       )}
 
