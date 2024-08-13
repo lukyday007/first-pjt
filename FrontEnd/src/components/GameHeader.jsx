@@ -37,7 +37,7 @@ const GameHeader = ({ publisher, handleMainVideoStream }) => {
 
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-700 to-teal-700 p-4">
-      {gameStatus && isAlive ? (
+      {targetId ? (
         <>
           <div className="mb-2 flex flex-row">
             <div className="mr-4 rounded-full bg-gradient-to-r from-teal-400 to-teal-200 p-1 px-3 text-center font-bold text-black">
