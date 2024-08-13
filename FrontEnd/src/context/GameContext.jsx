@@ -34,11 +34,12 @@ export const GameProvider = ({ children }) => {
     return savedIsAlive === "true";
   }); // 플레이어의 생존 상태 (게임 시작 시 true로 전환되고 sessionStorage에 저장됨)
   const [areaCenter, setAreaCenter] = useState(() => {
-    const savedCenter = sessionStorage.getItem("areaCenter");
+    const savedCenter = sessionStorage.getItem("areaCenter"); // 기본적으로 String
     if (savedCenter) {
+      const parsedCenter = JSON.parse(savedCenter);
       return {
-        lat: savedCenter.lat,
-        lng: savedCenter.lng,
+        lat: parseFloat(parsedCenter.lat),
+        lng: parseFloat(parsedCenter.lng),
       };
     }
     return { lat: 0, lng: 0 };
@@ -56,22 +57,50 @@ export const GameProvider = ({ children }) => {
   const [distance, setDistance] = useState(null); // 사용자와 영역 중심 간 거리
   const [distToTarget, setDistToTarget] = useState(null); // 사용자와 타겟 간 거리
   const [missionList, setMissionList] = useState([
-    { id: 1, name: "미션 이름", description: "미션 내용" }, // 임시 데이터
-    { id: 2, name: "ddd", description: "hahaha"},
+    { missionId: 1, category: "1", target: "A", alt: "a", done: true },
+    { missionId: 2, category: "2", target: "의자", alt: "chair", done: false }, // 임시 데이터
+    {
+      missionId: 3,
+      category: "3",
+      target: "#e35e4b",
+      alt: "227-94-75",
+      done: true,
+    },
   ]); // 미션 목록
-  const [itemList, setItemList] = useState([]);
+  const [itemList, setItemList] = useState([
+    { itemId: 1, count: 0 }, // 스텔스 망토 (GPS)
+    { itemId: 2, count: 0 }, // 방해 폭탄 (screen)
+    { itemId: 3, count: 0 }, // 강화 총알
+  ]);
   const [playerCount, setPlayerCount] = useState(() => {
     const savedPlayerCount = sessionStorage.getItem("playerCount");
     return savedPlayerCount !== null ? parseInt(savedPlayerCount, 10) : null;
   });
+  const [toOffChatting, setToOffChatting] = useState(false);
   const username = localStorage.getItem("username"); // sendGPS 함수에서 활용 (useFirebase.jsx)
   // 로그인 시 setItem 대상이 sessionStorage로 변경되면 이 부분도 같이 변경되어야 함
 
+  // item 적용 여부 부분
+  const [blockGPS, setBlockGPS] = useState(false); // 스텔스 망토
+  const [blockScreen, setBlockScreen] = useState(false); // 방해 폭탄
+
+  const DISTANCE_TO_CATCH = 5; // 잡기 버튼이 활성화되기 위한 타겟과의 거리
+  const DISTANCE_ENHANCED_BULLET = 10; // 강화 총알 거리
+  const [distToCatch, setDistToCatch] = useState(DISTANCE_TO_CATCH);
+
+  // 위치 보정
   const GET_POSITION_COUNT = 5;
 
   const myLocationRef = useRef(myLocation);
   const targetLocationRef = useRef(targetLocation);
   const areaCenterRef = useRef(areaCenter);
+
+  useEffect(() => {
+    myLocationRef.current = myLocation;
+    console.log(
+      `myLocation: ${myLocationRef.current.lat} ${myLocationRef.current.lng}`
+    );
+  }, [myLocation]);
 
   useEffect(() => {
     targetLocationRef.current = targetLocation;
@@ -91,7 +120,6 @@ export const GameProvider = ({ children }) => {
     };
 
     setMyLocation(newLocation);
-    // myLocationRef.current = newLocation;
 
     if (areaCenterRef.current) {
       const myDist = approximateDistance(
@@ -210,7 +238,17 @@ export const GameProvider = ({ children }) => {
         setItemList,
         playerCount,
         setPlayerCount,
+        toOffChatting,
+        setToOffChatting,
         username,
+        blockGPS,
+        setBlockGPS,
+        blockScreen,
+        setBlockScreen,
+        distToCatch,
+        setDistToCatch,
+        DISTANCE_TO_CATCH,
+        DISTANCE_ENHANCED_BULLET,
       }}
     >
       {children}

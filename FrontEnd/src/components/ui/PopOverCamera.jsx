@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useParams } from "react-router-dom";
@@ -31,23 +32,24 @@ const PopOverCamera = ({ open, publisher, missionId, handleMainVideoStream }) =>
 
       // ================================
       // 어제 test에서 주석처리한 부분, 작동 확인 필요
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = image;
-      link.download = "capture.png";
-      link.click();
+    //   const image = canvas.toDataURL("image/png");
+    //   const link = document.createElement("a");
+    //   link.href = image;
+    //   link.download = "capture.png";
+    //   link.click();
       // ================================
        
+
       canvas.toBlob(blob => {
         const formData = new FormData();
         formData.append("file", blob);
-
         // 수정
         formData.append("username", localStorage.getItem("username"));
         formData.append("gameId", sessionStorage.getItem("gameRoomId"));
         formData.append("missionId", missionId);
         
         // axiosInstance 사용 수정
+
         axiosInstance
           .post("/in-game/imageMission", formData, {
             headers: {
@@ -63,6 +65,7 @@ const PopOverCamera = ({ open, publisher, missionId, handleMainVideoStream }) =>
               alert(`미션 성공! 아이템 ID: ${obtained}`);
             } else if (response.status === 400) {
               alert("미션 실패!");
+
               setIsButtonDisabled(false)  // 수정부분
             } else if (response.status === 404) {
               alert("알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
@@ -70,12 +73,14 @@ const PopOverCamera = ({ open, publisher, missionId, handleMainVideoStream }) =>
             } else {
               alert("예상치 못한 응답 상태: " + response.status);
               setIsButtonDisabled(false); // 수정부분
+
             }
           })
           .catch(error => {
             console.error("Error uploading file:", error);
             alert("파일 업로드 중 오류가 발생했습니다. 콘솔을 확인하세요.");
             setIsButtonDisabled(false); // 수정부분
+
           });
       }, "image/png");
     }
@@ -104,7 +109,7 @@ const PopOverCamera = ({ open, publisher, missionId, handleMainVideoStream }) =>
         <Button onClick={captureImage} disabled={isButtonDisabled}>캡처</Button>
       </div>
       <canvas ref={canvasRef} style={{ display: "none" }} />{" "}
-      
+
     </div>
   );
 };

@@ -5,7 +5,8 @@ import axiosInstance from "@/api/axiosInstance.js";
 const INITIAL_SAFETY_TIME = 60; // 영역 이탈 가능 시간 60초 초기 세팅 (sessionStorage 값과 비교해 사용)
 
 const useTimer = () => {
-  const { gameRoomId, setIsAlive, username } = useContext(GameContext);
+  const username = localStorage.getItem("username");
+  const { gameRoomId, setIsAlive } = useContext(GameContext);
   const [remainingTime, setRemainingTime] = useState(() => {
     const savedRemainingTime = sessionStorage.getItem("remainingTime");
     return savedRemainingTime !== null
@@ -18,7 +19,7 @@ const useTimer = () => {
   }, []);
 
   useEffect(() => {
-    if (remainingTime == 0) {
+    if (remainingTime <= 0) {
       // 타이머 종료로 인한 사망 처리
       (async () => {
         try {
@@ -29,7 +30,7 @@ const useTimer = () => {
 
           setIsAlive(false);
           sessionStorage.setItem("isAlive", false);
-          console.log(`Timeout: Play ${username}`);
+          console.log(`Timeout: Player ${username}`);
         } catch {
           // axios 요청 실패 시 부분 입력
           console.error("Failed to send death status");
