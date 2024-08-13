@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 
+import axiosInstance from "@/api/axiosInstance";
 import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
 import { GameContext } from "@/context/GameContext";
