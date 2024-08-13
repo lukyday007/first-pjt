@@ -114,6 +114,14 @@ const GamePlay = () => {
   const username = localStorage.getItem("username"); // 추가
   const { gameRoomId: paramGameRoomId } = useParams(); // 추가
 
+
+  // toOffChatting 값이 true로 변경되면 leaveSession() 호출
+  useEffect(() => {
+    if (toOffChatting) {
+      leaveSession();
+    }
+  }, [toOffChatting, session]);
+
   useEffect(() => {
     const handleBeforeUnload = () => {
       leaveSession();
@@ -270,6 +278,7 @@ const GamePlay = () => {
         // ws.current.onerror = error => {
         //   console.log("WebSocket error:", error);
         // };
+        
       } catch (permissionError) {
         console.error("Permission denied:", permissionError);
         alert(
@@ -538,7 +547,7 @@ const GamePlay = () => {
                     {subscribers
                       .filter(sub => sub !== publisher) // publisher와 동일한 객체 필터링
                       .map((sub, index) => (
-                        <CarouselItem key={sub.id} className="stream-container">
+                        <CarouselItem key={index} className="stream-container">
                           <UserVideoComponent
                             streamManager={sub}
                             currentUserNickname={username} // username 전달

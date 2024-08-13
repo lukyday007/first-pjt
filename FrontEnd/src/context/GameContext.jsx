@@ -36,10 +36,10 @@ export const GameProvider = ({ children }) => {
   const [areaCenter, setAreaCenter] = useState(() => {
     const savedCenter = sessionStorage.getItem("areaCenter"); // 기본적으로 String
     if (savedCenter) {
-      const parsedCenter = JSON.parse(savedCenter);
+      // const parsedCenter = JSON.parse(savedCenter);
       return {
-        lat: parseFloat(parsedCenter.lat),
-        lng: parseFloat(parsedCenter.lng),
+        lat: parseFloat(savedCenter.lat),
+        lng: parseFloat(savedCenter.lng),
       };
     }
     return { lat: 0, lng: 0 };

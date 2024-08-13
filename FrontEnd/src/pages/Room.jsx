@@ -56,7 +56,7 @@ const Room = () => {
       />
       {/* 게임시작 버튼은 방장만 보여주기 */}
       {
-        /*isChief && !isGameRoomLoading*/ true && (
+        isChief && !isGameRoomLoading && (
           <Button
             className="absolute right-12 top-8 h-12 w-32 animate-gradient-move bg-gradient-rainbow bg-[length:200%_200%] font-bold shadow-3d"
             onClick={handleStartGame}
