@@ -12,7 +12,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import GameRuleDialog from "@/components/GameRuleDialog";
 
 import useRoomWebSocket from "@/hooks/WebSocket/useRoomWebSocket";
