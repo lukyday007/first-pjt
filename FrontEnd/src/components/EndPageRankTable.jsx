@@ -3,13 +3,15 @@ import { Card } from "@/components/ui/Card";
 const EndPageRankTable = () => {
   const winner1 = sessionStorage.getItem("winner1");
   const winner2 = sessionStorage.getItem("winner2");
-  const rankingList = JSON.parse(sessionStorage.getItem("result")) || [];
+  const rankingList = JSON.parse(sessionStorage.getItem("result")) || [
+    1, 2, 3, 4, 5, 6,
+  ];
 
   return (
     <div>
       <div id="game-result" className="my-5 flex flex-col items-center">
-        <Card className="flex w-[90vw] flex-col items-center rounded-lg border-2 border-black">
-          <h1 className="my-4 text-3xl font-bold">게임 결과</h1>
+        <h1 className="my-8 text-3xl font-bold">게임 결과</h1>
+        <Card className="flex w-[90vw] flex-col items-center rounded-2xl border-2 border-black py-4">
           {rankingList.map((user, idx) => (
             <Card
               key={idx}
