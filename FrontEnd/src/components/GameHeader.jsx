@@ -36,12 +36,12 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
     }
   };
 
-  useEffect(() => {
-    if (!openCamera && currentCameraFacingMode !== "user") {
-      setCurrentCameraFacingMode("user");
-      switchCamera("user"); // 정면 카메라로 다시 전환
-    }
-  }, [openCamera, switchCamera, currentCameraFacingMode]);
+  // useEffect(() => {
+  //   if (!openCamera && currentCameraFacingMode !== "user") {
+  //     setCurrentCameraFacingMode("user");
+  //     switchCamera("user"); // 정면 카메라로 다시 전환
+  //   }
+  // }, [openCamera, switchCamera, currentCameraFacingMode]);
 
 
 
