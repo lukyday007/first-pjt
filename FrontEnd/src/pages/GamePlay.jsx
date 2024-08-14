@@ -429,9 +429,12 @@ const GamePlay = () => {
       const videoDevices = devices.filter(device => device.kind === "videoinput");
   
       let selectedDeviceId = null;
+
+      console.log("videoDevices ===============>");
+      console.log(videoDevices);
   
       if (facingMode === "environment") {
-        selectedDeviceId = videoDevices.find(device => device.label.includes("back"))?.deviceId;
+        selectedDeviceId = videoDevices.find(device => device.label.includes("rear"))?.deviceId;
       } else {
         selectedDeviceId = videoDevices.find(device => device.label.includes("front"))?.deviceId;
       }
