@@ -487,7 +487,7 @@ const GamePlay = () => {
 
   return (
     <>
-      {/*timeUntilStart > 0 && (
+      {timeUntilStart > 0 && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-75 text-center text-3xl leading-relaxed text-white">
           게임 시작까지
           <div className="text-rose-500">
@@ -495,7 +495,7 @@ const GamePlay = () => {
           </div>
           남았습니다 <span className="h-16 w-16 animate-spin">🕛</span>
         </div>
-      )*/}
+      )}
 
       {/* blockScreen 아이템 화면 오버레이 부분 */}
       <div
