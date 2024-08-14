@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 
-import axiosInstance from "@/api/axiosInstance";
 import GameHeader from "@/components/GameHeader";
 import MapComponent from "@/components/MapComponent";
 import { GameContext } from "@/context/GameContext";
@@ -56,47 +55,11 @@ import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 import { BASE_URL } from "@/constants/baseURL";
 
 const APPLICATION_SERVER_URL =
-  process.env.NODE_ENV === "production"
-    ? BASE_URL
-    : "http://localhost:8080/cam/";
+  process.env.NODE_ENV === "production" ? BASE_URL : "http://localhost:8080/cam/";
 
 let count = 1;
 const GamePlay = () => {
-  //===========================   ITEM   ============================
-
-  const username = localStorage.getItem("username");
-  const { gameRoomId: gameId, isAlive } = useContext(GameContext);
-  const { blockGPSCount, blockScreenCount, enhancedBulletCount, useItem } =
-    useItemCount();
-
-  // // 테스트 데이터
-  // const blockGPSCount = 1;
-  // const blockScreenCount = 2;
-  // const enhancedBulletCount = 3;
-
-  const handleUseItem = async itemId => {
-    // alert(`${itemId}번 아이템 사용`); // 테스트
-    try {
-      const response = await axiosInstance.post("/in-game/useItem", {
-        username,
-        gameId,
-        itemId,
-      });
-
-      if (response.status == 200) {
-        useItem(itemId);
-      } else {
-        alert("아이템 사용중 오류가 발생했습니다.");
-      }
-    } catch (err) {
-      alert(
-        "서버와 통신하는 중에 문제가 발생했습니다. 나중에 다시 시도해주세요."
-      );
-    }
-  };
-
   //===========================   GPS   ============================
-
   const { gameStatus, blockScreen, toOffChatting } = useContext(GameContext);
   const { fetch, timeUntilStart, checkItemEffect } = useStartGame();
   const { startSendingGPS } = useSendGPS();
@@ -133,6 +96,11 @@ const GamePlay = () => {
     }
   }, [gameStatus]);
 
+  //===========================   ITEM   ============================
+
+  const { blockGPSCount, blockScreenCount, enhancedBulletCount } =
+    useItemCount();
+
   //===========================   OPENVIDU   ============================
 
   const [session, setSession] = useState(undefined); // 방 생성 관련
@@ -143,8 +111,8 @@ const GamePlay = () => {
   const audioEnabled = false;
 
   const ws = useRef(null);
+  const username = localStorage.getItem("username"); // 추가
   const { gameRoomId: paramGameRoomId } = useParams(); // 추가
-  // username 추출 코드 위로 옮김
 
 
   // toOffChatting 값이 true로 변경되면 leaveSession() 호출
@@ -403,27 +371,20 @@ const GamePlay = () => {
   return (
     <>
       {timeUntilStart > 0 && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-75 text-center text-3xl leading-relaxed text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white">
           게임 시작까지
-          <div className="text-rose-500">
-            {Math.max(0, Math.ceil(timeUntilStart / 1000))} 초
-          </div>
-          남았습니다 <span className="h-16 w-16 animate-spin">🕛</span>
+          <br /> {Math.max(0, Math.ceil(timeUntilStart / 1000))}초<br />
+          남았습니다.
         </div>
       )}
 
       {/* blockScreen 아이템 화면 오버레이 부분 */}
       <div
-        className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-75 text-center text-3xl leading-relaxed ${blockScreen ? "visible" : "hidden"}`}
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 text-3xl text-white ${blockScreen ? "visible" : "hidden"}`}
       >
-        내 타겟이 나에게
-        <div>
-          <span className="text-rose-500">방해 폭탄</span>을 쐈습니다 !
-        </div>
+        방해 폭탄을
         <br />
-        <div>화면을 30초 동안</div>
-        사용할 수 없습니다
-        <span className="h-12 w-16 animate-spin">😵</span>
+        맞았습니다!
       </div>
 
       {/* publisher 의 카메라 인자 전달 */}
@@ -432,8 +393,8 @@ const GamePlay = () => {
         handleMainVideoStream={handleMainVideoStream}
       />
 
-      <div className="m-2 flex items-center justify-around">
-        <div id="game-rule-dialog">
+      <div className="flex items-center justify-center">
+        <div id="game-rule-dialog" className="m-4">
           <Button
             onClick={() => setIsDialogOpen(true)}
             className="h-[6vh] w-32 bg-gradient-to-r from-teal-400 to-blue-700 font-bold shadow-3d"
@@ -483,7 +444,7 @@ const GamePlay = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     onClick={toggleItemList}
-                    className={`m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black ${isAlive ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                    className="m-2 h-[7vh] w-[7vh] flex-col rounded-full border-black bg-gradient-to-r from-lime-200 to-teal-400 text-black"
                   >
                     <img src={itemIcon} alt="item" />
                     <div className="text-xs">아이템</div>
@@ -492,11 +453,11 @@ const GamePlay = () => {
                 {isItemClicked && (
                   <DropdownMenuContent
                     side="left"
-                    className="mr-1 mt-12 h-28 w-60 rounded-2xl bg-white"
+                    className="mr-1 mt-12 h-28 w-60 rounded-2xl bg-lime-100"
                   >
                     <div className="flex flex-row">
                       <DropdownMenuItem
-                        onClick={() => handleUseItem(1)}
+                        onClick=""
                         className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                       >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
@@ -509,8 +470,8 @@ const GamePlay = () => {
                         <div className="text-xs font-bold">스텔스 망토</div>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleUseItem(2)}
-                        className={`relative flex flex-col ${blockScreenCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                        onClick=""
+                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                       >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
                           {blockScreenCount}
@@ -519,8 +480,8 @@ const GamePlay = () => {
                         <div className="text-xs font-bold">방해 폭탄</div>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleUseItem(3)}
-                        className={`relative flex flex-col ${enhancedBulletCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
+                        onClick=""
+                        className={`relative flex flex-col ${blockGPSCount > 0 ? "" : "pointer-events-none cursor-not-allowed opacity-30"}`}
                       >
                         <div className="absolute left-1 top-1 h-6 w-6 rounded-full bg-rose-500 text-center font-semibold text-white">
                           {enhancedBulletCount}
