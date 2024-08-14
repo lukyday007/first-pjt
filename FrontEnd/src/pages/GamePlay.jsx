@@ -474,10 +474,6 @@ const GamePlay = () => {
   
   
 
-
-
-  
-
   const getToken = async () => {
     const sessionId = await createSession(paramGameRoomId);
     return await createToken(sessionId);
