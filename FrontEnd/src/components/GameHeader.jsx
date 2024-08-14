@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { GameContext } from "@/context/GameContext";
 
 import {
@@ -16,7 +16,7 @@ import * as Popover from "@radix-ui/react-popover";
 
 // 미션 클릭 때 팝업될 카메라 비디오 인자 전달
 // { publisher, handleMainVideoStream }
-const GameHeader = ({ publisher, handleMainVideoStream }) => {
+const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
   const [isSpread, setIsSpread] = useState(null);
   const { targetId, missionList, playerCount } = useContext(GameContext);
 
@@ -28,6 +28,14 @@ const GameHeader = ({ publisher, handleMainVideoStream }) => {
     setOpenCamera(missionId);
     setIsSpread(true); // 드롭다운을 계속 열어둠
   };
+
+  useEffect(() => {
+    if (openCamera !== null) {
+      switchCamera(); // 후방 카메라로 전환
+    } else {
+      switchCamera(); // 정면 카메라로 다시 전환
+    }
+  }, [openCamera, switchCamera]);
 
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-700 to-teal-700 p-4">
