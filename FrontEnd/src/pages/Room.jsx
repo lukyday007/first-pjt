@@ -127,7 +127,7 @@ const Room = () => {
               />
             )} */}
             <div className="mb-12 text-center text-3xl font-bold leading-loose">
-              방 코드 : 12345678{gameCode}
+              방 코드 : {gameCode}
             </div>
           </>
         ) : (
