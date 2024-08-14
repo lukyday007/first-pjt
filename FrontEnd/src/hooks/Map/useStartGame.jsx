@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import { GameContext } from "@/context/GameContext";
-import useBullet from "@/hooks/Map/useBullet";
 import axiosInstance from "@/api/axiosInstance";
 
 // GamePlay.jsx에서 시작 프로세스 관리
@@ -14,13 +13,13 @@ const useStartGame = () => {
     setIsAlive,
     setMissionList,
     setItemList,
+    setBullet,
     setBlockScreen,
     setBlockGPS,
     setDistToCatch,
     DISTANCE_TO_CATCH,
     DISTANCE_ENHANCED_BULLET,
   } = useContext(GameContext);
-  const { getBullet } = useBullet();
   const [timeUntilStart, setTimeUntilStart] = useState(null);
 
   // 미션 및 아이템 목록 업데이트 함수
@@ -31,7 +30,8 @@ const useStartGame = () => {
 
   // 게임 시작 시간 처리 함수 별도 분리
   const handleStartGameTime = newStartTime => {
-    const startTimeValue = new Date(newStartTime).getTime();
+    const startTimeValue =
+      new Date(newStartTime).getTime() + 9 * 60 * 60 * 1000 - 55 * 1000; // 테스트용 (추후 "55 * 1000"은 제거 필요)
     sessionStorage.setItem("startTime", startTimeValue);
 
     const currentTime = new Date().getTime();
@@ -94,7 +94,7 @@ const useStartGame = () => {
         setAreaRadius(newAreaRadius);
         setAreaCenter(newAreaCenter);
         setTargetId(newTargetId);
-        getBullet(newBullet);
+        setBullet(newBullet);
 
         sessionStorage.setItem("areaRadius", newAreaRadius);
         sessionStorage.setItem("areaCenter", JSON.stringify(newAreaCenter));
@@ -117,10 +117,10 @@ const useStartGame = () => {
   };
 
   const checkItemEffect = () => {
-    const expirationTime = parseInt(
-      sessionStorage.getItem("effectExpirationTime"),
-      10
-    );
+    const expirationTime = sessionStorage.getItem("effectExpirationTime")
+      ? parseInt(sessionStorage.getItem("effectExpirationTime"), 10)
+      : null;
+
     const currentTime = Date.now();
 
     if (expirationTime) {

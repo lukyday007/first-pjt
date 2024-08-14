@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import QrScanner from "react-qr-scanner";
+// import QrScanner from "react-qr-scanner";
 import axiosInstance from "@/api/axiosInstance";
 
 import { Button } from "@components/ui/Button";
@@ -8,7 +8,8 @@ import GameSettingDialog from "@components/GameSettingDialog";
 
 import titleImage from "@assets/app-title.png";
 import plusIcon from "@assets/material-icon/plus-icon.svg";
-import qrcodeIcon from "@assets/material-icon/qrcode-icon.svg";
+// import qrcodeIcon from "@assets/material-icon/qrcode-icon.svg";
+import enterIcon from "@assets/material-icon/enter-icon.svg";
 import trophyIcon from "@assets/material-icon/trophy-icon.svg";
 import profileIcon from "@assets/material-icon/profile-icon.svg";
 import MyProfileDialog from "@/components/MyProfileDialog";
@@ -31,13 +32,15 @@ const Home = () => {
   const navigate = useNavigate();
   const [isGameSettingDialogOpen, setIsGameSettingDialogOpen] = useState(false);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
-  const [isQrReaderOpen, setIsQrReaderOpen] = useState(false);
+  // const [isQrReaderOpen, setIsQrReaderOpen] = useState(false);
 
   const username = localStorage.getItem("username");
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    sessionStorage.clear();
+    localStorage.clear();
+    document.cookie =
+      "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // 쿠키 삭제
 
     // 카카오 로그아웃
     window.Kakao.Auth.logout()
@@ -75,9 +78,9 @@ const Home = () => {
     }
   };
 
-  const handleQrError = err => {
-    console.error("QR Code Scan Error:", err);
-  };
+  // const handleQrError = err => {
+  //   console.error("QR Code Scan Error:", err);
+  // };
 
   return (
     <div className="bg-theme-color-2 h-screen">
@@ -96,7 +99,7 @@ const Home = () => {
             로그아웃
           </Button>
         </div>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-10">
           <ActionButton
             onClick={() => setIsGameSettingDialogOpen(true)}
             icon={plusIcon}
@@ -104,10 +107,11 @@ const Home = () => {
             label="방 만들기"
           />
           <ActionButton
-            onClick={() => setIsQrReaderOpen(true)}
-            icon={qrcodeIcon}
+            // onClick={() => setIsQrReaderOpen(true)}
+            onClick={() => navigate("/room-number")}
+            icon={enterIcon}
             color="bg-gradient-to-r from-teal-300 to-teal-600"
-            label="방 코드 찍기"
+            label="방 입장"
           />
           <ActionButton
             onClick={() => navigate("/rank")}
@@ -132,7 +136,8 @@ const Home = () => {
           onClose={() => setIsProfileDialogOpen(false)}
         />
 
-        {isQrReaderOpen && (
+        {/* QR 미사용 */}
+        {/* {isQrReaderOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
             <div className="flex flex-col items-center justify-center p-4">
               <div className="mb-4 text-4xl font-bold text-white">
@@ -159,7 +164,7 @@ const Home = () => {
               </Button>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
