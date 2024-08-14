@@ -11,7 +11,7 @@ import {
 
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production"
-    ? BASE_URL
+    ? BASE_URL + "/cam/"
     : "http://localhost:8080/cam/";
 
 const CamChatting = () => {
@@ -167,13 +167,12 @@ const CamChatting = () => {
             {session !== undefined ? (
                 <div id="session">
                     <div id="session-header">
-                        <h1 id="session-title">{mySessionId}</h1>
                         <input
                             className="btn btn-large btn-danger"
                             type="button"
                             id="buttonLeaveSession"
                             onClick={leaveRoomAndNavigate}
-                            value="Leave session"
+                            value="방 떠나기"
                         />
                     </div>
 

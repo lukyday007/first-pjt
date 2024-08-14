@@ -33,6 +33,7 @@ const Room = () => {
 
   const { handleStartGame } = useReadyGame();
 
+  // 테스트를 위한 최소 인원 제한 없음 
   const handleStartButtonClick = () => {
     if (gameRoomUsers.length >= 3) {
       handleStartGame();

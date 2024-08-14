@@ -54,6 +54,11 @@ import "../hooks/WebRTC/CamChatting.css";
 import OvVideo from "@/hooks/WebRTC/OvVideo.jsx";
 import { BASE_URL, WS_BASE_URL } from "@/constants/baseURL";
 
+// const APPLICATION_SERVER_URL =
+//   process.env.NODE_ENV === "production"
+//     ? BASE_URL + "/cam/"
+//     : "http://localhost:8080/cam/";
+
 const APPLICATION_SERVER_URL =
   process.env.NODE_ENV === "production"
     ? BASE_URL + "/cam/"
@@ -303,7 +308,7 @@ const GamePlay = () => {
         setMainStreamManager(newPublisher);
         setPublisher(newPublisher);
 
-        //================== WebSocket 연결 설정 ==========================
+        // //================== WebSocket 연결 설정 ==========================
         // ws.current = new WebSocket("ws://localhost:8080/ChattingServer");
         ws.current = new WebSocket(`${WS_BASE_URL}/ChattingServer`);
         ws.current.onopen = () => {
@@ -342,6 +347,7 @@ const GamePlay = () => {
           console.log("WebSocket error:", error);
           leaveSession();
         };
+
       } catch (permissionError) {
         console.error("Permission denied:", permissionError);
         alert(
