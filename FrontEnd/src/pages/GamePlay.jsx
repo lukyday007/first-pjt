@@ -361,8 +361,8 @@ const GamePlay = () => {
         setPublisher(newPublisher);
 
         //================== WebSocket 연결 설정 ==========================
-        ws.current = new WebSocket("ws://localhost:8080/ChattingServer");
-        // ws.current = new WebSocket(`${WS_BASE_URL}/ChattingServer`);
+        // ws.current = new WebSocket("ws://localhost:8080/ChattingServer");
+        ws.current = new WebSocket(`${WS_BASE_URL}/ChattingServer`);
         ws.current.onopen = () => {
           const message = {
             username: username,
