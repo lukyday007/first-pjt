@@ -149,9 +149,11 @@ const useGameWebSocket = () => {
       setBlockScreen(true); // GamePlay.jsx
       effectTimeoutRef.current = setTimeout(() => {
         setBlockScreen(false);
-        sessionStorage.removeItem("itemInEffect");
-        sessionStorage.removeItem("effectStartTime");
-        sessionStorage.removeItem("effectExpirationTime");
+        if (sessionStorage.getItem("itemInEffect") === "blockScreen") {
+          sessionStorage.removeItem("itemInEffect");
+          sessionStorage.removeItem("effectStartTime");
+          sessionStorage.removeItem("effectExpirationTime");
+        }
       }, 30 * 1000);
     } else if (effect === "blockGPS") {
       sessionStorage.setItem("itemInEffect", "blockGPS");
@@ -159,9 +161,11 @@ const useGameWebSocket = () => {
       setBlockGPS(true); // useTargetMarker.jsx
       effectTimeoutRef.current = setTimeout(() => {
         setBlockGPS(false);
-        sessionStorage.removeItem("itemInEffect");
-        sessionStorage.removeItem("effectStartTime");
-        sessionStorage.removeItem("effectExpirationTime");
+        if (sessionStorage.getItem("itemInEffect") === "blockGPS") {
+          sessionStorage.removeItem("itemInEffect");
+          sessionStorage.removeItem("effectStartTime");
+          sessionStorage.removeItem("effectExpirationTime");
+        }
       }, 30 * 1000);
     }
   };
@@ -175,6 +179,12 @@ const useGameWebSocket = () => {
     sessionStorage.removeItem("effectStartTime");
     sessionStorage.removeItem("effectExpirationTime");
     sessionStorage.removeItem("itemInEffect");
+
+    // 기존 타이머가 있다면 클리어
+    if (effectTimeoutRef.current) {
+      clearTimeout(effectTimeoutRef.current);
+      effectTimeoutRef.current = null;
+    }
   };
 
   return { connect, disconnect };
