@@ -100,7 +100,7 @@ public class GameRoomController {
     int maxCount = game.getMaxPlayer();
     int currCount = gameRoomService.getCurrentRoomPlayerCount(String.valueOf(game.getId()));
     if (currCount >= maxCount) {
-      return ResponseEntity.status(SUCCESS.getCode()).body(new EnterRoomResponse("Full", null));
+      return ResponseEntity.status(FAIL.getCode()).body(new EnterRoomResponse("Full", null));
     }
     return ResponseEntity.status(SUCCESS.getCode()).body(new EnterRoomResponse("Available",
         game.getId()));
