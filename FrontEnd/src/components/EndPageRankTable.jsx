@@ -3,9 +3,7 @@ import { Card } from "@/components/ui/Card";
 const EndPageRankTable = () => {
   const winner1 = sessionStorage.getItem("winner1");
   const winner2 = sessionStorage.getItem("winner2");
-  const rankingList = JSON.parse(sessionStorage.getItem("result")) || [
-    1, 2, 3, 4, 5, 6,
-  ];
+  const rankingList = JSON.parse(sessionStorage.getItem("result")) || [];
 
   return (
     <div>
