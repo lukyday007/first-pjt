@@ -103,7 +103,6 @@ public class GameRoomServiceImpl implements GameRoomService {
       if (acquired) {
         // "room:" + roomId 해시에 새로운 엔트리 추가
         redisObjectTemplate.opsForHash().put("room:" + roomId, sessionId, userName);
-        Map<String, String> usersInRoom = redisObjectTemplate.<String, String>opsForHash().entries("room:" + roomId);
       } else {
         log.info("{} 방에 아직 들어갈 수 없습니다.", roomId);
       }
