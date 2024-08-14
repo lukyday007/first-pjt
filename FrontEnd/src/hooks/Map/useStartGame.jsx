@@ -11,6 +11,7 @@ const useStartGame = () => {
     setAreaCenter,
     setTargetId,
     setIsAlive,
+    setPlayerCount,
     setMissionList,
     setItemList,
     setBullet,
@@ -51,9 +52,16 @@ const useStartGame = () => {
           clearInterval(intervalId);
           setTimeUntilStart(0);
           setGameStatus(true);
-          setIsAlive(true);
           sessionStorage.setItem("gameStatus", true);
-          sessionStorage.setItem("isAlive", true);
+
+          const savedIsAlive = sessionStorage.getItem("isAlive");
+          if (savedIsAlive == "true") {
+            setIsAlive(true);
+            sessionStorage.setItem("isAlive", true);
+          } else {
+            setIsAlive(false);
+            sessionStorage.setItem("isAlive", false);
+          }
         } else {
           setTimeUntilStart(updatedTimeUntilStart);
         }
@@ -86,11 +94,13 @@ const useStartGame = () => {
         const newTargetId = metadata.targetName;
         const newGamePlayTime = parseInt(metadata.gameInfo.time, 10) * 60; // 초 단위
         const newBullet = parseInt(metadata.bullets, 10);
+        const newPlayerCount = parseInt(metadata.playerCount);
 
         console.log(`newGamePlayTime: ${newGamePlayTime}`);
         console.log(`newBullet: ${newBullet}`);
 
         // 상태 업데이트
+        setPlayerCount(newPlayerCount);
         setAreaRadius(newAreaRadius);
         setAreaCenter(newAreaCenter);
         setTargetId(newTargetId);

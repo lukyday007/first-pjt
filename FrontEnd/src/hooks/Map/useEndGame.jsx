@@ -30,7 +30,7 @@ const useEndGame = () => {
 
     sessionStorage.setItem("winner1", data.winner1);
     sessionStorage.setItem("winner2", data.winner2);
-    sessionStorage.setItem("result", JSON.stringfy(data.result));
+    sessionStorage.setItem("result", JSON.stringify(data.result));
 
     navigate(`/ending/${gameRoomId}`);
   };

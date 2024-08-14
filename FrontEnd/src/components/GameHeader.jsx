@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { GameContext } from "@/context/GameContext";
 
 import {
@@ -24,23 +24,18 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
 
   const [openCamera, setOpenCamera] = useState(false);
 
-
   const handleMissionClick = missionId => {
     setOpenCamera(missionId);
     setIsSpread(true); // 드롭다운을 계속 열어둠
   };
 
-
   useEffect(() => {
     if (openCamera !== null) {
-      switchCamera();  // 후방 카메라로 전환
+      switchCamera(); // 후방 카메라로 전환
     } else {
-      switchCamera();  // 정면 카메라로 다시 전환
+      switchCamera(); // 정면 카메라로 다시 전환
     }
   }, [openCamera, switchCamera]);
-
-
-
 
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-700 to-teal-700 p-4">
@@ -51,7 +46,10 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
               타겟 : <span className="text-red-500">{targetId}</span>,
             </div>
             <div className="text-center font-bold">
-              남은 사람 : <span className="text-rose-500">{playerCount}</span>{" "}
+              남은 사람 :{" "}
+              <span className="text-rose-500">
+                {isNaN(playerCount) ? 0 : playerCount}
+              </span>{" "}
               명
             </div>
           </div>

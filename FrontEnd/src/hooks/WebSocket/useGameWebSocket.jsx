@@ -30,9 +30,11 @@ const useGameWebSocket = () => {
 
   const connect = () => {
     // WebSocket 연결 생성
-    console.log("test");
-    console.log(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
+    console.log(
+      `게임웹소켓 연결 시도중... : ${WS_BASE_URL}/gameRoom/${gameRoomId}`
+    );
     const socket = new WebSocket(`${WS_BASE_URL}/gameRoom/${gameRoomId}`);
+
     stompClient.current = Stomp.over(socket);
 
     // 사용자 이름 가져오기
@@ -42,14 +44,20 @@ const useGameWebSocket = () => {
     stompClient.current.connect(
       { username: username }, // 헤더에 username 추가
       frame => {
-        console.log("Connected:" + frame);
+        console.log("게임웹소켓 연결 완료, frame:", frame);
 
         // 메시지 구독 설정
         stompClient.current.subscribe(
           `/topic/play/${gameRoomId}`,
           serverMsg => {
-            const msg = JSON.parse(serverMsg.body);
-            handleAlertMessage(msg);
+            console.log("서버에서 게임웹소켓 메시지 수신됨:", serverMsg);
+            try {
+              const msg = JSON.parse(serverMsg.body);
+              console.log("게임웹소켓 메시지 수신 완료:", msg); // 이 메시지가 안나오면 구독 경로 또는 WebSocket 서버 설정 문제
+              handleAlertMessage(msg);
+            } catch (error) {
+              console.error("게임웹소켓 메시지 수신 실패:", error);
+            }
           }
         );
       },
@@ -101,11 +109,12 @@ const useGameWebSocket = () => {
         setGameStatus(false);
         setToOffChatting(true); // 종료 시 true로 변환
         alert("게임 종료!");
-        const data = JSON.parse(msg.data);
+        const data = msg.data;
         endGame(data);
         break;
       case "playerCount":
         const count = parseInt(msg.count, 10);
+        console.log("웹소켓 메시지로 받는 남은 인원수 : " + count);
         setPlayerCount(count);
         alert(`남은 인원 수: ${count}`);
         break;
