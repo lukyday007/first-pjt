@@ -101,9 +101,9 @@ export const GameProvider = ({ children }) => {
 
   useEffect(() => {
     myLocationRef.current = myLocation;
-    console.log(
-      `myLocation: ${myLocationRef.current.lat} ${myLocationRef.current.lng}`
-    );
+    // console.log(
+    //   `myLocation: ${myLocationRef.current.lat} ${myLocationRef.current.lng}`
+    // );
   }, [myLocation]);
 
   useEffect(() => {
