@@ -137,6 +137,7 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
                       publisher={publisher} // publisher 전달
                       missionId={mission.missionId}
                       handleMainVideoStream={handleMainVideoStream} // handleMainVideoStream 전달
+                      switchCamera={switchCamera}
                     />
                   </Popover.Content>
                 </Popover.Root>
