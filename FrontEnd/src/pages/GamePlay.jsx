@@ -95,6 +95,9 @@ const GamePlay = () => {
 
       if (response.status == 200) {
         useItem(itemId);
+        if (itemId == 3) {
+          alert("강화 총알 효과가 30초간 적용됩니다!");
+        }
       } else {
         alert("아이템 사용중 오류가 발생했습니다.");
       }
@@ -125,15 +128,15 @@ const GamePlay = () => {
     setIsItemClicked(prevState => !prevState);
   };
 
-  // useEffect(() => {
-  //   connect();
-  //   fetch();
-  //   checkItemEffect();
+  useEffect(() => {
+    connect();
+    fetch();
+    checkItemEffect();
 
-  //   return () => {
-  //     disconnect();
-  //   };
-  // }, []);
+    return () => {
+      disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (gameStatus) {
@@ -668,7 +671,7 @@ const GamePlay = () => {
             </Button>
             {/* ==================   비디오 시작!  ===================*/}
             {session !== undefined ? (
-              <div className="flex items-center justify-center">
+              <div>
                 {/* <h1 id="session-title">{mySessionId}</h1> */}
                 {/* <div style={{overflow: "hidden"}}> */}
                 {mainStreamManager === undefined ? (
@@ -689,7 +692,7 @@ const GamePlay = () => {
                 */}
 
                 <Carousel opts={{ align: "start" }}>
-                  <CarouselContent className="[h-40vh] overflow-hidden">
+                  <CarouselContent>
                     {subscribers
                       .filter(sub => sub !== publisher) // publisher와 동일한 객체 필터링
                       .map((sub, index) => (
@@ -702,19 +705,24 @@ const GamePlay = () => {
                       ))}
                   </CarouselContent>
                 </Carousel>
-                <div className="m-4 grid grid-cols-2 gap-4">
+                <div className="m-4">
                   {subscribers.map((subscriber, idx) => {
                     const clientData = JSON.parse(
                       subscriber.stream.connection.data
                     ).clientData;
                     return (
-                      <Button
-                        key={idx}
-                        onClick={() => handleButtonClick(clientData)}
-                        className="w-40 bg-gradient-to-r from-purple-600 to-teal-300 p-2"
-                      >
-                        {clientData}
-                      </Button>
+                      // <Button key={idx} onClick={handleButtonClick}>
+                      //   {clientData}
+                      // </Button>
+                      <div className="grid grid-cols-2 gap-4">
+                        <Button
+                          key={idx}
+                          onClick={() => handleButtonClick(clientData)}
+                          className="bg-gradient-to-r from-purple-600 to-teal-300 p-2"
+                        >
+                          {clientData}
+                        </Button>
+                      </div>
                     );
                   })}
                 </div>

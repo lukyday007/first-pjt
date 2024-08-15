@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './styles.css'; 
 
 export default class MissionVideo extends Component {
     constructor(props) {
@@ -6,7 +7,7 @@ export default class MissionVideo extends Component {
         this.videoRef = React.createRef();
 
         // 메서드 바인딩
-        this.applyVideoInversion = this.applyVideoInversion.bind(this);
+        // this.applyVideoInversion = this.applyVideoInversion.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -34,6 +35,6 @@ export default class MissionVideo extends Component {
 
     render() {
         // 비디오 요소 생성 및 ref 연결
-        return <video autoPlay={true} ref={this.videoRef} style={{ width: '100%', height: 'auto' }} />;
+        return <video autoPlay={true} ref={this.videoRef} className="w-full h-auto transform rotate-y-180" />;
     }
 }
