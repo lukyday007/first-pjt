@@ -23,19 +23,27 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
   //================= 카메라 미션 =========================
 
   const [openCamera, setOpenCamera] = useState(false);
+  const [currentCameraFacingMode, setCurrentCameraFacingMode] = useState("user");
+
 
   const handleMissionClick = missionId => {
     setOpenCamera(missionId);
     setIsSpread(true); // 드롭다운을 계속 열어둠
+
+    if (currentCameraFacingMode !== "environment") {
+      setCurrentCameraFacingMode("environment");
+      switchCamera("environment"); // 후방 카메라로 전환
+    }
   };
 
-  useEffect(() => {
-    if (openCamera !== null) {
-      switchCamera(); // 후방 카메라로 전환
-    } else {
-      switchCamera(); // 정면 카메라로 다시 전환
-    }
-  }, [openCamera, switchCamera]);
+  // useEffect(() => {
+  //   if (!openCamera && currentCameraFacingMode !== "user") {
+  //     setCurrentCameraFacingMode("user");
+  //     switchCamera("user"); // 정면 카메라로 다시 전환
+  //   }
+  // }, [openCamera, switchCamera, currentCameraFacingMode]);
+
+
 
   return (
     <div className="flex flex-col items-center justify-center bg-gradient-to-r from-blue-700 to-teal-700 p-4">
@@ -129,6 +137,7 @@ const GameHeader = ({ switchCamera, publisher, handleMainVideoStream }) => {
                       publisher={publisher} // publisher 전달
                       missionId={mission.missionId}
                       handleMainVideoStream={handleMainVideoStream} // handleMainVideoStream 전달
+                      switchCamera={switchCamera}
                     />
                   </Popover.Content>
                 </Popover.Root>

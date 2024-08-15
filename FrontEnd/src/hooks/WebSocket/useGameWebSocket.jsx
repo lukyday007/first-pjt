@@ -23,12 +23,41 @@ const useGameWebSocket = () => {
   const stompClient = useRef(null);
   const areaRadiusRef = useRef(areaRadius);
   const effectTimeoutRef = useRef(null); // 현재 실행 중인 타이머를 저장하는 변수
+  const reconnectAttempts = useRef(0); // 재연결 시도 횟수를 저장하는 변수
+  const maxReconnectAttempts = 5; // 최대 재연결 시도 횟수
 
   useEffect(() => {
     areaRadiusRef.current = areaRadius;
   }, [areaRadius]);
 
+  // 끊길 시 재연결에 관한 로직
+  const handleDisconnect = () => {
+    if (reconnectAttempts.current < maxReconnectAttempts) {
+      reconnectAttempts.current += 1;
+      console.log(
+        `재연결 시도 중... (${reconnectAttempts.current}/${maxReconnectAttempts})`
+      );
+      setTimeout(() => {
+        connect();
+      }, 1000); // 1초 후 재연결 시도
+    } else {
+      console.error(
+        "최대 재연결 시도 횟수를 초과했습니다. 페이지를 새로고침합니다."
+      );
+      window.location.reload(); // 최대 시도 횟수를 초과하면 페이지 새로고침
+    }
+  };
+
   const connect = () => {
+    // 기본 연결 상태 체크
+    if (
+      stompClient.current &&
+      stompClient.current.ws.readyState === WebSocket.OPEN
+    ) {
+      console.log("이미 연결된 WebSocket이 있습니다.");
+      return;
+    }
+
     // WebSocket 연결 생성
     console.log(
       `게임웹소켓 연결 시도중... : ${WS_BASE_URL}/gameRoom/${gameRoomId}`
@@ -46,11 +75,14 @@ const useGameWebSocket = () => {
       frame => {
         console.log("게임웹소켓 연결 완료, frame:", frame);
 
+        // 재연결 시도 횟수 초기화
+        reconnectAttempts.current = 0;
+
         // 메시지 구독 설정
         stompClient.current.subscribe(
           `/topic/play/${gameRoomId}`,
           serverMsg => {
-            console.log("서버에서 게임웹소켓 메시지 수신됨:", serverMsg);
+            console.log("서버에서 게임웹소켓 메시지 수신됨:", serverMsg.body);
             try {
               const msg = JSON.parse(serverMsg.body);
               console.log("게임웹소켓 메시지 수신 완료:", msg); // 이 메시지가 안나오면 구독 경로 또는 WebSocket 서버 설정 문제
@@ -58,23 +90,43 @@ const useGameWebSocket = () => {
             } catch (error) {
               console.error("게임웹소켓 메시지 수신 실패:", error);
             }
+            // let jsonString = serverMsg.body;
+            // try {
+            //   // 먼저 JSON 파싱 시도
+            //   let parsedData = JSON.parse(jsonString);
+
+            //   // 만약 `result`가 문자열로 되어 있다면
+            //   if (typeof parsedData.result === "string") {
+            //     parsedData.result = JSON.parse(parsedData.result);
+            //   }
+
+            //   console.log(`parsedData: ${parsedData}`);
+            //   handleAlertDegree(parsedData);
+            // } catch (error) {
+            //   console.error("JSON 파싱 실패:", error);
+            // }
           }
         );
       },
       error => {
         console.error("STOMP connection error:", error);
+        handleDisconnect();
       }
     );
+
+    socket.onclose = () => {
+      console.log("WebSocket 연결이 종료되었습니다.");
+      handleDisconnect();
+    };
   };
 
   const disconnect = () => {
-    if (
-      stompClient.current &&
-      stompClient.current.ws.readyState === WebSocket.OPEN
-    ) {
-      stompClient.current.disconnect(() => {
-        console.log("Disconnect");
-      });
+    if (stompClient.current) {
+      if (stompClient.current.ws.readyState === WebSocket.OPEN) {
+        stompClient.current.disconnect(() => {
+          console.log("Disconnect");
+        });
+      }
       stompClient.current = null;
     }
   };
@@ -88,7 +140,7 @@ const useGameWebSocket = () => {
           const newTargetId = msg.target;
           setTargetId(newTargetId);
           sessionStorage.setItem("targetId", newTargetId);
-          alert(`타겟 변경: ${newTargetId}`);
+          alert(`타겟이 변경되었습니다: ${newTargetId}`);
         }
         break;
       case "eliminated":
@@ -103,14 +155,13 @@ const useGameWebSocket = () => {
         break;
       case "alert":
         handleAlertDegree(msg.alertDegree);
-        alert(`alert: ${msg.alertDegree}`);
+        alert(`영역 축소 ${msg.alertDegree}단계 발동`);
         break;
       case "end": // 게임 종료 조건(인원수)
         setGameStatus(false);
         setToOffChatting(true); // 종료 시 true로 변환
-        alert("게임 종료!");
-        const data = msg.data;
-        endGame(data);
+        alert("게임이 종료되었습니다.");
+        endGame(msg);
         break;
       case "playerCount":
         const count = parseInt(msg.count, 10);
@@ -123,7 +174,6 @@ const useGameWebSocket = () => {
         const affected = msg.username;
         if (username === affected) {
           handleItemEffect(effect);
-          alert(`아이템을 맞았습니다! ${effect}`);
         }
         break;
       default:
@@ -160,7 +210,7 @@ const useGameWebSocket = () => {
 
     if (effect === "blockScreen") {
       sessionStorage.setItem("itemInEffect", "blockScreen");
-      alert("방해 폭탄 공격");
+      alert("방해 폭탄 공격을 맞았습니다!");
       setBlockScreen(true); // GamePlay.jsx
       effectTimeoutRef.current = setTimeout(() => {
         setBlockScreen(false);
@@ -172,7 +222,7 @@ const useGameWebSocket = () => {
       }, 30 * 1000);
     } else if (effect === "blockGPS") {
       sessionStorage.setItem("itemInEffect", "blockGPS");
-      alert("스텔스 망토 작동");
+      alert("상대가 스텔스 망토를 작동했습니다!");
       setBlockGPS(true); // useTargetMarker.jsx
       effectTimeoutRef.current = setTimeout(() => {
         setBlockGPS(false);

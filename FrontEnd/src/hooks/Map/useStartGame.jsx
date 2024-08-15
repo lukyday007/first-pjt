@@ -32,7 +32,7 @@ const useStartGame = () => {
   // 게임 시작 시간 처리 함수 별도 분리
   const handleStartGameTime = newStartTime => {
     const startTimeValue =
-      new Date(newStartTime).getTime() + 9 * 60 * 60 * 1000 - 55 * 1000; // 테스트용 (추후 "55 * 1000"은 제거 필요)
+      new Date(newStartTime).getTime() + 9 * 60 * 60 * 1000;
     sessionStorage.setItem("startTime", startTimeValue);
 
     const currentTime = new Date().getTime();
@@ -95,6 +95,7 @@ const useStartGame = () => {
         const newGamePlayTime = parseInt(metadata.gameInfo.time, 10) * 60; // 초 단위
         const newBullet = parseInt(metadata.bullets, 10);
         const newPlayerCount = parseInt(metadata.playerCount);
+        const newIsAlive = metadata.status == "alive" ? true : false;
 
         console.log(`newGamePlayTime: ${newGamePlayTime}`);
         console.log(`newBullet: ${newBullet}`);
@@ -105,12 +106,14 @@ const useStartGame = () => {
         setAreaCenter(newAreaCenter);
         setTargetId(newTargetId);
         setBullet(newBullet);
+        setIsAlive(newIsAlive);
 
         sessionStorage.setItem("areaRadius", newAreaRadius);
         sessionStorage.setItem("areaCenter", JSON.stringify(newAreaCenter));
         sessionStorage.setItem("targetId", newTargetId);
         sessionStorage.setItem("gamePlayTime", newGamePlayTime);
         sessionStorage.setItem("bullets", newBullet);
+        sessionStorage.setItem("isAlive", newIsAlive);
 
         // 미션 및 아이템 업데이트
         updateMissionAndItems(metadata.myMissions, metadata.myItems);

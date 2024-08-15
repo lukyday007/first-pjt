@@ -319,7 +319,7 @@ const GamePlay = () => {
         console.warn(exception);
       });
 
-      newSession.on("sessionDisconnected", async event => {});
+      newSession.on("sessionDisconnected", async (event) => {});
       setSession(newSession);
       room.data = newSession;
     }
@@ -415,6 +415,7 @@ const GamePlay = () => {
     }
   }, [username, session, subscribers]);
 
+
   useEffect(() => {
     const initSession = async () => {
       if (!session) {
@@ -424,41 +425,59 @@ const GamePlay = () => {
     initSession();
   }, []);
 
+
   const switchCamera = useCallback(async () => {
-    if (!currentVideoDevice || !session) return;
-
+    if (!session || !publisher) return;
+  
     try {
-      const OV = new OpenVidu(); // switchCamera에서도 OV를 선언
-      const devices = await OV.getDevices();
-      const videoDevices = devices.filter(
-        device => device.kind === "videoinput"
-      );
+      // 우선 환경 설정으로 후방 카메라 시도 (environment)
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } },
+        audio: false,
+      });
+      console.log("아이폰 시작! mediaStream =====> ",  mediaStream);
+      
+      const newTrack = mediaStream.getVideoTracks()[0];
+      console.log("아이폰 시작! newTrack =====> ",  newTrack);
 
-      if (videoDevices.length > 1) {
-        const newVideoDevice = videoDevices.find(
-          device => device.deviceId !== currentVideoDevice.deviceId
+      await publisher.replaceTrack(newTrack);
+      console.log("New track has been published using facingMode: environment");
+  
+    } catch (error) {
+      console.warn("facingMode: 'environment' failed, trying with deviceId", error);
+  
+      // facingMode가 실패할 경우, deviceId 방식으로 시도
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === "videoinput");
+        console.log("갤럭시 시작! videoDevices ====> ", videoDevices);
+        
+        const rearCamera = videoDevices.find(device => 
+          device.label.toLowerCase().includes("back") ||
+          device.label.toLowerCase().includes("rear") ||
+          device.label.toLowerCase().includes("환경") ||
+          device.label.toLowerCase().includes("후면")
         );
-
-        if (newVideoDevice) {
-          const newPublisher = OV.initPublisher(undefined, {
-            videoSource: newVideoDevice.deviceId,
-            publishAudio: true,
-            publishVideo: true,
-            mirror: true,
-          });
-
-          await session.unpublish(mainStreamManager);
-          await session.publish(newPublisher);
-
-          setCurrentVideoDevice(newVideoDevice);
-          setMainStreamManager(newPublisher);
-          setPublisher(newPublisher);
-        }
+        console.log("갤럭시 시작! rearCamera ====> ", rearCamera);
+  
+        const selectedDeviceId = rearCamera ? rearCamera.deviceId : videoDevices[0].deviceId;
+  
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: selectedDeviceId } },
+          audio: false,
+        });
+  
+        const newTrack = mediaStream.getVideoTracks()[0];
+        await publisher.replaceTrack(newTrack);
+        console.log("New track has been published using deviceId");
+  
+      } catch (fallbackError) {
+        console.error("Error switching camera with both facingMode and deviceId", fallbackError);
       }
-    } catch (e) {
-      console.error(e);
     }
-  }, [session, mainStreamManager, currentVideoDevice]);
+  }, [session, publisher]);
+  
+  
 
   const getToken = async () => {
     const sessionId = await createSession(paramGameRoomId);
