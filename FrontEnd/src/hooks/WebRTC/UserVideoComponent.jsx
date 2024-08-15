@@ -26,9 +26,10 @@ export default class UserVideoComponent extends Component {
       <div>
         {/* {this.props.streamManager !== undefined ? ( */}
         <div className="streamcomponent">
+          <div className="h-[40vh]"></div>
           <OpenViduVideoComponent
-            style={{ height: "40%" }} // 테스트 해서 높이 조정해야함
             streamManager={this.props.streamManager}
+            className="h-[40vh]"
           />
           <div>
             <p>{this.getNicknameTag()}</p>
