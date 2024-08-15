@@ -194,7 +194,7 @@ const GamePlay = () => {
     const parsedPublisherName = parsedData.clientData;
 
     if (userInvitationStatus[username]?.isInviting || userInvitationStatus[parsedPublisherName]?.isBeingInvited) {
-      alert(`다른 유저로 부터 초대중입니다`);
+      alert(`다른 유저로부터 초대중입니다`);
       return;
     }
 
@@ -215,8 +215,6 @@ const GamePlay = () => {
           privateRoom: "Room" + Math.floor(Math.random() * 100),
         };
         ws.current.send(`click:${JSON.stringify(message)}`);
-
-
       } catch (error) {
         console.error("Error creating or sending offer:", error);
       }
