@@ -27,7 +27,7 @@ const CamChatting = () => {
     const [subscribers, setSubscribers] = useState([]);
     const [currentVideoDevice, setCurrentVideoDevice] = useState(undefined);
     const initializedRef = useRef(false);
-    const [timeLeft, setTimeLeft] = useState(30);  // 남은 시간을 상태로 관리
+    const [timeLeft, setTimeLeft] = useState(20);  // 남은 시간을 상태로 관리
 
     const room = useRef(null);
     const timeoutRef = useRef(null);  // 타이머를 저장하는 ref
@@ -47,7 +47,7 @@ const CamChatting = () => {
             // 30초 후에 자동으로 나가기 설정
             timeoutRef.current = setTimeout(() => {
                 leaveRoomAndNavigate();  // 30초 후에 나가게 하는 함수 호출
-            }, 30000);  // 50,000ms = 30초
+            }, 20000);  // 20,000ms = 20초
 
             intervalRef.current = setInterval(() => {
                 setTimeLeft(prevTime => prevTime - 1);
