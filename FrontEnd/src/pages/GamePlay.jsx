@@ -243,8 +243,6 @@ const GamePlay = () => {
             [fromUser.current]: { isInviting: false, isBeingInvited: false },
           }));
 
-          console.log("========================")
-          console.log("상태 초기화: "+userInvitationStatus)
         } catch (error) {
           console.error("Error creating or sending answer:", error);
         }
