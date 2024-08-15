@@ -194,7 +194,7 @@ const GamePlay = () => {
     const parsedPublisherName = parsedData.clientData;
 
     if (userInvitationStatus[username]?.isInviting || userInvitationStatus[parsedPublisherName]?.isBeingInvited) {
-      alert(`${username} 또는 ${parsedPublisherName}는 이미 초대 중이거나 초대받고 있습니다.`);
+      alert(`다른 유저로 부터 초대중입니다`);
       return;
     }
 
@@ -215,6 +215,8 @@ const GamePlay = () => {
           privateRoom: "Room" + Math.floor(Math.random() * 100),
         };
         ws.current.send(`click:${JSON.stringify(message)}`);
+
+
       } catch (error) {
         console.error("Error creating or sending offer:", error);
       }
@@ -243,6 +245,8 @@ const GamePlay = () => {
             [fromUser.current]: { isInviting: false, isBeingInvited: false },
           }));
 
+          console.log("========================")
+          console.log("상태 초기화: "+userInvitationStatus)
         } catch (error) {
           console.error("Error creating or sending answer:", error);
         }
