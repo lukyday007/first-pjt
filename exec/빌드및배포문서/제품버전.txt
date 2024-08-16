@@ -1,0 +1,16 @@
+-Frontend
+react : 18.3.1
+javascript : 6.0.2
+vite : 5.3.1
+axios : 1.7.2
+tailwind CSS : 3.4.5
+shadcn/ui : 0.8.0
+
+-Backend
+SpringBoot : 3.2.7
+JDK17 : 17.0.11
+JPA : 3.2.7
+Querydsl : 5.0.0
+JWT : 0.12.5
+Mysql : 9.0.1
+Rdis : 7.4.0
