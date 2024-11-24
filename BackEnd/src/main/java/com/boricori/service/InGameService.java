@@ -9,6 +9,7 @@ import com.boricori.entity.Item;
 import com.boricori.entity.Mission;
 import com.boricori.entity.User;
 
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 public interface InGameService {
@@ -39,12 +40,16 @@ public interface InGameService {
 
   Mission getMissionById(long missionId);
 
-  void addGamePlayerScore(long gameId);
+  List<GameParticipants> updateWinnerScore(long gameId);
 
-  GameResult finishGameAndHandleLastTwoPlayers(long gameId);
+  GameResult finishGameAndHandleLastTwoPlayers(long gameId, List<GameParticipants> winners);
 
   void finishGame(long gameId);
 
   // redis expired = 4 일 때, 타임아웃 종료
   GameResult gameTimeout(long gameId);
+
+  //임시
+  @Transactional
+  void tempGiveItem(GameParticipants player);
 }
