@@ -44,10 +44,11 @@ public class GameParticipants {
   private int score;
 
   @Builder
-  public GameParticipants(GameRoom gameRoom, User user) {
+  public GameParticipants(GameRoom gameRoom, User user, int bullets) {
     this.gameRoom = gameRoom;
     this.user = user;
     alive = true;
+    this.bullets = bullets;
   }
 
   public void eliminate() {
@@ -71,6 +72,10 @@ public class GameParticipants {
 
   public void getBullet() {
     this.bullets++;
+  }
+
+  public void addScore(int add){
+    score += add;
   }
 
 

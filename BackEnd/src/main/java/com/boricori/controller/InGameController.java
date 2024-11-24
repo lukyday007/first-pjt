@@ -28,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.boricori.dto.GameResult;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "게임 컨트롤러", description = "게임 진행 중 일어나는 이벤트 관리")
@@ -97,8 +96,10 @@ public class InGameController {
         Item item = inGameService.getItem(player);
         return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(ItemResponse.of(item));
       }
-      return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body(null);
-      } catch (IOException e) {
+      System.out.println("mission fail");
+      return ResponseEntity.status(ResponseEnum.CREATED.getCode()).body(null);
+    }catch (Exception e){
+      e.printStackTrace();
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
   }
@@ -116,6 +117,8 @@ public class InGameController {
     if (itemId == 1 || itemId == 2){
       Node<User> hunter = gameManager.identifyHunter(gameId, username);
       String effect = itemId == 1 ? "blockGPS" : "blockScreen";
+      System.out.println("====================hunter: " + hunter.data.getUsername());
+      System.out.println("====================effect: " + effect);
       messageService.useItem(gameId, hunter.data.getUsername(), effect);
     }
   }
@@ -129,17 +132,18 @@ public class InGameController {
       Node<User> targetNode = gameManager.catchTargetForUser(gameId, username);
       Node<User> newTarget = targetNode.next;
       messageService.changeTarget(username, newTarget.data.getUsername(), gameId);
-      messageService.eliminateUser(targetNode.data.getUsername(), gameId);
+      messageService.notifyEliminated(targetNode.data.getUsername(), gameId);
+      messageService.playersCount(gameId, gameManager.numPlayers(gameId));
       User user = userService.findByUsername(username);
       inGameService.catchTarget(user, targetNode.data, gameId);
 
       if (gameManager.isLastTwo(gameId)) {
-        inGameService.addGamePlayerScore(gameId);
-        GameResult res = inGameService.finishGameAndHandleLastTwoPlayers(gameId);
+        List<GameParticipants> winners = inGameService.updateWinnerScore(gameId);
+        GameResult res = inGameService.finishGameAndHandleLastTwoPlayers(gameId, winners);
         messageService.endGameScore(res);
-        return ResponseEntity.status(ResponseEnum.REDIRECT.getCode()).body("게임 종료");
+        return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("END");
       }else {
-          return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("잡았습니다.");
+          return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body("CONTINUE");
       }
     } catch (Exception e) {
       return ResponseEntity.status(ResponseEnum.FAIL.getCode()).body("알 수 없는 오류");
@@ -154,16 +158,19 @@ public class InGameController {
   public ResponseEntity<InitResponse> initiate(@PathVariable long gameId, HttpServletRequest req){
     String username = (String) req.getAttribute("username");
     try{
+      System.out.println("===================init called================");
+      int playerCnt = gameManager.numPlayers(gameId);
       GameParticipants player = inGameService.checkIfPlayer(username, gameId);
       GameRoom game = gameRoomService.findGame(gameId);
       if (!player.isAlive()){ // 게임이 진행중이고, 플레이어는 아웃된 상태
-        InitResponse data = InitResponse.builder().status("dead").gameInfo(GameInfo.of(game)).build();
+        InitResponse data = InitResponse.builder().status("dead").gameInfo(GameInfo.of(game)).playerCount(playerCnt).build();
         return ResponseEntity.status(ResponseEnum.SUCCESS.getCode()).body(data);
       }
-      // 플레이어가 살아있는 상태. 게임 시작전일수도, 진행중일 수도 있음
+      // 플레이어가 살아있는 상태. 게임 시작전일수도, 진행중일 수도 있음git p
       User target = gameManager.identifyTarget(gameId, username).data;
       List<MissionResponse> myMissions = inGameService.getMissions(player);
       List<ItemCount> myItems = null;
+      myItems = inGameService.getPlayerItems(player); // 임시값
 
       if (myMissions == null || myMissions.isEmpty()){
         // 게임 시작 전 초기 설정 단계
@@ -175,10 +182,14 @@ public class InGameController {
       return ResponseEntity.status(ResponseEnum.SUCCESS.getCode())
           .body(InitResponse.builder().status("alive").gameInfo(GameInfo.of(game))
               .targetName(target.getUsername()).myMissions(myMissions).myItems(myItems).bullets(
-                  player.getBullets()).build());
+                  player.getBullets()).playerCount(playerCnt).build());
 
     }catch (NotAPlayerException e){
       return ResponseEntity.status(ResponseEnum.NOT_ACCEPTABLE.getCode()).body(null);
+    }catch (Exception e){
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+      return null;
     }
   }
 
@@ -212,10 +223,12 @@ public class InGameController {
     long gameId = request.getGameId();
     String username = request.getUsername();
     inGameService.eliminateUser(username, gameId);
-    messageService.eliminateUser(username,gameId);
+    messageService.notifyEliminated(username,gameId);
     Node<User> hunter = gameManager.removePlayerAndReturnHunter(gameId, username);
+    messageService.playersCount(gameId, gameManager.numPlayers(gameId));
     if (gameManager.isLastTwo(gameId)) {
-      GameResult res = inGameService.finishGameAndHandleLastTwoPlayers(gameId);
+      List<GameParticipants> winners = inGameService.updateWinnerScore(gameId);
+      GameResult res = inGameService.finishGameAndHandleLastTwoPlayers(gameId, winners);
       messageService.endGameScore(res);
     }else{
       messageService.changeTarget(hunter.data.getUsername(), hunter.next.data.getUsername(), gameId);
